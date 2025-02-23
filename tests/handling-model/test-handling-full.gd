@@ -74,10 +74,11 @@ func body(data: Dictionary):
 	var ttt = result["brake"]
 	var msg = "gear=" + str(params["gear"]) \
 			+ " hb=" + str(params["handbrake"]) \
+			+ " rpm=" + str(params["rpm"]) \
 			+ " v=" + str(params["linear_velocity"]) \
 			+ " w=" + str(params["angular_velocity"]) \
 			+ " bi=" + str(params["brake_input"])
-	#assert_eq(result["rpm"], expected_rpm, msg)
+	assert_almost_eq(result["rpm"], expected_rpm, 1, msg)
 	#assert_eq(result["handbrake"], expected_handbrake, msg)
 	assert_eq(result["gear"], expected_gear, msg)
 	assert_almost_eq(result["linear_velocity"], expected_velocity, Vector3.ONE * 0.01, msg)
