@@ -136,6 +136,21 @@ func process_car_extras(root: Node, data: Dictionary):
 	root.set_meta("performance", data["performance"])
 	root.set_meta("type", "car")
 	root.set_meta("color_set", color_set)
+	var samples = data["audio_samples"]
+	var engine_audio = EngineAudio.new()
+	engine_audio.idle = AudioStreamWAV.new()
+	engine_audio.idle.data = Marshalls.base64_to_raw(samples["2"]).decompress(10000000, FileAccess.COMPRESSION_GZIP)
+	engine_audio.load_1 = load("res://import/audio/out_3.wav")
+	engine_audio.load_2 = load("res://import/audio/out_4.wav")
+	engine_audio.load_3 = load("res://import/audio/out_5.wav")
+	engine_audio.load_4 = load("res://import/audio/out_6.wav")
+	for table in data["sound_tables"]["load"]:
+		engine_audio.volume_tables.append(table["volume"])
+		engine_audio.pitch_tables.append(table["pitch"])
+	var emitter = preload("res://core/car/car_engine_audio.tscn").instantiate()
+	emitter.stream = engine_audio
+	root.add_child(emitter)
+	emitter.owner = root
 
 func get_image_by_name(state: GLTFState, name: String) -> CompressedTexture2D:
 	var images = state.get_images()
