@@ -127,6 +127,27 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 		checked_node.set_meta("surface_type", surface_type)
 	return OK
 
+
+func _load_stream(sample: Dictionary) -> EngineSample:
+	var params = {
+		"edit/loop_mode": 2,
+		"edit/loop_end": -1,
+		"edit/loop_begin": 0,
+		"compress/mode": 0,
+		"force/max_rate_hz": 22050
+	}
+	var decoded = Marshalls.base64_to_raw(sample["sample"])
+	var wav = AudioStreamWAV.load_from_buffer(decoded, params)
+	var result = EngineSample.new()
+	result.sample = wav
+	result.rear = sample["is_rear"]
+	for table in sample["tables"]:
+		result.volume_tables.append(table["volume"])
+		result.pitch_tables.append(table["pitch"])
+		result.is_load_table.append(table["type"] == "load")
+	return result
+
+
 func process_car_extras(root: Node, data: Dictionary):
 	var dimensions = data["dimensions"]
 	var color_set: Array[CarColorSet]
@@ -136,17 +157,22 @@ func process_car_extras(root: Node, data: Dictionary):
 	root.set_meta("performance", data["performance"])
 	root.set_meta("type", "car")
 	root.set_meta("color_set", color_set)
-	var samples = data["audio_samples"]
 	var engine_audio = EngineAudio.new()
-	engine_audio.idle = AudioStreamWAV.new()
-	engine_audio.idle.data = Marshalls.base64_to_raw(samples["2"]).decompress(10000000, FileAccess.COMPRESSION_GZIP)
-	engine_audio.load_1 = load("res://import/audio/out_3.wav")
-	engine_audio.load_2 = load("res://import/audio/out_4.wav")
-	engine_audio.load_3 = load("res://import/audio/out_5.wav")
-	engine_audio.load_4 = load("res://import/audio/out_6.wav")
-	for table in data["sound_tables"]["load"]:
-		engine_audio.volume_tables.append(table["volume"])
-		engine_audio.pitch_tables.append(table["pitch"])
+	var i = 0
+	for sample in data["engine_samples"]:
+		engine_audio.samples.append(self._load_stream(sample))
+		if i == 0:
+			engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x24.wav")
+		if i == 1:
+			engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x25.wav")
+		if i == 2:
+			engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x26.wav")
+		if i == 3:
+			engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x27.wav")
+		if i == 4:
+			engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x28.wav")
+		engine_audio.samples[-1].sample.loop_mode = 1
+		i += 1
 	var emitter = preload("res://core/car/car_engine_audio.tscn").instantiate()
 	emitter.stream = engine_audio
 	root.add_child(emitter)
