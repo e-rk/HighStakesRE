@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dxrte1m4wqs6e"
+
+[deps]
+
+files=["res://tests/audio/data/pitch_calculate.unknown1.translation", "res://tests/audio/data/pitch_calculate.result.translation"]
+
+source_file="res://tests/audio/data/pitch_calculate.csv"
+dest_files=["res://tests/audio/data/pitch_calculate.unknown1.translation", "res://tests/audio/data/pitch_calculate.result.translation"]
+
+[params]
+
+compress=true
+delimiter=0
