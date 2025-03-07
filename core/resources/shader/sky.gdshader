@@ -1,7 +1,7 @@
 shader_type sky;
 uniform sampler2D CloudTexture : source_color, hint_default_black;
 uniform sampler2D CloudSubtractTexture : source_color;
-uniform sampler2D BackgroundTexture : source_color, hint_default_transparent;
+uniform samplerCube background_texture : source_color, hint_default_transparent, filter_linear;
 uniform sampler2D earth_gradient : source_color, hint_default_black;
 uniform float cloud_speed = 0.010000;
 uniform float cloud_scale = 0.12000;
@@ -68,15 +68,10 @@ void sky() {
 	vec4 cloud = make_cloud(CloudTexture, EYEDIR, cloud_scale, cloud_speed);
 	vec3 gradient = make_sky_gradient(EYEDIR);
 	vec4 ground = make_earth_gradient(earth_gradient, EYEDIR);
-	vec4 background = texture(BackgroundTexture, SKY_COORDS);
+	vec3 adjust = vec3(EYEDIR.x, EYEDIR.y, EYEDIR.z);
+	vec4 background = texture(background_texture, adjust);
 	vec4 sun = make_sun(EYEDIR);
-	if (background.a > 0.1) {
-		COLOR = background.xyz;
-	} else {
-		//COLOR = gradient.xyz;
-		vec3 blended = cloud.xyz + (1.0 - cloud.x) * gradient.xyz;
-		//vec3 blended = gradient.xyz;
-		COLOR = mix(blended + ground.xyz, sun.xyz, sun.a);
-		//COLOR = mix(blended, sun.xyz, sun.a);
-	}
+	vec3 blended = cloud.xyz + (1.0 - cloud.x) * gradient.xyz;
+	vec3 sky = mix(blended + ground.xyz, sun.xyz, sun.a);
+	COLOR = mix(sky, background.xyz, background.a);
 }

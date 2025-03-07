@@ -26,7 +26,19 @@ func scale_light_energy(node: Node):
 func dict_to_color(value: Dictionary) -> Color:
 	return Color(value["red"], value["green"], value["blue"])
 
-func create_environment(environment: Dictionary):
+func _make_skybox(state: GLTFState) -> Cubemap:
+	var images = state.get_images()
+	var json_images = state.json["images"]
+	for i in len(json_images):
+		if json_images[i].name == "horizon":
+			var image = images[i].get_image()
+			var cubemap = Cubemap.new()
+			var empty = Image.create_empty(image.get_width(), image.get_height(), true, image.get_format())
+			cubemap.create_from_images([image, image, empty, empty, image, image])
+			return cubemap
+	return null
+
+func create_environment(state: GLTFState, environment: Dictionary):
 	var worldenv = load("res://core/resources/environment/environment.tscn").instantiate()
 	var ambient = environment["ambient"]
 	var horizon = environment["horizon"]
@@ -34,6 +46,7 @@ func create_environment(environment: Dictionary):
 	worldenv.environment.sky.sky_material.set_shader_parameter("sun_side_color", dict_to_color(horizon["sun"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("top_side_color", dict_to_color(horizon["top"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("opposite_side_color", dict_to_color(horizon["opposite"]))
+	worldenv.environment.sky.sky_material.set_shader_parameter("background_texture", self._make_skybox(state))
 	return worldenv
 
 func finalize_additive_materials(json: Dictionary, materials: Array[Material]):
@@ -93,8 +106,8 @@ func process_car_extras(root: Node, data: Dictionary):
 	root.set_meta("performance", data["performance"])
 	root.set_meta("type", "car")
 
-func process_track_extras(root: Node, data: Dictionary):
-	var node = self.create_environment(data["environment"])
+func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
+	var node = self.create_environment(state, data["environment"])
 	root.add_child(node)
 	node.owner = root
 	node = self.create_waypoints(data["waypoints"])
@@ -111,7 +124,7 @@ func process_scene_extras(state: GLTFState, root: Node):
 	if extras.has("SPT_car"):
 		process_car_extras(root, extras["SPT_car"])
 	if extras.has("SPT_track"):
-		process_track_extras(root, extras["SPT_track"])
+		process_track_extras(state, root, extras["SPT_track"])
 
 func _import_post(state: GLTFState, root: Node):
 	var err
