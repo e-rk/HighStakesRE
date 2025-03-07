@@ -27,27 +27,13 @@ func dict_to_color(value: Dictionary) -> Color:
 	return Color(value["red"], value["green"], value["blue"])
 
 func create_environment(environment: Dictionary):
-	var worldenv = WorldEnvironment.new()
+	var worldenv = load("res://core/resources/environment/environment.tscn").instantiate()
 	var ambient = environment["ambient"]
 	var horizon = environment["horizon"]
 	var color = dict_to_color(ambient)
-	worldenv.name = "WorldEnvironment"
-	worldenv.environment = Environment.new()
-	worldenv.environment.ssao_enabled = true
-	worldenv.environment.ssao_intensity = 6
-	worldenv.environment.ssao_detail = 5
-	worldenv.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	worldenv.environment.ambient_light_color = Color.WHITE
-	worldenv.environment.ambient_light_energy = 0.5
-	worldenv.environment.background_mode = Environment.BG_SKY
-	worldenv.environment.sky = Sky.new()
-	worldenv.environment.sky.sky_material = ShaderMaterial.new()
-	worldenv.environment.sky.sky_material.shader = load("res://core/resources/shader/sky.gdshader")
-	worldenv.camera_attributes = load("res://core/resources/camera-attributes.tres")
 	worldenv.environment.sky.sky_material.set_shader_parameter("sun_side_color", dict_to_color(horizon["sun"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("top_side_color", dict_to_color(horizon["top"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("opposite_side_color", dict_to_color(horizon["opposite"]))
-	worldenv.environment.sky.sky_material.set_shader_parameter("CloudTexture", load("res://core/resources/clouds.tres"))
 	return worldenv
 
 func finalize_additive_materials(json: Dictionary, materials: Array[Material]):
