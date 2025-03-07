@@ -30,12 +30,13 @@ transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 
 remote_path = NodePath("../PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport/RearViewCamera")
 
 [node name="ReflectionProbe" type="ReflectionProbe" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+layers = 6
 update_mode = 1
 max_distance = 1.0
-size = Vector3(50, 10, 50)
+size = Vector3(30, 15, 30)
 origin_offset = Vector3(0, 1, 0)
 cull_mask = 1047555
+reflection_mask = 1047558
 
 [editable path="PlayerUI"]
 [editable path="PlayerUI/HSplitContainer/RearViewMirror"]

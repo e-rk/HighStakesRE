@@ -9,6 +9,7 @@ func make_wheel(node: Node):
 	var wheel = CarWheel.new()
 	wheel.mesh = wheel_mesh.mesh
 	wheel.name = wheel_mesh.name
+	wheel.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
 	wheel_mesh.replace_by(wheel)
 	wheel.transform = wheel_mesh.transform
 	if wheel_mesh.name.contains("front"):
@@ -41,6 +42,8 @@ func _post_import(scene):
 		new_scene.continuous_cd = true
 		new_scene.physics_material_override = load("res://core/resources/car-physics-material.tres")
 		for node in new_scene.get_children():
+			if node is VisualInstance3D:
+				node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
 			self.make_wheel(node)
 		scene = new_scene
 	return scene

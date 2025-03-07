@@ -10,6 +10,12 @@ enum CollisionLayer {
 	POLICE = 5,
 }
 
+enum VisualLayer {
+	TRACK = 0,
+	OPPONENTS = 1,
+	PLAYER = 2,
+}
+
 enum PlayerStatus { UNKNOWN, IN_LOBBY, IN_LOBBY_READY, IN_GAME_STANDBY, IN_GAME_PLAYING }
 
 
@@ -19,6 +25,11 @@ static func collision_layer_to_mask(layers: Array[CollisionLayer]) -> int:
 		mask |= 1 << layer
 	return mask
 
+static func visual_layer_to_mask(layers: Array[VisualLayer]) -> int:
+	var mask = 0
+	for layer in layers:
+		mask |= 1 << layer
+	return mask
 
 static func player_status_to_str(status: PlayerStatus) -> String:
 	match status:
