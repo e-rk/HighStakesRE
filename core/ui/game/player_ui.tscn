@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://n6ecpp4f60w8"]
 
-[ext_resource type="Script" path="res://core/ui/game/ui_player_top.gd" id="1_u41d7"]
+[ext_resource type="Script" uid="uid://dutq8ncjrd42f" path="res://core/ui/game/ui_player_top.gd" id="1_u41d7"]
 [ext_resource type="PackedScene" uid="uid://pwgwatjtewlu" path="res://core/ui/game/lap_timer.tscn" id="1_x1foh"]
 [ext_resource type="PackedScene" uid="uid://bys21a36e3wlm" path="res://core/ui/game/kph_meter_digital.tscn" id="2_gd0ag"]
 [ext_resource type="PackedScene" uid="uid://b5plb6024tl3w" path="res://core/ui/game/rear_view_mirror.tscn" id="3_q0m1n"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cobfxotpk11ed"]
 
-[ext_resource type="Script" path="res://core/ui/config/player_config.gd" id="1_dfnna"]
+[ext_resource type="Script" uid="uid://b3nohr312xlho" path="res://core/ui/config/player_config.gd" id="1_dfnna"]
 [ext_resource type="PackedScene" uid="uid://b00fb5ox2w4oh" path="res://core/ui/car_picker.tscn" id="2_lyx4f"]
 
 [node name="PlayerConfig" type="VBoxContainer"]

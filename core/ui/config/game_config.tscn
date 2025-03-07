@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dsfc26eqpq6ki"]
 
-[ext_resource type="Script" path="res://core/ui/config/game_config.gd" id="1_t1nk8"]
+[ext_resource type="Script" uid="uid://w52krdgy3a4d" path="res://core/ui/config/game_config.gd" id="1_t1nk8"]
 [ext_resource type="PackedScene" uid="uid://cf011ecvi2pr7" path="res://core/ui/config/track_picker.tscn" id="2_7mklj"]
 [ext_resource type="PackedScene" uid="uid://dyaeadu4s2csp" path="res://core/ui/config/modes/rule_configurator.tscn" id="2_22dhf"]
 

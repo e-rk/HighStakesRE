@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://cfwpo7o5qxn42"]
 
-[ext_resource type="Script" path="res://core/gameplay/player/player.gd" id="1_n5itm"]
-[ext_resource type="Script" path="res://core/gameplay/player/player_input.gd" id="2_7f16e"]
+[ext_resource type="Script" uid="uid://3gf0nectxbjp" path="res://core/gameplay/player/player.gd" id="1_n5itm"]
+[ext_resource type="Script" uid="uid://2ekyng230e8r" path="res://core/gameplay/player/player_input.gd" id="2_7f16e"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_mia2f"]
 properties/0/path = NodePath(".:car_uuid")

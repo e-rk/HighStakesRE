@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bys21a36e3wlm"]
 
 [ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_3oumr"]
-[ext_resource type="Script" path="res://core/ui/game/kph_meter_digital.gd" id="2_g6ts4"]
+[ext_resource type="Script" uid="uid://bj6qcwolb7teg" path="res://core/ui/game/kph_meter_digital.gd" id="2_g6ts4"]
 
 [node name="RpmMeterDigital" type="PanelContainer"]
 custom_minimum_size = Vector2(180, 180)

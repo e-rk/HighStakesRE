@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://nq8vfo23dbql"]
 
-[ext_resource type="Script" path="res://core/multiplayer/player_data.gd" id="1_33qj4"]
+[ext_resource type="Script" uid="uid://c3utt4p0q5nfv" path="res://core/multiplayer/player_data.gd" id="1_33qj4"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_iaiic"]
 properties/0/path = NodePath(".:car_uuid")

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://hx8gqlpaxyc1"]
 
-[ext_resource type="Script" path="res://core/multiplayer/lobby_status.gd" id="1_nq2q6"]
+[ext_resource type="Script" uid="uid://bntfgjuto2tqd" path="res://core/multiplayer/lobby_status.gd" id="1_nq2q6"]
 
 [node name="LobbyStatus" type="PanelContainer"]
 anchors_preset = 15

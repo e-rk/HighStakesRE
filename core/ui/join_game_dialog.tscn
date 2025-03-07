@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b06d2fypc8o5p"]
 
-[ext_resource type="Script" path="res://core/ui/join_game_dialog.gd" id="1_gp5kc"]
+[ext_resource type="Script" uid="uid://cd5y7vv5024cc" path="res://core/ui/join_game_dialog.gd" id="1_gp5kc"]
 
 [node name="JoinGame" type="Button"]
 offset_left = 4.0

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bqikxwi6sfkmt"]
 
-[ext_resource type="Script" path="res://core/db/car_db.gd" id="1_d48wt"]
+[ext_resource type="Script" uid="uid://bft6e1brersep" path="res://core/db/car_db.gd" id="1_d48wt"]
 [ext_resource type="PackedScene" uid="uid://byytg52xlx8dy" path="res://core/utils/directory_watcher.tscn" id="2_dn6jv"]
 
 [node name="CarDB" type="Node"]

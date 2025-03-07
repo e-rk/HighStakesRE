@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cvfpcatdlp81m"]
 
-[ext_resource type="Script" path="res://core/ui/config/modes/single_race_configurator.gd" id="1_dtip5"]
+[ext_resource type="Script" uid="uid://s5teamr276p2" path="res://core/ui/config/modes/single_race_configurator.gd" id="1_dtip5"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6cqhs"]
 properties/0/path = NodePath("HBoxContainer/LapNumber:value")

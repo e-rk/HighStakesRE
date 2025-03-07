@@ -5,11 +5,11 @@
 [ext_resource type="PackedScene" uid="uid://b06d2fypc8o5p" path="res://core/ui/join_game_dialog.tscn" id="5_fw77u"]
 [ext_resource type="PackedScene" uid="uid://blnopg2eg5tfb" path="res://core/ui/common/disconnect_dialog.tscn" id="6_0dax1"]
 [ext_resource type="PackedScene" uid="uid://dj051yp3mnerg" path="res://core/ui/host_game_dialog.tscn" id="7_stv8w"]
-[ext_resource type="Script" path="res://core/ui/lobby/lobby_state_context.gd" id="9_ea3qp"]
+[ext_resource type="Script" uid="uid://dnfs7jufbpobi" path="res://core/ui/lobby/lobby_state_context.gd" id="9_ea3qp"]
 [ext_resource type="PackedScene" uid="uid://hx8gqlpaxyc1" path="res://core/multiplayer/lobby_status.tscn" id="9_grfk7"]
-[ext_resource type="Script" path="res://core/ui/lobby/lobby_state_disconnected.gd" id="10_h0874"]
-[ext_resource type="Script" path="res://core/ui/lobby/lobby_state_hosting.gd" id="11_pykj5"]
-[ext_resource type="Script" path="res://core/ui/lobby/lobby_state_joined.gd" id="12_hs50p"]
+[ext_resource type="Script" uid="uid://cprahinr204tj" path="res://core/ui/lobby/lobby_state_disconnected.gd" id="10_h0874"]
+[ext_resource type="Script" uid="uid://br8hp1mjxece6" path="res://core/ui/lobby/lobby_state_hosting.gd" id="11_pykj5"]
+[ext_resource type="Script" uid="uid://d0ltal5itv82t" path="res://core/ui/lobby/lobby_state_joined.gd" id="12_hs50p"]
 [ext_resource type="PackedScene" uid="uid://bdjcugue7syvn" path="res://core/multiplayer/player_data_container.tscn" id="14_xn7nn"]
 
 [node name="LobbyStateContext" type="Node"]
@@ -37,7 +37,7 @@ size = Vector2i(220, 100)
 dialog_text = "Disconnected from server."
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://core/gameplay/race.tscn")
+_spawnable_scenes = PackedStringArray("uid://fnr6x5fft0m6")
 spawn_path = NodePath("..")
 spawn_limit = 1
 

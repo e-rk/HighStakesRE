@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cr646pbsg8bgl"]
 
-[ext_resource type="Script" path="res://core/ui/config/modes/pursuit_configurator.gd" id="2_ih2sh"]
+[ext_resource type="Script" uid="uid://dlp0wwxc051et" path="res://core/ui/config/modes/pursuit_configurator.gd" id="2_ih2sh"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_5oukv"]
 properties/0/path = NodePath("HBoxContainer/LapNumber:value")

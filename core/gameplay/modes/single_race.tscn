@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://12bhkdru8lnd"]
 
-[ext_resource type="Script" path="res://core/gameplay/modes/single_race.gd" id="1_ir3hg"]
+[ext_resource type="Script" uid="uid://dm1redrh35g2e" path="res://core/gameplay/modes/single_race.gd" id="1_ir3hg"]
 [ext_resource type="PackedScene" uid="uid://cuo7um5xrdifo" path="res://core/gameplay/player_spectator.tscn" id="2_2vlpj"]
 
 [node name="SingleRace" type="Node"]

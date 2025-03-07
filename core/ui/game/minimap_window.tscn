@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://51iduyulvjlr"]
 
 [ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_1e8ky"]
-[ext_resource type="Script" path="res://core/ui/game/minimap_window.gd" id="2_65wyc"]
+[ext_resource type="Script" uid="uid://xvpmt7r6d1j6" path="res://core/ui/game/minimap_window.gd" id="2_65wyc"]
 [ext_resource type="PackedScene" uid="uid://bo50eoiwwm13n" path="res://core/ui/game/minimap_bare.tscn" id="3_vfh64"]
 
 [node name="MinimapWindow" type="PanelContainer"]

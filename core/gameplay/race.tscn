@@ -1,13 +1,13 @@
 [gd_scene load_steps=9 format=3 uid="uid://fnr6x5fft0m6"]
 
-[ext_resource type="Script" path="res://core/gameplay/race.gd" id="1_1qfiq"]
-[ext_resource type="Script" path="res://core/gameplay/race_state_context.gd" id="2_p7ekf"]
-[ext_resource type="Script" path="res://core/gameplay/race_state_waiting_for_players.gd" id="4_jqtk6"]
-[ext_resource type="Script" path="res://core/gameplay/race_state_ending.gd" id="4_nr0d0"]
-[ext_resource type="Script" path="res://core/gameplay/race_state_start_countdown.gd" id="4_r43nu"]
-[ext_resource type="Script" path="res://core/gameplay/race_setup_state.gd" id="4_yv50v"]
-[ext_resource type="Script" path="res://core/gameplay/race_state_in_progress.gd" id="5_5jlev"]
-[ext_resource type="Script" path="res://core/gameplay/race_state.gd" id="9_suekg"]
+[ext_resource type="Script" uid="uid://jm02kbbdh2ab" path="res://core/gameplay/race.gd" id="1_1qfiq"]
+[ext_resource type="Script" uid="uid://821871ckrc7m" path="res://core/gameplay/race_state_context.gd" id="2_p7ekf"]
+[ext_resource type="Script" uid="uid://dewxeyttyvfly" path="res://core/gameplay/race_state_waiting_for_players.gd" id="4_jqtk6"]
+[ext_resource type="Script" uid="uid://dbp17u3rxkcvo" path="res://core/gameplay/race_state_ending.gd" id="4_nr0d0"]
+[ext_resource type="Script" uid="uid://bs51faobs3m74" path="res://core/gameplay/race_state_start_countdown.gd" id="4_r43nu"]
+[ext_resource type="Script" uid="uid://g6ewymks8umj" path="res://core/gameplay/race_setup_state.gd" id="4_yv50v"]
+[ext_resource type="Script" uid="uid://qk2fyksu5u7f" path="res://core/gameplay/race_state_in_progress.gd" id="5_5jlev"]
+[ext_resource type="Script" uid="uid://r3x4s52bq436" path="res://core/gameplay/race_state.gd" id="9_suekg"]
 
 [node name="Race" type="Node"]
 script = ExtResource("1_1qfiq")

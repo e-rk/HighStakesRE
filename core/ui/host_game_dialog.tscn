@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dj051yp3mnerg"]
 
-[ext_resource type="Script" path="res://core/ui/host_game_dialog.gd" id="1_fu45c"]
+[ext_resource type="Script" uid="uid://t48sy8hauo72" path="res://core/ui/host_game_dialog.gd" id="1_fu45c"]
 
 [node name="HostGame" type="Button"]
 offset_left = 4.0

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b00fb5ox2w4oh"]
 
-[ext_resource type="Script" path="res://core/ui/car_picker.gd" id="1_0bts6"]
+[ext_resource type="Script" uid="uid://cjwc5b6114dic" path="res://core/ui/car_picker.gd" id="1_0bts6"]
 
 [node name="CarPicker" type="HBoxContainer"]
 script = ExtResource("1_0bts6")

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bo50eoiwwm13n"]
 
-[ext_resource type="Script" path="res://core/ui/game/minimap.gd" id="1_i3sxd"]
+[ext_resource type="Script" uid="uid://bsbbkhvor3oy2" path="res://core/ui/game/minimap.gd" id="1_i3sxd"]
 
 [node name="MinimapBare" type="Control"]
 layout_mode = 3

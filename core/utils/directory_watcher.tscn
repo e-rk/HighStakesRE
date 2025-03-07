@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://byytg52xlx8dy"]
 
-[ext_resource type="Script" path="res://core/utils/directory_watcher.gd" id="1_yo3f7"]
+[ext_resource type="Script" uid="uid://b21tjs0v83t7c" path="res://core/utils/directory_watcher.gd" id="1_yo3f7"]
 
 [node name="DirectoryWatcher" type="Node"]
 script = ExtResource("1_yo3f7")

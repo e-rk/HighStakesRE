@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bxxaadjg00dar"]
 
-[ext_resource type="Script" path="res://core/multiplayer/on_demand_synchronizer.gd" id="1_gwvtl"]
+[ext_resource type="Script" uid="uid://bdvpu8gs0dm6h" path="res://core/multiplayer/on_demand_synchronizer.gd" id="1_gwvtl"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_kvh6g"]
 properties/0/path = NodePath("OnDemandSynchronizer:sequence_counter")

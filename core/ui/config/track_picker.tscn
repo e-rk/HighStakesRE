@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cf011ecvi2pr7"]
 
-[ext_resource type="Script" path="res://core/ui/config/track_picker.gd" id="1_wyeq0"]
-[ext_resource type="Script" path="res://core/ui/common/syncable_option_button.gd" id="2_vo8gj"]
+[ext_resource type="Script" uid="uid://cq8hejt6ssjwc" path="res://core/ui/config/track_picker.gd" id="1_wyeq0"]
+[ext_resource type="Script" uid="uid://dnuqriykuyh2n" path="res://core/ui/common/syncable_option_button.gd" id="2_vo8gj"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_lrg3q"]
 properties/0/path = NodePath("HBoxContainer/TrackSelection:selected_uuid")

@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://dyaeadu4s2csp"]
 
-[ext_resource type="Script" path="res://core/ui/config/modes/rule_configurator.gd" id="1_scn7g"]
+[ext_resource type="Script" uid="uid://cy4mpi6r22qex" path="res://core/ui/config/modes/rule_configurator.gd" id="1_scn7g"]
 [ext_resource type="PackedScene" uid="uid://bxxaadjg00dar" path="res://core/multiplayer/on_demand_synchronizer.tscn" id="2_0akbo"]
-[ext_resource type="Script" path="res://core/ui/common/syncable_option_button.gd" id="2_486de"]
+[ext_resource type="Script" uid="uid://dnuqriykuyh2n" path="res://core/ui/common/syncable_option_button.gd" id="2_486de"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_q8dv4"]
 properties/0/path = NodePath("HBoxContainer/ModeSelector:selected_uuid")

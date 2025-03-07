@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://pwgwatjtewlu"]
 
-[ext_resource type="Script" path="res://core/ui/game/lap_timer.gd" id="1_sjpu7"]
+[ext_resource type="Script" uid="uid://b4pek51jdyebi" path="res://core/ui/game/lap_timer.gd" id="1_sjpu7"]
 [ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_tapyx"]
 
 [node name="LapTimer" type="PanelContainer"]
