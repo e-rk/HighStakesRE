@@ -19,7 +19,7 @@ func _ready():
 
 
 func _physics_process(_delta: float):
-	if multiplayer.get_unique_id() == 1:
+	if self.target and multiplayer.get_unique_id() == 1:
 		sync_state = {
 			"transform": body_state.transform,
 			"linear_velocity": body_state.linear_velocity,

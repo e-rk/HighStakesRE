@@ -18,7 +18,6 @@ func make_wheel(node: Node):
 
 func set_wall_collision(node: Node):
 	if node is StaticBody3D and node.name.contains("not_driveable"):
-		print("Collision set to wall")
 		node.collision_layer = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_WALLS])
 		node.collision_mask = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_WALLS])
 

@@ -124,7 +124,6 @@ func keep_height_above_ground(positional_attributes: Dictionary):
 		var pos = self.global_position
 		pos.y = collision["position"].y + 0.5  # 0.6
 		self.global_position = pos
-		#prints("moving up")
 
 
 func _process(delta: float):
