@@ -1,7 +1,7 @@
 shader_type sky;
 uniform sampler2D CloudTexture : source_color, hint_default_black;
 uniform sampler2D CloudSubtractTexture : source_color;
-uniform samplerCube background_texture : source_color, hint_default_transparent, filter_linear;
+uniform samplerCube background_texture : source_color, hint_default_black, filter_linear;
 uniform sampler2D earth_gradient : source_color, hint_default_black;
 uniform float cloud_speed = 0.010000;
 uniform float cloud_scale = 0.12000;
@@ -9,7 +9,7 @@ uniform vec3 sun_side_color: source_color;
 uniform vec3 top_side_color: source_color;
 uniform vec3 opposite_side_color: source_color;
 
-vec4 make_cloud(sampler2D tex, vec3 uv, float scale, float speed) 
+vec4 make_cloud(sampler2D tex, vec3 uv, float scale, float speed)
 {
 	vec2 uv_flat = uv.xz * scale / uv.y;
 	vec2 uv_offset = fma(vec2(TIME), vec2(speed), uv_flat);
@@ -49,16 +49,16 @@ vec4 make_earth_gradient(sampler2D tex, vec3 uv)
 	return color;
 }
 
-vec4 make_sun(vec3 uv) 
+vec4 make_sun(vec3 uv)
 {
 	float fact = 0.05;
-	
+
 	if (LIGHT0_ENABLED) {
 		float direction = distance(uv, LIGHT0_DIRECTION);
 		float position = 1.0 - clamp(direction / fact, 0.0, 1.0);
 		float disk = smoothstep(0.00, fact, position);
 		vec4 sun = vec4(vec3(1.0), disk);
-		
+
 		return sun;
 	}
 	return vec4(0.0);

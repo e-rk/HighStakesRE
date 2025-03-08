@@ -29,6 +29,9 @@ enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/speedtool
 scene={
 "import_script/path": "res://addons/speedtools-gltf/post-import.gd"
 }
+texture={
+&"detect_3d/compress_to": 0
+}
 
 [input]
 

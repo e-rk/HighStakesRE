@@ -109,6 +109,14 @@ func process_car_extras(root: Node, data: Dictionary):
 	root.set_meta("performance", data["performance"])
 	root.set_meta("type", "car")
 
+func get_image_by_name(state: GLTFState, name: String) -> CompressedTexture2D:
+	var images = state.get_images()
+	var json_images = state.json["images"]
+	for i in len(images):
+		if json_images[i]["name"] == name:
+			return images[i]
+	return null
+
 func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
 	var node = self.create_environment(state, data["environment"])
 	root.add_child(node)
@@ -117,6 +125,39 @@ func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
 	root.add_child(node, true)
 	node.owner = root
 	root.set_meta("type", "track")
+	var json_materials = state.json["materials"]
+	var json_images = state.json["images"]
+	var json_textures = state.json["textures"]
+	var images = state.get_images()
+
+	for i in len(json_materials):
+		var material = json_materials[i]
+		if not material.has("extras"):
+			continue
+		if material["extras"].has("SPT_animation_images"):
+			var image_idx = material["pbrMetallicRoughness"]["baseColorTexture"]["index"]
+			var tex = json_textures[image_idx]
+			var tex_source = tex["source"]
+			var array_images = []
+			for name in material["extras"]["SPT_animation_images"]:
+				var img = self.get_image_by_name(state, name)
+				array_images.append(img.get_image())
+			var texture_array = Texture2DArray.new()
+			texture_array.create_from_images(array_images)
+			var mat = ShaderMaterial.new()
+			if material["extras"].has("SPT_additive"):
+				mat.shader = load("res://core/resources/shader/animated_texture_add.gdshader")
+				mat.render_priority += 1
+			else:
+				mat.shader = load("res://core/resources/shader/animated_texture_blend.gdshader")
+			var ticks = int(material["extras"]["SPT_animation_ticks"])
+			mat.set_shader_parameter("layers", texture_array)
+			mat.set_shader_parameter("ticks", ticks)
+			for child_node in root.get_children():
+				if child_node is ImporterMeshInstance3D:
+					for surface_id in child_node.mesh.get_surface_count():
+						if child_node.mesh.get_surface_material(surface_id) == state.get_materials()[i]:
+							child_node.mesh.set_surface_material(surface_id, mat)
 
 func process_scene_extras(state: GLTFState, root: Node):
 	var main_scene_idx = state.json["scene"]
