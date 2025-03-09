@@ -79,6 +79,42 @@ func inertia_inv(data: Dictionary) -> Vector3:
 	var iz = float(data.get("inertia_inv_z", "0.0"))
 	return Vector3(ix, iy, iz)
 
+func global_camera_position(data: Dictionary) -> Vector3:
+	var x = float(data.get("global_camera_position_x", "0.0"))
+	var y = float(data.get("global_camera_position_y", "0.0"))
+	var z = float(data.get("global_camera_position_z", "0.0"))
+	return Vector3(x, y, z)
+
+func result_global_camera_position(data: Dictionary) -> Vector3:
+	var x = float(data.get("result_global_camera_position_x", "0.0"))
+	var y = float(data.get("result_global_camera_position_y", "0.0"))
+	var z = float(data.get("result_global_camera_position_z", "0.0"))
+	return Vector3(x, y, z)
+
+func global_position(data: Dictionary) -> Vector3:
+	var x = float(data.get("global_position_x", "0.0"))
+	var y = float(data.get("global_position_y", "0.0"))
+	var z = float(data.get("global_position_z", "0.0"))
+	return Vector3(x, y, z)
+
+func local_offset(data: Dictionary) -> Vector3:
+	var x = float(data.get("local_offset_x", "0.0"))
+	var y = float(data.get("local_offset_y", "0.0"))
+	var z = float(data.get("local_offset_z", "0.0"))
+	return Vector3(x, y, z)
+
+func global_camera_offset(data: Dictionary) -> Vector3:
+	var x = float(data.get("global_camera_offset_x", "0.0"))
+	var y = float(data.get("global_camera_offset_y", "0.0"))
+	var z = float(data.get("global_camera_offset_z", "0.0"))
+	return Vector3(x, y, z)
+
+func final_local_offset(data: Dictionary) -> Vector3:
+	var x = float(data.get("finale_local_offset_x", "0.0"))
+	var y = float(data.get("finale_local_offset_y", "0.0"))
+	var z = float(data.get("finale_local_offset_z", "0.0"))
+	return Vector3(x, y, z)
+
 func mass(data: Dictionary) -> float:
 	return float(data["mass"])
 
