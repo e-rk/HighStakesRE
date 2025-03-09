@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://d2y1hi6r2x6nq" path="res://core/gameplay/player_spectator.gd" id="1_eomyr"]
 
 [node name="PlayerSpectator" type="Node3D"]
+top_level = true
 script = ExtResource("1_eomyr")
 
 [node name="PlayerUI" parent="." instance=ExtResource("1_08nnd")]
@@ -14,17 +15,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.034)
 fov = 40.0
 far = 200.0
 
-[node name="CameraArm" type="SpringArm3D" parent="."]
-unique_name_in_owner = true
-transform = Transform3D(-1, 2.26267e-08, -8.44439e-08, 0, 0.965926, 0.258819, 8.74228e-08, 0.258819, -0.965926, 0, 0, 0)
-spring_length = 7.0
-
-[node name="Camera3D" type="Camera3D" parent="CameraArm"]
-transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0, 0)
-current = true
-fov = 60.0
-far = 500.0
-
 [node name="RemoteTransform3D" type="RemoteTransform3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.034)
 remote_path = NodePath("../PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport/RearViewCamera")
@@ -32,11 +22,20 @@ remote_path = NodePath("../PlayerUI/HSplitContainer/RearViewMirror/RearViewMirro
 [node name="ReflectionProbe" type="ReflectionProbe" parent="."]
 layers = 6
 update_mode = 1
-max_distance = 1.0
-size = Vector3(30, 15, 30)
+max_distance = 60.0
+size = Vector3(50.005, 15, 50.008)
 origin_offset = Vector3(0, 1, 0)
-cull_mask = 1047555
+cull_mask = 1047553
 reflection_mask = 1047558
+
+[node name="MainCamera" type="Camera3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+top_level = true
+doppler_tracking = 2
+current = true
+fov = 70.8
+size = 0.07
+far = 500.0
 
 [editable path="PlayerUI"]
 [editable path="PlayerUI/HSplitContainer/RearViewMirror"]
