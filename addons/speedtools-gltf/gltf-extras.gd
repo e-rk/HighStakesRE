@@ -49,20 +49,31 @@ func create_environment(state: GLTFState, environment: Dictionary):
 	worldenv.environment.sky.sky_material.set_shader_parameter("background_texture", self._make_skybox(state))
 	return worldenv
 
-func finalize_additive_materials(json: Dictionary, materials: Array[Material]):
+func finalize_materials(json: Dictionary, materials: Array[Material]):
 	var json_materials = json["materials"]
 	for i in len(materials):
 		var json_material = json_materials[i]
 		var material = materials[i]
-		if !json_material.has("extras"):
-			continue
-		var extras = json_material["extras"]
-		var is_additive = false
-		if extras.has("SPT_additive"):
-			is_additive = extras["SPT_additive"]
-		if is_additive and material is BaseMaterial3D:
-			material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-			material.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
+		if json_material.has("extensions"):
+			var ext = json_material["extensions"]
+			if ext.has("KHR_materials_specular"):
+				material.metallic_specular = ext["KHR_materials_specular"]["specularFactor"]
+		if json_material.has("extras"):
+			var extras = json_material["extras"]
+			var is_additive = false
+			var is_transparent = false
+			material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+			if extras.has("SPT_additive"):
+				is_additive = extras["SPT_additive"]
+			if is_additive and material is BaseMaterial3D:
+				material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+				material.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
+			if extras.has("SPT_transparent"):
+				is_transparent = extras["SPT_transparent"]
+			if is_transparent and material is BaseMaterial3D:
+				material.refraction_enabled = true
+				material.refraction_scale = 0.0
+				material.transparency = BaseMaterial3D.Transparency.TRANSPARENCY_ALPHA
 	return OK
 
 func finalize_static_bodies(state: GLTFState, node: Node):
@@ -79,14 +90,6 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 		checked_node.set_meta("surface_type", surface_type)
 	return OK
 
-func remove_metallic_specular(materials: Array[Material]):
-	for material in materials:
-		if material is BaseMaterial3D:
-			material.metallic_specular = 0.0
-			material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
-	return OK
-
-
 func process_car_extras(root: Node, data: Dictionary):
 	var synchronizer = CarSynchronizer.new()
 	synchronizer.name = "CarSynchronizer"
@@ -97,7 +100,6 @@ func process_car_extras(root: Node, data: Dictionary):
 	synchronizer.owner = root
 	var dimensions = data["dimensions"]
 	var collisionshape = CollisionShape3D.new()
-	collisionshape.owner = root
 	collisionshape.name = "Collider"
 	collisionshape.shape = BoxShape3D.new()
 	collisionshape.shape.size = Vector3(dimensions[0], dimensions[1], dimensions[2])
@@ -131,14 +133,8 @@ func _import_post(state: GLTFState, root: Node):
 	err = scale_light_energy(root)
 	if err != OK:
 		return err
-	err = finalize_additive_materials(state.json, state.materials)
+	err = finalize_materials(state.json, state.materials)
 	if err != OK:
 		return err
-	err = remove_metallic_specular(state.materials)
-	if err != OK:
-		return err
-	#err = finalize_static_bodies(state, root)
-	#if err != OK:
-		#return err
 	process_scene_extras(state, root)
 	return OK
