@@ -5,8 +5,9 @@ func create_waypoints(waypoints: Array):
 	var node = Waypoints.new()
 	node.name = "Waypoints"
 	var curve = Curve3D.new()
+	curve.up_vector_enabled = false
 	for waypoint in waypoints:
-		var v = Vector3(waypoint[0], waypoint[1], -waypoint[2])
+		var v = Vector3(waypoint[0], waypoint[1], waypoint[2])
 		curve.add_point(v)
 	node.waypoints = curve
 	return node

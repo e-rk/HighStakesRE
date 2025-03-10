@@ -12,7 +12,7 @@ var players: Array = []:
 
 
 func to_vec2(point: Vector3) -> Vector2:
-	return Vector2(point.x, point.z)
+	return Vector2(-point.x, -point.z)
 
 
 func center_points_custom(points: Array, center: Vector2):

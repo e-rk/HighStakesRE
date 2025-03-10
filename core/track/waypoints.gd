@@ -18,7 +18,7 @@ func get_closest_point(position: Vector3) -> Vector3:
 
 func get_closest_transform(position: Vector3) -> Transform3D:
 	var offset = waypoints.get_closest_offset(position)
-	return waypoints.sample_baked_with_rotation(offset, false, true)
+	return waypoints.sample_baked_with_rotation(offset, false, false).rotated_local(Vector3.UP, PI)
 
 
 func offset_normalized(position: Vector3) -> float:

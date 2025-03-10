@@ -1378,9 +1378,6 @@ func traction_pipeline(params: Dictionary) -> Dictionary:
 	return extend(pipeline).call(params)
 
 func process(params: Dictionary) -> Dictionary:
-	var basis = Basis.from_euler(Vector3(0, PI, 0))
-	params["basis"] = params["basis"] * basis
-	params["basis_to_road"] = params["basis_to_road"] * basis
 	var angular_velocity = params["angular_velocity"] / TAU
 	params["angular_velocity"] = angular_velocity
 	params["slip_angle"] = self.vehicle_slip_angle_tg(params)
