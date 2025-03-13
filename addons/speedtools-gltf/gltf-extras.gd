@@ -129,14 +129,8 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 
 
 func _load_stream(sample: Dictionary) -> EngineSample:
-	var params = {
-		#"edit/loop_mode": 2,
-		#"edit/loop_end": -1,
-		#"edit/loop_begin": 0,
-		#"compress/mode": 0,
-		#"force/max_rate_hz": 22050
-	}
-	var decoded = Marshalls.base64_to_raw(sample["sample"])
+	var params = {}
+	var decoded = Marshalls.base64_to_raw(sample["sample"]).decompress(1000000, FileAccess.COMPRESSION_GZIP)
 	var wav = AudioStreamWAV.load_from_buffer(decoded, params)
 	var result = EngineSample.new()
 	result.sample = wav
