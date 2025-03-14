@@ -47,7 +47,7 @@ func make_params(data: Dictionary) -> Dictionary:
 	result["timestep"] = 1 / 32.0
 	result["handbrake_accumulator"] = self.handbrake_accumulator(data)
 	result["gear_shift_counter"] = (int(data["unknown_engine_value2"]) >> 0x10)
-	result["shifted_down"] = false
+	result["shifted_down"] = data["unknown_engine_value"] != "0"
 	result["wheels"] = [
 		{"type": CarTypes.Wheel.FRONT_RIGHT, "road_surface": self.wheel_road_surface(data, 0)},
 		{"type": CarTypes.Wheel.FRONT_LEFT, "road_surface": self.wheel_road_surface(data, 1)},

@@ -23,6 +23,7 @@ func make_params(data: Dictionary) -> Dictionary:
 	result["brake"] = self.brake(data)
 	result["basis_to_road"] = Basis()
 	result["handbrake"] = self.handbrake(data)
+	result["lost_grip"] = false
 	return result
 
 

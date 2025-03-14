@@ -17,6 +17,7 @@ func get_csv() -> FileAccess:
 func make_params(data: Dictionary) -> Dictionary:
 	var result = Dictionary()
 	result["handbrake"] = self.handbrake(data)
+	result["lost_grip"] = false
 	result["handbrake_accumulator"] = self.handbrake_accumulator(data)
 	result["weather"] = self.weather(data)
 	return result

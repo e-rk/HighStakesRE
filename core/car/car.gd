@@ -171,7 +171,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D):
 		"inertia_inv": state.inverse_inertia,
 		"road_surface": 0,
 		"weather": 0,
-		"has_grip": true,
+		"lost_grip": true,
 		"basis_to_road_next": next_positional_attributes["basis_to_road"],
 		"distance_above_ground": positional_attributes["distance_above_ground"],
 		"wheels": wheels,

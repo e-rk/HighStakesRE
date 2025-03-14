@@ -28,7 +28,7 @@ func make_params(data: Dictionary) -> Dictionary:
 	result["brake"] = self.brake(data)
 	result["rpm"] = 0.0
 	result["current_steering"] = 0.0
-	result["has_grip"] = true
+	result["lost_grip"] = false
 	result["handbrake_accumulator"] = 0
 	result["force"] = 0.0
 	result["gear_shift_counter"] = 0

@@ -28,6 +28,7 @@ func make_params(data: Dictionary) -> Dictionary:
 	result["current_steering"] = self.steering(data)
 	result["throttle"] = self.throttle(data)
 	result["handbrake"] = self.handbrake(data)
+	result["lost_grip"] = false
 	result["inertia_inv"] = self.inertia_inv(data)
 	result["mass"] = self.mass(data)
 	result["has_contact_with_ground"] = !self.is_airborne(data)

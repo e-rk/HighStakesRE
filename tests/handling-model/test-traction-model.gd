@@ -22,6 +22,7 @@ func make_params(data: Dictionary) -> Dictionary:
 	result["gear"] = self.gear(data)
 	result["linear_velocity"] = self.local_linear_velocity(data)
 	result["handbrake"] = self.handbrake(data)
+	result["lost_grip"] = false
 	result["throttle"] = self.throttle(data)
 	result["weather"] = self.weather(data)
 	result["slip_angle"] = self.slip_angle(data)
@@ -49,5 +50,5 @@ func body(data: Dictionary):
 			+ " sd=" + str(params["shifted_down"]) \
 			+ " sc=" + str(params["gear_shift_counter"])
 	assert_almost_eq(result["force"], expected_force, EPSILON, "force: " + msg)
-	assert_eq(result["handbrake"], expected_handbrake, "hb: " + msg)
+	assert_eq(result["lost_grip"], expected_handbrake, "hb: " + msg)
 	assert_eq(result["rpm"], expected_rpm, "rpm: " + msg)

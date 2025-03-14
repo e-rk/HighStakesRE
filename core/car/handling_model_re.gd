@@ -71,6 +71,9 @@ func gear_rpm_to_velocity(params: Dictionary, gear: CarTypes.Gear) -> float:
 	var performance = params["performance"]
 	return 1.0 / performance.gear_velocity_to_rpm(gear)
 
+func get_lost_grip(params: Dictionary) -> bool:
+	return params["handbrake"] || params["lost_grip"]
+
 func prepare_traction_model_ctx(params: Dictionary) -> Dictionary:
 	var basis = params["basis_to_road"]
 	var velocity_local = basis.inverse() * params["linear_velocity"]
@@ -99,7 +102,7 @@ func prepare_traction_model_ctx(params: Dictionary) -> Dictionary:
 func traction_model_extend(f: Callable) -> Callable:
 	return func(traction_params: Dictionary) -> Dictionary:
 		var value = f.call(traction_params)
-		var result = traction_params
+		var result = traction_params.duplicate(true)
 		if value.has("rpm"):
 			result["rpm"] = value["rpm"]
 		if value.has("handbrake_accumulator"):
@@ -162,7 +165,7 @@ func traction_model(params: Dictionary) -> Dictionary:
 	return {
 		"rpm": result["rpm"],
 		"force": result["force"],
-		"handbrake": result["lost_grip"],
+		"lost_grip": result["lost_grip"],
 		"handbrake_accumulator": result["handbrake_accumulator"],
 		"gear": result["gear"]
 	}
@@ -885,7 +888,7 @@ func increment_handbrake_accumulator(params: Dictionary) -> int:
 
 
 func update_handbrake_accumulator(params: Dictionary) -> int:
-	var handbrake = params["handbrake"]
+	var handbrake = self.get_lost_grip(params)
 	if not handbrake:
 		return 0
 	return increment_handbrake_accumulator(params)
@@ -929,7 +932,7 @@ func wheel_force(params: Dictionary, wheel_data: Dictionary) -> Vector3:
 	var performance = params["performance"]
 	var current_steering = params["current_steering"]
 	var throttle = params["throttle"]
-	var handbrake = params["handbrake"]
+	var handbrake = self.get_lost_grip(params)
 	var grip = wheel_data["grip"]
 	var speed_xz = params["speed_xz"]
 	var lateral_grip_mult = performance.lateral_grip_multiplier()
@@ -1205,7 +1208,7 @@ func brake_force(params: Dictionary, wheel_data: Dictionary) -> float:
 	brake_deceleration = min(brake_maximum, brake_deceleration)
 	if 0.15 < brake and has_spoiler:
 		brake_deceleration += abs(velocity_local.z) * downforce_mult
-	if params["handbrake"]:
+	if self.get_lost_grip(params):
 		front_brake_ratio += 0.05
 	var rear_brake_ratio = 1 - front_brake_ratio
 	match wheel_type:
@@ -1353,7 +1356,7 @@ func traction_pipeline(params: Dictionary) -> Dictionary:
 	params["speed_xz"] = self.calculate_speed_xz(params)
 	params["unknown_bool"] = false
 	params["force"] = 0.0
-	params["has_grip"] = true
+	params["lost_grip"] = true
 	var traction = make_model_pipeline(
 		[
 			integrate(self.process_wheels_cm),
