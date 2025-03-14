@@ -66,6 +66,9 @@ func finalize_materials(json: Dictionary, materials: Array[Material]):
 			material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 			if extras.has("SPT_additive"):
 				is_additive = extras["SPT_additive"]
+			if extras["SPT_billboard"] and material is BaseMaterial3D:
+				material.billboard_mode = BaseMaterial3D.BillboardMode.BILLBOARD_FIXED_Y
+				material.cull_mode = BaseMaterial3D.CullMode.CULL_FRONT
 			if is_additive and material is BaseMaterial3D:
 				material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 				material.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
