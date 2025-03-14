@@ -384,9 +384,9 @@ func detune_to_linear(val: int) -> int:
 	return (ret * (ENVELOPE[idx] + 0x100)) >> 9
 
 func pitch_calculate(pitch_value: int, unknown: int) -> int:
-	var val = unknown + (pitch_value - 64) * unknown >> 6
+	var val = unknown + ((pitch_value - 64) * 1800 >> 6)
 	var detuned = self.detune_to_linear(val)
-	var res = detuned * 4096 >> 0xc
+	var res = (detuned * 4096) >> 0xc
 	return res
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -421,6 +421,8 @@ func _physics_process(delta: float) -> void:
 			var detuned = self.detune_to_linear(xxx)
 			var res = detuned * 4096 >> 0xc
 			#print (roundi(pitch), ", ", xxx, ", ", res / 4096.0)
+			
+			#var test = pitch_calculate(pitch, )
 			
 			vols.append(t * v)
 			#print(j, " ", v)
