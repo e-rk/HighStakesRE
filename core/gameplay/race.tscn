@@ -23,7 +23,7 @@ script = ExtResource("4_yv50v")
 script = ExtResource("4_jqtk6")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="RaceStateContext/RaceStateWaitingForPlayers"]
-_spawnable_scenes = PackedStringArray("res://core/gameplay/player/player.tscn")
+_spawnable_scenes = PackedStringArray("uid://cfwpo7o5qxn42")
 spawn_path = NodePath("../../PlayerContainer")
 
 [node name="MarginContainer" type="MarginContainer" parent="RaceStateContext/RaceStateWaitingForPlayers"]

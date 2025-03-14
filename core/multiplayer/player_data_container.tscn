@@ -8,7 +8,7 @@ script = ExtResource("1_w3ibw")
 [node name="Players" type="Node" parent="."]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://core/multiplayer/player_data.tscn")
+_spawnable_scenes = PackedStringArray("uid://nq8vfo23dbql")
 spawn_path = NodePath("../Players")
 
 [connection signal="despawned" from="MultiplayerSpawner" to="." method="_on_multiplayer_spawner_despawned"]
