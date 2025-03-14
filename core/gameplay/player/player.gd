@@ -38,12 +38,14 @@ func _physics_process(_delta):
 	if not self.disable_steering:
 		car.brake = input.brake
 		car.throttle = input.throttle
+		car.steering = input.steering
+		car.handbrake = input.handbrake
+		car.gear = input.gear
 	else:
 		car.brake = 1.0
 		car.throttle = 0.0
-	car.steering = input.steering
-	car.handbrake = input.handbrake
-	car.gear = input.gear
+		car.handbrake = false
+		car.gear = CarTypes.Gear.NEUTRAL
 	car.lights_on = input.lights_on
 
 
