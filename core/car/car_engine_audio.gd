@@ -420,7 +420,7 @@ func _physics_process(delta: float) -> void:
 			var xxx = 1800 + (roundi(pitch) - 64) * 1800 >> 6
 			var detuned = self.detune_to_linear(xxx)
 			var res = detuned * 4096 >> 0xc
-			print (roundi(pitch), ", ", xxx, ", ", res / 4096.0)
+			#print (roundi(pitch), ", ", xxx, ", ", res / 4096.0)
 			
 			vols.append(t * v)
 			#print(j, " ", v)
