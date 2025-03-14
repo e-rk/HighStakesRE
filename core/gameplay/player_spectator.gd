@@ -9,15 +9,26 @@ extends Node3D
 @export var race_laps: int = 2
 
 @onready var ui: PlayerUI = $PlayerUI
+@onready var camera_arm: SpringArm3D = $CameraArm
 @onready var reflection: ReflectionProbe = $ReflectionProbe
 @onready var main_camera: Camera3D = $MainCamera
+@onready var target: Marker3D = $CameraArm/CameraTarget
 
-var offset = Vector3(0.0, 1.8, -5.2)
 var factor = 0.25
 var previous_global_offset = Vector3.ZERO
 
+
+func _ready() -> void:
+	self.set_target_position(Vector3(0.0, 1.8, -5.2))
+
+
 func set_waypoints(waypoints: Array):
 	ui.set_minimap_waypoints(waypoints)
+
+
+func set_target_position(position: Vector3):
+	self.camera_arm.look_at(self.to_global(position), Vector3.RIGHT, true)
+	self.camera_arm.spring_length = position.length()
 
 
 func player_to_minimap_data(node: Node) -> Dictionary:
@@ -47,7 +58,7 @@ func interpolate_camera(car: Car) -> Vector3:
 	var local_linear_accel = car.basis.inverse() * car.linear_acceleration
 	var accel_factor = self._acceleration_factor(local_linear_accel.z, 0.20)
 	var interpolation_factor = self._interpolation_factor()
-	var offset = self.offset * accel_factor
+	var offset = (self.camera_arm.basis * self.target.position) * accel_factor
 	offset.y += dimensions.y * 0.25
 	offset.z = offset.z - z_offset - dimensions.z * 0.25
 	var global_target = car.basis * offset

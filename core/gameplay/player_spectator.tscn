@@ -49,5 +49,10 @@ fov = 70.8
 size = 0.07
 far = 500.0
 
+[node name="CameraArm" type="SpringArm3D" parent="." unique_id=1537446907]
+collision_mask = 7
+
+[node name="CameraTarget" type="Marker3D" parent="CameraArm" unique_id=1297170021]
+
 [editable path="PlayerUI"]
 [editable path="PlayerUI/HSplitContainer/RearViewMirror"]

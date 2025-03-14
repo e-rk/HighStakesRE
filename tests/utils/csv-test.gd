@@ -1,6 +1,8 @@
 extends GutTest
 class_name CsvTest
 
+var current_line = 0
+
 func get_csv() -> FileAccess:
 	return null
 
@@ -13,6 +15,7 @@ func get_csv_line_dict(file, header):
 	if len(line) == 1:
 		return null
 	for i in line.size():
+		current_line += 1
 		result[header[i]] = line[i]
 	return result
 
