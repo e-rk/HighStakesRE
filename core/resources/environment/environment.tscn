@@ -25,7 +25,6 @@ sky = SubResource("Sky_m4usb")
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.5
-ssao_enabled = true
 ssao_intensity = 6.0
 ssao_detail = 5.0
 
