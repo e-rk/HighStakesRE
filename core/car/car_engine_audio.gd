@@ -422,13 +422,20 @@ func _physics_process(delta: float) -> void:
 			var res = detuned * 4096 >> 0xc
 			#print (roundi(pitch), ", ", xxx, ", ", res / 4096.0)
 			
-			#var test = pitch_calculate(pitch, )
+			var step1 = sample.pitch_unknown2
+			var step2 = step1 + (sample.pitch_unknown2 - 60) * -100
+			
+			#print(step2)
+			
+			var test = pitch_calculate(pitch, step2)
+			
+			print(test)
 			
 			vols.append(t * v)
 			#print(j, " ", v)
 			playback.set_stream_volume(id, linear_to_db(t * v))
 			#playback.set_stream_volume(id, 0)
-			playback.set_stream_pitch_scale(id, (res / 4096.0))
+			playback.set_stream_pitch_scale(id, (test / 4096.0))
 			#playback.set_stream_pitch_scale(id, 1)
 			#print(pitch_log)
 	#print(vols)

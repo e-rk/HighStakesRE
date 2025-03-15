@@ -135,6 +135,9 @@ func _load_stream(sample: Dictionary) -> EngineSample:
 	var result = EngineSample.new()
 	result.sample = wav
 	result.rear = sample["is_rear"]
+	result.pitch_unknown0 = sample["pitch_unknown0"]
+	result.pitch_unknown1 = sample["pitch_unknown1"]
+	result.pitch_unknown2 = sample["pitch_unknown2"]
 	for table in sample["tables"]:
 		result.volume_tables.append(table["volume"])
 		result.pitch_tables.append(table["pitch"])
