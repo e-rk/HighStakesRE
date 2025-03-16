@@ -23,21 +23,21 @@ You must own the original game and convert the cars and tracks yourself locally.
 	- Import collision
 	- Import cameras
 	- Import ambient
-	- Mode: GLTF
 3. Export the track into the `./import/tracks` directory
 	- For example, export map `UK` into `./import/tracks/UK/UK.glb`
-	- Enable the following options:
-		- Export attributes
-		- Export cameras
-		- Export extras
-		- Export lights
+	- Enable the following options and keep the rest at default values:
+		- Include -> Data -> Custom properties
+		- Include -> Data -> Cameras
+		- Include -> Data -> Lights
+		- Data -> Material -> Unused images
+		- Data -> Mesh -> Attributes
 4. Import a car
 5. Export the car into the `./import/cars` directory
 	- For example, export B911 into `./import/cars/B911/B911.glb`
-	- Enable the following options:
-		- Export attributes
-		- Export extras
-		- Export lights
+	- Enable the following options and keep the rest at default values:
+		- Include -> Data -> Custom properties
+		- Data -> Mesh -> Attributes
+		- Include -> Data -> Lights
 6. Wait for Godot to process the asset. This may take a while.
 7. Run the project
 8. Select a track and a car. Click `Start game` button
