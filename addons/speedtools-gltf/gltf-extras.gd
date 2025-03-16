@@ -95,20 +95,8 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 	return OK
 
 func process_car_extras(root: Node, data: Dictionary):
-	var synchronizer = CarSynchronizer.new()
-	synchronizer.name = "CarSynchronizer"
-	var config = SceneReplicationConfig.new()
-	config.add_property("CarSynchronizer:sync_state")
-	synchronizer.replication_config = config
-	root.add_child(synchronizer)
-	synchronizer.owner = root
 	var dimensions = data["dimensions"]
-	var collisionshape = CollisionShape3D.new()
-	collisionshape.name = "Collider"
-	collisionshape.shape = BoxShape3D.new()
-	collisionshape.shape.size = Vector3(dimensions[0], dimensions[1], dimensions[2])
-	root.add_child(collisionshape)
-	collisionshape.owner = root
+	root.set_meta("dimensions", Vector3(dimensions[0], dimensions[1], dimensions[2]))
 	root.set_meta("performance", data["performance"])
 	root.set_meta("type", "car")
 

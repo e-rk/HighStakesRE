@@ -30,11 +30,17 @@ func _post_import(scene):
 			self.set_wall_collision(child)
 		return new_scene
 	elif scene.get_meta("type") == "car":
-		var new_scene = Car.new()
+		var dimensions = scene.get_meta("dimensions")
+		var new_scene: Node = load("res://core/car/car.tscn").instantiate()
+		var shadow = new_scene.get_child(0)
+		var collider = new_scene.get_child(2)
+		shadow.size = Vector3(dimensions.x, 1.5, dimensions.z) * 1.15
+		collider.shape.size = dimensions
 		new_scene.name = scene.name
 		scene.replace_by(new_scene)
 		var performance = CarPerformance.new()
 		performance.data = scene.get_meta("performance")
+		new_scene.mass = performance.mass()
 		new_scene.performance = performance
 		new_scene.collision_layer = Constants.collision_layer_to_mask([Constants.CollisionLayer.RACERS])
 		new_scene.collision_mask = Constants.collision_layer_to_mask([Constants.CollisionLayer.RACERS, Constants.CollisionLayer.TRACK_WALLS])
