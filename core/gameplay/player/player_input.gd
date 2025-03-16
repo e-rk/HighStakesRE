@@ -52,12 +52,15 @@ func _input(event: InputEvent):
 		self.shift_up()
 	if event.is_action_pressed("shift_down"):
 		self.shift_down()
-	if event.is_action_pressed("reset"):
-		self.reposition.rpc()
 	self.steering = Input.get_axis("turn_right", "turn_left")
 	self.handbrake = Input.is_action_pressed("handbrake")
 	self.throttle = Input.get_action_strength("accelerate")
 	self.brake = Input.get_action_strength("brake")
+
+
+func _physics_process(delta: float) -> void:
+	if Input.is_action_just_pressed("reset"):
+		self.reposition.rpc()
 
 
 @rpc("authority", "call_local", "reliable")
