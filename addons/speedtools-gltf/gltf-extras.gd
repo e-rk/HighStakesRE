@@ -44,6 +44,7 @@ func create_environment(state: GLTFState, environment: Dictionary):
 	var ambient = environment["ambient"]
 	var horizon = environment["horizon"]
 	var color = dict_to_color(ambient)
+	worldenv.environment.ambient_light_color = color
 	worldenv.environment.sky.sky_material.set_shader_parameter("sun_side_color", dict_to_color(horizon["sun"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("top_side_color", dict_to_color(horizon["top"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("opposite_side_color", dict_to_color(horizon["opposite"]))
