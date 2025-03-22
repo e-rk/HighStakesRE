@@ -28,6 +28,8 @@ extends Node
 
 @export var handbrake := false
 
+@export var lights_on := false
+
 signal reposition_requested
 
 var max_gear := CarTypes.Gear.GEAR_6
@@ -52,6 +54,8 @@ func _input(event: InputEvent):
 		self.shift_up()
 	if event.is_action_pressed("shift_down"):
 		self.shift_down()
+	if event.is_action_pressed("lights"):
+		self.lights_on = not self.lights_on
 	self.steering = Input.get_axis("turn_right", "turn_left")
 	self.handbrake = Input.is_action_pressed("handbrake")
 	self.throttle = Input.get_action_strength("accelerate")

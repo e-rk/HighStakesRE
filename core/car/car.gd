@@ -31,6 +31,13 @@ extends RigidBody3D
 
 @export var handling_model: HandlingModel
 
+@export var lights_on : bool:
+	set(value):
+		self._enable_lights(self.head_lights, lights_on)
+		lights_on = value
+	get:
+		return lights_on
+
 const RAYCAST_DISTANCE = 10
 
 var current_rpm := 0.0
@@ -47,6 +54,13 @@ var gear_shift_counter = 0
 var shifted_down = false
 var g_transfer := 0.0
 var has_contact_with_ground := true
+var head_lights := []
+var tail_lights := []
+var brake_lights := []
+var directional_lights := []
+var reverse_lights := []
+var tail_light_energy : float = 0.0
+var brake_light_energy : float = 0.0
 
 @onready var collider: CollisionShape3D = $Collider
 
@@ -54,6 +68,27 @@ var has_contact_with_ground := true
 func _ready():
 	if handling_model == null:
 		handling_model = HandlingModelRE.new()
+	var nodes = self.get_children().filter(func(x): return x is Light3D)
+	self.head_lights = nodes.filter(func(x): return x.name.begins_with("headlight"))
+	self.tail_lights = nodes.filter(func(x): return x.name.begins_with("taillight"))
+	self.brake_lights = nodes.filter(func(x): return x.name.begins_with("brakelight"))
+	self.reverse_lights = nodes.filter(func(x): return x.name.begins_with("reverse"))
+	self.directional_lights = nodes.filter(func(x): return x.name.begins_with("directional"))
+	self._enable_lights(self.head_lights, self.lights_on)
+	self._enable_lights(self.tail_lights, self.lights_on)
+	self._enable_lights(self.brake_lights, false)
+	self._enable_lights(self.reverse_lights, false)
+	self._enable_lights(self.directional_lights, false)
+	if self.tail_lights:
+		self.tail_light_energy = self.tail_lights[0].light_energy
+	if self.brake_lights:
+		self.brake_light_energy = self.brake_lights[0].light_energy
+	else:
+		self.brake_light_energy = 2 * tail_light_energy
+
+func _enable_lights(lights: Array, visible: bool):
+	for light in lights:
+		light.visible = visible
 
 func dimensions() -> Vector3:
 	return collider.shape.size
@@ -193,5 +228,13 @@ func _integrate_forces(state: PhysicsDirectBodyState3D):
 	self.linear_acceleration = (state.linear_velocity - prev_linear_velocity) / (state.step * 2)
 	prev_linear_velocity = state.linear_velocity
 	prev_angular_velocity = state.angular_velocity
-
 	self.keep_height_above_ground(positional_attributes)
+
+	self._enable_lights(self.brake_lights, self.current_brake > 0)
+	self._enable_lights(self.tail_lights, self.current_brake > 0 || self.lights_on)
+	self._enable_lights(self.reverse_lights,self.current_gear == CarTypes.Gear.REVERSE)
+	var tail_light_energy = self.tail_light_energy
+	if self.current_brake > 0:
+		tail_light_energy = self.brake_light_energy
+	for light in self.tail_lights:
+		light.light_energy = tail_light_energy

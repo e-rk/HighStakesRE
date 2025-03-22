@@ -39,6 +39,7 @@ func _physics_process(_delta):
 	car.steering = input.steering
 	car.handbrake = input.handbrake
 	car.gear = input.gear
+	car.lights_on = input.lights_on
 
 
 func _on_input_reposition_requested():
