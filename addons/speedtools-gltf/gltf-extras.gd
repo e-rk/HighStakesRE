@@ -39,17 +39,31 @@ func _make_skybox(state: GLTFState) -> Cubemap:
 			return cubemap
 	return null
 
+func find_gltf_node(state: GLTFState, name: String) -> Dictionary:
+	var json = state.json
+	var nodes = json["nodes"]
+	for node in nodes:
+		if node["name"] == name:
+			return node
+	return {}
+
 func create_environment(state: GLTFState, environment: Dictionary):
 	var worldenv = load("res://core/resources/environment/environment.tscn").instantiate()
 	var ambient = environment["ambient"]
 	var horizon = environment["horizon"]
 	var color = dict_to_color(ambient)
+	var sun = self.find_gltf_node(state, "sun")
 	worldenv.environment.ambient_light_color = color
+	worldenv.environment.sky.sky_material.set_shader_parameter("ambient_color", color)
 	worldenv.environment.sky.sky_material.set_shader_parameter("sun_side_color", dict_to_color(horizon["sun"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("top_side_color", dict_to_color(horizon["top"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("opposite_side_color", dict_to_color(horizon["opposite"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("background_texture", self._make_skybox(state))
 	worldenv.environment.sky.sky_material.set_shader_parameter("sun_texture", self.get_image_by_name(state, "sun"))
+	if sun.has("extras") and sun["extras"].has("SPT_sun"):
+		var spt_sun = sun["extras"]["SPT_sun"]
+		worldenv.environment.sky.sky_material.set_shader_parameter("sun_additive", spt_sun["additive"])
+		worldenv.environment.sky.sky_material.set_shader_parameter("sun_radius", spt_sun["radius"] / 4000.0)
 	return worldenv
 
 func finalize_materials(json: Dictionary, materials: Array[Material]):

@@ -3,12 +3,18 @@ uniform sampler2D CloudTexture : source_color, hint_default_black;
 uniform sampler2D CloudSubtractTexture : source_color;
 uniform samplerCube background_texture : source_color, hint_default_black, filter_linear;
 uniform sampler2D earth_gradient : source_color, hint_default_black;
-uniform sampler2D sun_texture : source_color, repeat_disable;
 uniform float cloud_speed = 0.010000;
 uniform float cloud_scale = 0.12000;
 uniform vec3 sun_side_color: source_color;
 uniform vec3 top_side_color: source_color;
 uniform vec3 opposite_side_color: source_color;
+uniform vec3 ambient_color: source_color;
+
+group_uniforms Sun;
+uniform sampler2D sun_texture : source_color, repeat_disable, hint_default_transparent;
+uniform float sun_radius = 0.1;
+uniform bool sun_additive = false;
+uniform bool sun_rotates = false;
 
 vec4 make_cloud(sampler2D tex, vec3 uv, float scale, float speed)
 {
@@ -17,6 +23,7 @@ vec4 make_cloud(sampler2D tex, vec3 uv, float scale, float speed)
 	vec4 color;
 	if (uv.y > 0.0) {
 		color = texture(tex, uv_offset);
+		color.rgb *= ambient_color.rgb;
 	} else {
 		color = vec4(0.0);
 	}
@@ -30,16 +37,17 @@ float eyedir_coord_to_factor(float coord)
 
 vec3 make_sky_gradient(vec3 uv)
 {
-	vec2 sundir = normalize(LIGHT0_DIRECTION.xz);
-	float dist = 0.5 * distance(uv.xz, sundir);
-	//float dist = 0.5 * distance(uv, LIGHT0_DIRECTION);
-	float mix_sun = eyedir_coord_to_factor(dist);
-	vec3 color = vec3(0.0);
-	color = mix(sun_side_color, opposite_side_color, mix_sun);
-	color = mix(color, top_side_color, uv.y);
-	//dist = eyedir_coord_to_factor(uv.z);
-	//color = vec3(dist, 0.0, 0.0);
-	return color * step(0, uv.y);
+	vec3 sundir_xz = normalize(vec3(LIGHT0_DIRECTION.x, 0.0, LIGHT0_DIRECTION.z));
+	vec3 uv_xz = normalize(vec3(uv.x, 0.0, uv.z));
+	float dist = distance(uv_xz, sundir_xz);
+	const float half = sqrt(2.0);
+	const float transition = 0.6;
+	float interp = smoothstep(half - transition, half + transition, dist);
+	vec3 bottom_color = mix(sun_side_color, opposite_side_color, interp);
+	const float top_height = 0.25;
+	const float top_transition = 0.2;
+	float interp2 = smoothstep(top_height - top_transition, top_height + top_transition, uv.y);
+	return mix(bottom_color, top_side_color, interp2) * step(0.0, uv.y);
 }
 
 vec4 make_earth_gradient(sampler2D tex, vec3 uv)
@@ -66,18 +74,12 @@ vec4 make_sun(vec3 uv)
 	float fact = 0.05;
 
 	if (LIGHT0_ENABLED) {
-		float direction = distance(uv, LIGHT0_DIRECTION);
-		float position = 1.0 - clamp(direction / fact, 0.0, 1.0);
-		float disk = smoothstep(0.00, fact, position);
 		float dir = dot(uv, LIGHT0_DIRECTION);
-		vec2 uv = eyedir_to_sun_uv(uv, LIGHT0_DIRECTION, 0.3);
+		vec2 uv = eyedir_to_sun_uv(uv, LIGHT0_DIRECTION, sun_radius);
 		vec4 color = texture(sun_texture, uv) * step(0, dir);
-		const float TRANSITION = 0.15;
-		color = color
-		      * smoothstep(-TRANSITION, TRANSITION, uv.x)
-			  * smoothstep(-TRANSITION, TRANSITION, uv.y)
-			  * smoothstep(1.0 + TRANSITION, 1.0 - TRANSITION, uv.x)
-			  * smoothstep(1.0 + TRANSITION, 1.0 - TRANSITION, uv.y);
+		const float TRANSITION = 0.2;
+		float dist = distance(vec2(0.5), uv);
+		color = color * smoothstep(0.5 + TRANSITION, 0.5 - TRANSITION, dist);
 		return color;
 	}
 	return vec4(0.0);
@@ -91,7 +93,12 @@ void sky() {
 	vec4 background = texture(background_texture, adjust);
 	vec4 sun = make_sun(EYEDIR);
 	vec3 blended = cloud.xyz + (1.0 - cloud.x) * gradient.xyz;
-	vec3 sky = mix(gradient + ground.xyz, sun.xyz, sun.a);
+	vec3 sky;
+	if (sun_additive) {
+		sky = gradient + ground.xyz + sun.xyz;
+	} else {
+		sky = mix(gradient + ground.xyz, sun.xyz, sun.a);
+	}
 	sky = cloud.xyz + (1.0 - cloud.x) * sky.xyz;
-	COLOR = mix(sky, background.xyz, background.a);
+	COLOR = mix(sky, background.xyz * ambient_color, background.a);
 }
