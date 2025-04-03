@@ -49,6 +49,7 @@ func create_environment(state: GLTFState, environment: Dictionary):
 	worldenv.environment.sky.sky_material.set_shader_parameter("top_side_color", dict_to_color(horizon["top"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("opposite_side_color", dict_to_color(horizon["opposite"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("background_texture", self._make_skybox(state))
+	worldenv.environment.sky.sky_material.set_shader_parameter("sun_texture", self.get_image_by_name(state, "sun"))
 	return worldenv
 
 func finalize_materials(json: Dictionary, materials: Array[Material]):
