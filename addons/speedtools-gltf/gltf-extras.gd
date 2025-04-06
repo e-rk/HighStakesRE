@@ -71,6 +71,8 @@ func finalize_materials(json: Dictionary, materials: Array[Material]):
 	for i in len(materials):
 		var json_material = json_materials[i]
 		var material = materials[i]
+		if material is BaseMaterial3D:
+			material.vertex_color_is_srgb = true
 		if json_material.has("extensions"):
 			var ext = json_material["extensions"]
 			if ext.has("KHR_materials_specular"):
