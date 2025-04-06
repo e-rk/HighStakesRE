@@ -31,7 +31,8 @@ enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/speedtool
 [importer_defaults]
 
 scene={
-"import_script/path": "res://addons/speedtools-gltf/post-import.gd"
+&"import_script/path": "res://addons/speedtools-gltf/post-import.gd",
+&"meshes/force_disable_compression": true
 }
 texture={
 &"detect_3d/compress_to": 0
