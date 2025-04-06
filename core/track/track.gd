@@ -4,6 +4,14 @@ extends Node3D
 @onready var waypoints: Waypoints = $Waypoints
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
+func _ready() -> void:
+	for child in self.get_children():
+		if child is AnimationPlayer:
+			var action = child.get_meta(&"action", "")
+			if not action:
+				continue
+			child.play(action)
+
 
 func get_spawn_transform(idx) -> Transform3D:
 	var points = get_waypoints()

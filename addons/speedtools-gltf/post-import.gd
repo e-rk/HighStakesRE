@@ -28,6 +28,24 @@ func _post_import(scene):
 		scene.replace_by(new_scene)
 		for child in new_scene.get_children():
 			self.set_wall_collision(child)
+		var animation_player = new_scene.find_child("AnimationPlayer") as AnimationPlayer
+		if animation_player:
+			var animation_library = animation_player.get_animation_library(&"")
+			for animation_name in animation_library.get_animation_list():
+				var object = animation_name.rstrip("-action-Action_DEFAULT")
+				var animation = animation_library.get_animation(animation_name)
+				for track in [Animation.TrackType.TYPE_POSITION_3D, Animation.TrackType.TYPE_ROTATION_3D]:
+					var idx = animation.find_track(object, track)
+					if idx != -1:
+						animation.track_set_path(idx, ".")
+				var player = AnimationPlayer.new()
+				player.root_node = "../" + object
+				player.add_animation_library(&"", animation_library)
+				player.set_meta(&"action", animation_name)
+				var object_node = new_scene.find_child(object)
+				new_scene.add_child(player)
+				player.owner = new_scene
+			animation_player.queue_free()
 		return new_scene
 	elif scene.get_meta("type") == "car":
 		var dimensions = scene.get_meta("dimensions")
