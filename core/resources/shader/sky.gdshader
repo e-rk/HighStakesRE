@@ -95,7 +95,7 @@ void sky() {
 	vec3 blended = cloud.xyz + (1.0 - cloud.x) * gradient.xyz;
 	vec3 sky;
 	if (sun_additive) {
-		sky = gradient + ground.xyz + sun.xyz;
+		sky = gradient + ground.xyz + sun.xyz * sun.a;
 	} else {
 		sky = mix(gradient + ground.xyz, sun.xyz, sun.a);
 	}
