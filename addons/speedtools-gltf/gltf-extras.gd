@@ -16,10 +16,9 @@ func scale_light_energy(node: Node):
 	if node is Light3D:
 		node.light_energy /= 6830
 	if node is DirectionalLight3D:
-		node.light_energy = 0.5
 		node.shadow_reverse_cull_face = true
 		node.shadow_enabled = true
-		node.shadow_blur = true
+		node.shadow_blur = 5.0
 	for child in node.get_children():
 		scale_light_energy(child)
 	return OK
