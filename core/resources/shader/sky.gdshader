@@ -1,14 +1,18 @@
 shader_type sky;
 uniform sampler2D CloudTexture : source_color, hint_default_black;
 uniform sampler2D CloudSubtractTexture : source_color;
-uniform samplerCube background_texture : source_color, hint_default_black, filter_linear;
-uniform sampler2D earth_gradient : source_color, hint_default_black;
 uniform float cloud_speed = 0.010000;
 uniform float cloud_scale = 0.12000;
+uniform vec3 ambient_color: source_color;
+
+group_uniforms Strip;
+uniform samplerCube background_texture : source_color, hint_default_black, filter_linear;
 uniform vec3 sun_side_color: source_color;
 uniform vec3 top_side_color: source_color;
 uniform vec3 opposite_side_color: source_color;
-uniform vec3 ambient_color: source_color;
+uniform vec3 earth_bottom : source_color;
+uniform vec3 earth_top : source_color;
+
 
 group_uniforms Sun;
 uniform sampler2D sun_texture : source_color, repeat_disable, hint_default_transparent;
@@ -30,11 +34,6 @@ vec4 make_cloud(sampler2D tex, vec3 uv, float scale, float speed)
 	return color;
 }
 
-float eyedir_coord_to_factor(float coord)
-{
-	return 0.5 * coord + 0.5;
-}
-
 vec3 make_sky_gradient(vec3 uv)
 {
 	vec3 sundir_xz = normalize(vec3(LIGHT0_DIRECTION.x, 0.0, LIGHT0_DIRECTION.z));
@@ -50,12 +49,11 @@ vec3 make_sky_gradient(vec3 uv)
 	return mix(bottom_color, top_side_color, interp2) * step(0.0, uv.y);
 }
 
-vec4 make_earth_gradient(sampler2D tex, vec3 uv)
+vec3 make_earth_gradient(vec3 uv)
 {
 	vec4 color;
 	float distance_from_sun = distance(uv, LIGHT0_DIRECTION);
-	color = texture(tex, vec2(0.5 * distance_from_sun)) * step(0, uv.y);
-	return color;
+	return mix(earth_top, earth_bottom, -uv.y) * step(0, -uv.y);
 }
 
 vec2 eyedir_to_sun_uv(vec3 eyedir, vec3 sun_dir, float sun_size)
@@ -88,17 +86,18 @@ vec4 make_sun(vec3 uv)
 void sky() {
 	vec4 cloud = make_cloud(CloudTexture, EYEDIR, cloud_scale, cloud_speed);
 	vec3 gradient = make_sky_gradient(EYEDIR);
-	vec4 ground = make_earth_gradient(earth_gradient, EYEDIR);
+	vec3 ground = make_earth_gradient(EYEDIR);
 	vec3 adjust = vec3(EYEDIR.x, EYEDIR.y, EYEDIR.z);
 	vec4 background = texture(background_texture, adjust);
 	vec4 sun = make_sun(EYEDIR);
 	vec3 blended = cloud.xyz + (1.0 - cloud.x) * gradient.xyz;
+	vec3 strip = gradient + ground;
 	vec3 sky;
 	if (sun_additive) {
-		sky = gradient + ground.xyz + sun.xyz * sun.a;
+		sky = strip + sun.xyz * sun.a;
 	} else {
-		sky = mix(gradient + ground.xyz, sun.xyz, sun.a);
+		sky = mix(strip, sun.xyz, sun.a);
 	}
-	sky = cloud.xyz + (1.0 - cloud.x) * sky.xyz;
+	//sky = cloud.xyz + (1.0 - cloud.x) * sky.xyz;
 	COLOR = mix(sky, background.xyz * ambient_color, background.a);
 }

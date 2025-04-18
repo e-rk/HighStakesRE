@@ -54,9 +54,11 @@ func create_environment(state: GLTFState, environment: Dictionary):
 	var sun = self.find_gltf_node(state, "sun")
 	worldenv.environment.ambient_light_color = color
 	worldenv.environment.sky.sky_material.set_shader_parameter("ambient_color", color)
-	worldenv.environment.sky.sky_material.set_shader_parameter("sun_side_color", dict_to_color(horizon["sun"]))
-	worldenv.environment.sky.sky_material.set_shader_parameter("top_side_color", dict_to_color(horizon["top"]))
-	worldenv.environment.sky.sky_material.set_shader_parameter("opposite_side_color", dict_to_color(horizon["opposite"]))
+	worldenv.environment.sky.sky_material.set_shader_parameter("sun_side_color", dict_to_color(horizon["sun_side"]))
+	worldenv.environment.sky.sky_material.set_shader_parameter("top_side_color", dict_to_color(horizon["sun_top"]))
+	worldenv.environment.sky.sky_material.set_shader_parameter("opposite_side_color", dict_to_color(horizon["sun_opposite"]))
+	worldenv.environment.sky.sky_material.set_shader_parameter("earth_bottom", dict_to_color(horizon["earth_bottom"]))
+	worldenv.environment.sky.sky_material.set_shader_parameter("earth_top", dict_to_color(horizon["earth_top"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("background_texture", self._make_skybox(state))
 	worldenv.environment.sky.sky_material.set_shader_parameter("sun_texture", self.get_image_by_name(state, "sun"))
 	if sun.has("extras") and sun["extras"].has("SPT_sun"):
