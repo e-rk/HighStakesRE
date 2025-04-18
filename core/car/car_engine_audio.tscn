@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dowhytgk2pns0"]
+[gd_scene format=3 uid="uid://dowhytgk2pns0"]
 
 [ext_resource type="Script" uid="uid://csda3j1mjrfw" path="res://core/car/car_engine_audio.gd" id="7_pjrvn"]
 

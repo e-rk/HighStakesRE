@@ -427,7 +427,7 @@ func _physics_process(delta: float) -> void:
 			
 			#print(step2)
 			
-			var test = pitch_calculate(pitch, step2)
+			var test = pitch_calculate(pitch, 1)
 			
 			print(test)
 			
