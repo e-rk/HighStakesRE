@@ -61,6 +61,7 @@ func create_environment(state: GLTFState, environment: Dictionary):
 	worldenv.environment.sky.sky_material.set_shader_parameter("earth_top", dict_to_color(horizon["earth_top"]))
 	worldenv.environment.sky.sky_material.set_shader_parameter("background_texture", self._make_skybox(state))
 	worldenv.environment.sky.sky_material.set_shader_parameter("sun_texture", self.get_image_by_name(state, "sun"))
+	worldenv.environment.sky.sky_material.set_shader_parameter("sky_texture", self.get_image_by_name(state, "clouds"))
 	if sun.has("extras") and sun["extras"].has("SPT_sun"):
 		var spt_sun = sun["extras"]["SPT_sun"]
 		worldenv.environment.sky.sky_material.set_shader_parameter("sun_additive", spt_sun["additive"])

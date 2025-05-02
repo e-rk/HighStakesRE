@@ -2,17 +2,17 @@ shader_type sky;
 uniform sampler2D CloudTexture : source_color, hint_default_black;
 uniform sampler2D CloudSubtractTexture : source_color;
 uniform float cloud_speed = 0.010000;
-uniform float cloud_scale = 0.12000;
+uniform float cloud_scale = 2.0;
 uniform vec3 ambient_color: source_color;
 
 group_uniforms Strip;
 uniform samplerCube background_texture : source_color, hint_default_black, filter_linear;
+uniform sampler2D sky_texture : source_color, repeat_enable, filter_linear;
 uniform vec3 sun_side_color: source_color;
 uniform vec3 top_side_color: source_color;
 uniform vec3 opposite_side_color: source_color;
 uniform vec3 earth_bottom : source_color;
 uniform vec3 earth_top : source_color;
-
 
 group_uniforms Sun;
 uniform sampler2D sun_texture : source_color, repeat_disable, hint_default_transparent;
@@ -25,12 +25,12 @@ vec4 make_cloud(sampler2D tex, vec3 uv, float scale, float speed)
 	vec2 uv_flat = uv.xz * scale / uv.y;
 	vec2 uv_offset = fma(vec2(TIME), vec2(speed), uv_flat);
 	vec4 color;
-	if (uv.y > 0.0) {
-		color = texture(tex, uv_offset);
-		color.rgb *= ambient_color.rgb;
-	} else {
-		color = vec4(0.0);
-	}
+
+	float denominator = 1.0 + uv.y;
+	vec2 uv_tex = (uv.xz / denominator) * cloud_scale;
+
+	color = texture(tex, uv_tex) * step(0, uv.y);
+	color.rgb *= ambient_color.rgb;
 	return color;
 }
 
@@ -84,13 +84,12 @@ vec4 make_sun(vec3 uv)
 }
 
 void sky() {
-	vec4 cloud = make_cloud(CloudTexture, EYEDIR, cloud_scale, cloud_speed);
+	vec4 cloud = make_cloud(sky_texture, EYEDIR, cloud_scale, cloud_speed);
 	vec3 gradient = make_sky_gradient(EYEDIR);
 	vec3 ground = make_earth_gradient(EYEDIR);
 	vec3 adjust = vec3(EYEDIR.x, EYEDIR.y, EYEDIR.z);
 	vec4 background = texture(background_texture, adjust);
 	vec4 sun = make_sun(EYEDIR);
-	vec3 blended = cloud.xyz + (1.0 - cloud.x) * gradient.xyz;
 	vec3 strip = gradient + ground;
 	vec3 sky;
 	if (sun_additive) {
@@ -98,6 +97,7 @@ void sky() {
 	} else {
 		sky = mix(strip, sun.xyz, sun.a);
 	}
-	//sky = cloud.xyz + (1.0 - cloud.x) * sky.xyz;
+	sky = 1.0 * cloud.rgb + sky.rgb;
+
 	COLOR = mix(sky, background.xyz * ambient_color, background.a);
 }
