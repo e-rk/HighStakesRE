@@ -21,11 +21,45 @@ func set_wall_collision(node: Node):
 		node.collision_layer = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_WALLS])
 		node.collision_mask = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_WALLS])
 
+func make_rigid_body(scene: Node, node: Node):
+	var object = preload("res://core/track/track_object.tscn").instantiate()
+	scene.add_child(object)
+	object.owner = scene
+	object.name = "RigidBody3D"
+	object.transform = node.transform
+	object.collision_layer = Constants.collision_layer_to_mask([Constants.CollisionLayer.OBJECTS])
+	object.collision_mask = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_ROAD, Constants.CollisionLayer.TRACK_WALLS, Constants.CollisionLayer.TRACK_CEILING, Constants.CollisionLayer.RACERS, Constants.CollisionLayer.TRAFFIC, Constants.CollisionLayer.POLICE, Constants.CollisionLayer.OBJECTS])
+	var attrs = node.get_meta("extras")["SPT_object"]
+	object.mass = attrs["mass"]
+	var dimension = Vector3(
+		attrs["dimensions"][0],
+		attrs["dimensions"][1],
+		attrs["dimensions"][2],
+	)
+	var collider = CollisionShape3D.new()
+	object.add_child(collider)
+	collider.owner = scene
+	collider.name = "CollisionShape3D"
+	var shape = BoxShape3D.new()
+	shape.size = dimension
+	collider.shape = shape
+	node.transform = Transform3D()
+	node.owner = null
+	node.get_parent().remove_child(node)
+	object.add_child(node)
+	node.owner = scene
+
+func make_rigid_bodies(scene: Node):
+	var objects = scene.get_children().filter(func(x): return x.get_meta("extras", {}).has("SPT_object"))
+	for object in objects:
+		self.make_rigid_body(scene, object)
+
 func _post_import(scene):
 	if scene.get_meta("type") == "track":
 		var new_scene = RaceTrack.new()
 		new_scene.name = scene.name
 		scene.replace_by(new_scene)
+		self.make_rigid_bodies(new_scene)
 		for child in new_scene.get_children():
 			self.set_wall_collision(child)
 		var animation_player = new_scene.find_child("AnimationPlayer") as AnimationPlayer
@@ -60,10 +94,6 @@ func _post_import(scene):
 		performance.data = scene.get_meta("performance")
 		new_scene.mass = performance.mass()
 		new_scene.performance = performance
-		new_scene.collision_layer = Constants.collision_layer_to_mask([Constants.CollisionLayer.RACERS])
-		new_scene.collision_mask = Constants.collision_layer_to_mask([Constants.CollisionLayer.RACERS, Constants.CollisionLayer.TRACK_WALLS])
-		new_scene.continuous_cd = true
-		new_scene.physics_material_override = load("res://core/resources/car-physics-material.tres")
 		for node in new_scene.get_children():
 			if node is VisualInstance3D:
 				node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])

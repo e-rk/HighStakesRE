@@ -15,7 +15,7 @@ warnings/check_invalid_track_paths=false
 [application]
 
 config/name="Velocity"
-run/main_scene="res://core/main.tscn"
+run/main_scene="uid://drxrxxcoribky"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
 [autoload]
@@ -102,6 +102,7 @@ lights={
 3d_physics/layer_4="RACERS"
 3d_physics/layer_5="TRAFFIC"
 3d_physics/layer_6="POLICE"
+3d_physics/layer_7="OBJECTS"
 
 [physics]
 

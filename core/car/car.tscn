@@ -1,5 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://dd8wh1ccg1hn3"]
+[gd_scene load_steps=10 format=3 uid="uid://dd8wh1ccg1hn3"]
 
+[ext_resource type="PhysicsMaterial" uid="uid://wo7b1vixch3t" path="res://core/resources/car-physics-material.tres" id="1_erlt3"]
 [ext_resource type="Script" uid="uid://un2jefdr7h8w" path="res://core/car/car.gd" id="1_iu3ke"]
 [ext_resource type="Script" uid="uid://bodsc1ioqdpjc" path="res://core/multiplayer/car_synchronizer.gd" id="2_kivpk"]
 
@@ -40,7 +41,8 @@ size = Vector3(1.9, 1.3, 4.57605)
 
 [node name="Car" type="RigidBody3D"]
 collision_layer = 8
-collision_mask = 10
+collision_mask = 74
+physics_material_override = ExtResource("1_erlt3")
 center_of_mass_mode = 1
 can_sleep = false
 custom_integrator = true

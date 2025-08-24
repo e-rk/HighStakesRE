@@ -8,6 +8,7 @@ enum CollisionLayer {
 	RACERS = 3,
 	TRAFFIC = 4,
 	POLICE = 5,
+	OBJECTS = 6,
 }
 
 enum VisualLayer {
