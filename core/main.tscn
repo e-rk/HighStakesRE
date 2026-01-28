@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://drxrxxcoribky"]
+[gd_scene format=3 uid="uid://drxrxxcoribky"]
 
 [ext_resource type="PackedScene" uid="uid://cobfxotpk11ed" path="res://core/ui/config/player_config.tscn" id="2_bde8t"]
 [ext_resource type="PackedScene" uid="uid://dsfc26eqpq6ki" path="res://core/ui/config/game_config.tscn" id="3_mpyi5"]
@@ -12,39 +12,39 @@
 [ext_resource type="Script" uid="uid://d0ltal5itv82t" path="res://core/ui/lobby/lobby_state_joined.gd" id="12_hs50p"]
 [ext_resource type="PackedScene" uid="uid://bdjcugue7syvn" path="res://core/multiplayer/player_data_container.tscn" id="14_xn7nn"]
 
-[node name="LobbyStateContext" type="Node"]
+[node name="LobbyStateContext" type="Node" unique_id=627877390]
 script = ExtResource("9_ea3qp")
 initial_state = NodePath("LobbyStateDisconnected")
 
-[node name="LobbyStateDisconnected" type="Node" parent="."]
+[node name="LobbyStateDisconnected" type="Node" parent="." unique_id=58351117]
 script = ExtResource("10_h0874")
 
-[node name="LobbyStateHosting" type="Node" parent="."]
+[node name="LobbyStateHosting" type="Node" parent="." unique_id=1963969723]
 script = ExtResource("11_pykj5")
 
-[node name="ConfirmStart" type="ConfirmationDialog" parent="LobbyStateHosting"]
+[node name="ConfirmStart" type="ConfirmationDialog" parent="LobbyStateHosting" unique_id=732031268]
 initial_position = 4
 size = Vector2i(450, 100)
 ok_button_text = "Start race"
 dialog_text = "Not all players are ready. Do you want to start anyways?"
 
-[node name="LobbyStateJoined" type="Node" parent="."]
+[node name="LobbyStateJoined" type="Node" parent="." unique_id=739135218]
 script = ExtResource("12_hs50p")
 
-[node name="DisconnectedPopup" type="AcceptDialog" parent="LobbyStateJoined"]
+[node name="DisconnectedPopup" type="AcceptDialog" parent="LobbyStateJoined" unique_id=1073209821]
 initial_position = 4
 size = Vector2i(220, 100)
 dialog_text = "Disconnected from server."
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=982241280]
 _spawnable_scenes = PackedStringArray("uid://fnr6x5fft0m6")
 spawn_path = NodePath("..")
 spawn_limit = 1
 
-[node name="PlayerDataContainer" parent="." instance=ExtResource("14_xn7nn")]
+[node name="PlayerDataContainer" parent="." unique_id=1354250330 instance=ExtResource("14_xn7nn")]
 unique_name_in_owner = true
 
-[node name="Interface" type="Control" parent="."]
+[node name="Interface" type="Control" parent="." unique_id=787355897]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -52,7 +52,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Interface"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Interface" unique_id=1502079629]
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
@@ -62,15 +62,15 @@ offset_right = 158.0
 offset_bottom = 25.0
 grow_vertical = 2
 
-[node name="PlayerConfig" parent="Interface/VBoxContainer" instance=ExtResource("2_bde8t")]
+[node name="PlayerConfig" parent="Interface/VBoxContainer" unique_id=131156610 instance=ExtResource("2_bde8t")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="GameConfig" parent="Interface/VBoxContainer" instance=ExtResource("3_mpyi5")]
+[node name="GameConfig" parent="Interface/VBoxContainer" unique_id=1506566532 instance=ExtResource("3_mpyi5")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Interface"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Interface" unique_id=8037122]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -83,19 +83,19 @@ offset_right = 20.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="Ready" type="Button" parent="Interface/HBoxContainer"]
+[node name="Ready" type="Button" parent="Interface/HBoxContainer" unique_id=163877759]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 toggle_mode = true
 text = "Ready"
 
-[node name="StartRace" type="Button" parent="Interface/HBoxContainer"]
+[node name="StartRace" type="Button" parent="Interface/HBoxContainer" unique_id=1921122597]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Start race"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="Interface"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="Interface" unique_id=717144865]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -107,34 +107,34 @@ offset_top = -40.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="JoinDialog" parent="Interface/HBoxContainer2" instance=ExtResource("5_fw77u")]
+[node name="JoinDialog" parent="Interface/HBoxContainer2" unique_id=2081424677 instance=ExtResource("5_fw77u")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HostDialog" parent="Interface/HBoxContainer2" instance=ExtResource("7_stv8w")]
+[node name="HostDialog" parent="Interface/HBoxContainer2" unique_id=1346698872 instance=ExtResource("7_stv8w")]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Host game..."
 
-[node name="ShowLobby" type="Button" parent="Interface/HBoxContainer2"]
+[node name="ShowLobby" type="Button" parent="Interface/HBoxContainer2" unique_id=1808993589]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 toggle_mode = true
 text = "Show lobby"
 
-[node name="Disconnect" parent="Interface/HBoxContainer2" instance=ExtResource("6_0dax1")]
+[node name="Disconnect" parent="Interface/HBoxContainer2" unique_id=1304732528 instance=ExtResource("6_0dax1")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="LobbyWindow" type="Window" parent="Interface"]
+[node name="LobbyWindow" type="Window" parent="Interface" unique_id=2115446251]
 unique_name_in_owner = true
 title = "Lobby"
 initial_position = 2
 size = Vector2i(500, 400)
 visible = false
 
-[node name="PanelContainer" type="PanelContainer" parent="Interface/LobbyWindow"]
+[node name="PanelContainer" type="PanelContainer" parent="Interface/LobbyWindow" unique_id=1640033299]
 custom_minimum_size = Vector2(400, 400)
 anchors_preset = 15
 anchor_right = 1.0
@@ -144,18 +144,18 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="Interface/LobbyWindow/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="Interface/LobbyWindow/PanelContainer" unique_id=136919994]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Interface/LobbyWindow/PanelContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Interface/LobbyWindow/PanelContainer/MarginContainer" unique_id=490460049]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Interface/LobbyWindow/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="Interface/LobbyWindow/PanelContainer/MarginContainer/VBoxContainer" unique_id=194502541]
 layout_mode = 2
 text = "Players"
 horizontal_alignment = 1
 
-[node name="LobbyStatus" parent="Interface/LobbyWindow/PanelContainer/MarginContainer/VBoxContainer" instance=ExtResource("9_grfk7")]
+[node name="LobbyStatus" parent="Interface/LobbyWindow/PanelContainer/MarginContainer/VBoxContainer" unique_id=1183881627 instance=ExtResource("9_grfk7")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3

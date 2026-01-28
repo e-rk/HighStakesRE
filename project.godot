@@ -16,7 +16,7 @@ warnings/check_invalid_track_paths=false
 
 config/name="Velocity"
 run/main_scene="uid://drxrxxcoribky"
-config/features=PackedStringArray("4.4", "Forward Plus")
+config/features=PackedStringArray("4.6", "Forward Plus")
 
 [autoload]
 
