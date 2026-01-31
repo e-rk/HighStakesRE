@@ -1,6 +1,6 @@
-# (Naming suggestions welcome)
+# HighStakesRE
 
-This project is an attempt at re-making the Need For Speed 4 High Stakes experience in Godot engine.
+This project is an attempt at reverse engineering and re-making the Need For Speed 4 High Stakes experience in Godot engine.
 
 # Objectives
 
