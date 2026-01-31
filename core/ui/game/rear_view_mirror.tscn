@@ -1,19 +1,21 @@
-[gd_scene load_steps=2 format=3 uid="uid://b5plb6024tl3w"]
+[gd_scene format=3 uid="uid://b5plb6024tl3w"]
 
 [ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_4h78m"]
+[ext_resource type="Material" uid="uid://bddgol1n0wwdf" path="res://core/resources/materials/rear_view_mirror.tres" id="2_vy08p"]
 
-[node name="PanelContainer" type="PanelContainer"]
+[node name="PanelContainer" type="PanelContainer" unique_id=219114531]
 offset_right = 40.0
 offset_bottom = 40.0
 theme = ExtResource("1_4h78m")
 theme_type_variation = &"RearViewMirrorBorder"
 
-[node name="RearViewMirror" type="SubViewportContainer" parent="."]
+[node name="RearViewMirror" type="SubViewportContainer" parent="." unique_id=942523188]
+material = ExtResource("2_vy08p")
 custom_minimum_size = Vector2(500, 120)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="SubViewport" type="SubViewport" parent="RearViewMirror"]
+[node name="SubViewport" type="SubViewport" parent="RearViewMirror" unique_id=826522085]
 handle_input_locally = false
 size = Vector2i(500, 120)
 render_target_update_mode = 4

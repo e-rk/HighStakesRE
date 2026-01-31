@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://bddgol1n0wwdf"]
+
+[ext_resource type="Shader" uid="uid://15332wfpffyw" path="res://core/resources/shader/rear_view_mirror.gdshader" id="1_s5ahm"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_6jlnc"]
+viewport_path = NodePath("RearViewMirror/SubViewport")
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource("1_s5ahm")
+shader_parameter/viewport = SubResource("ViewportTexture_6jlnc")
