@@ -6,7 +6,7 @@ uniform float cloud_scale = 2.0;
 uniform vec3 ambient_color: source_color;
 
 group_uniforms Strip;
-uniform samplerCube background_texture : source_color, hint_default_black, filter_linear;
+uniform samplerCube background_texture : source_color, hint_default_transparent, filter_linear;
 uniform sampler2D sky_texture : source_color, repeat_enable, filter_linear;
 uniform vec3 sun_side_color: source_color;
 uniform vec3 top_side_color: source_color;
