@@ -1,25 +1,37 @@
-[gd_scene load_steps=3 format=3 uid="uid://cuo7um5xrdifo"]
+[gd_scene format=3 uid="uid://cuo7um5xrdifo"]
 
 [ext_resource type="PackedScene" uid="uid://n6ecpp4f60w8" path="res://core/ui/game/player_ui.tscn" id="1_08nnd"]
 [ext_resource type="Script" uid="uid://d2y1hi6r2x6nq" path="res://core/gameplay/player_spectator.gd" id="1_eomyr"]
+[ext_resource type="Shader" uid="uid://15332wfpffyw" path="res://core/resources/shader/rear_view_mirror.gdshader" id="3_lyypb"]
 
-[node name="PlayerSpectator" type="Node3D"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_6jlnc"]
+viewport_path = NodePath("RearViewMirror/SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cd8p5"]
+resource_local_to_scene = true
+shader = ExtResource("3_lyypb")
+shader_parameter/viewport = SubResource("ViewportTexture_6jlnc")
+
+[node name="PlayerSpectator" type="Node3D" unique_id=857663324]
 top_level = true
 script = ExtResource("1_eomyr")
 
-[node name="PlayerUI" parent="." instance=ExtResource("1_08nnd")]
+[node name="PlayerUI" parent="." unique_id=1361609481 instance=ExtResource("1_08nnd")]
 
-[node name="RearViewCamera" type="Camera3D" parent="PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport" index="0"]
+[node name="RearViewMirror" parent="PlayerUI/HSplitContainer/RearViewMirror" index="0" unique_id=942523188]
+material = SubResource("ShaderMaterial_cd8p5")
+
+[node name="RearViewCamera" type="Camera3D" parent="PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport" index="0" unique_id=1764865971]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.034)
 fov = 40.0
 far = 200.0
 
-[node name="RemoteTransform3D" type="RemoteTransform3D" parent="."]
+[node name="RemoteTransform3D" type="RemoteTransform3D" parent="." unique_id=273114835]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.034)
 remote_path = NodePath("../PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport/RearViewCamera")
 
-[node name="ReflectionProbe" type="ReflectionProbe" parent="."]
+[node name="ReflectionProbe" type="ReflectionProbe" parent="." unique_id=27073802]
 layers = 6
 update_mode = 1
 max_distance = 60.0
@@ -28,7 +40,7 @@ origin_offset = Vector3(0, 1, 0)
 cull_mask = 1047553
 reflection_mask = 1047558
 
-[node name="MainCamera" type="Camera3D" parent="."]
+[node name="MainCamera" type="Camera3D" parent="." unique_id=1594213212]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 top_level = true
 doppler_tracking = 2

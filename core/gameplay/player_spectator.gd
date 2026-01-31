@@ -9,7 +9,6 @@ extends Node3D
 @export var race_laps: int = 2
 
 @onready var ui: PlayerUI = $PlayerUI
-@onready var camera_arm: SpringArm3D = %CameraArm
 @onready var reflection: ReflectionProbe = $ReflectionProbe
 @onready var main_camera: Camera3D = $MainCamera
 
