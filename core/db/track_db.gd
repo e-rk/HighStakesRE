@@ -21,9 +21,10 @@ func get_track_by_uuid(uuid: String) -> TrackData:
 func _on_directory_watcher_content_changed():
 	var tracks = {}
 	for file in watcher.files:
-		var path = "%s/%s/%s.glb" % [watcher.directory, file, file]
+		var path = "%s/%s/%s.glb.import" % [watcher.directory, file, file]
 		if not FileAccess.file_exists(path):
 			continue
+		path = path.trim_suffix(".import")
 		var uuid = path
 		var car = TrackData.new()
 		car.name = file
