@@ -112,7 +112,8 @@ func start_race():
 
 
 func _on_end_race():
-	self.race.end_race()
+	if race:
+		self.race.end_race()
 
 
 func _set_local_status(status: Constants.PlayerStatus):
