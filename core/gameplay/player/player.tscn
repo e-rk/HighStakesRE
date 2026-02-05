@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cfwpo7o5qxn42"]
+[gd_scene format=3 uid="uid://cfwpo7o5qxn42"]
 
 [ext_resource type="Script" uid="uid://3gf0nectxbjp" path="res://core/gameplay/player/player.gd" id="1_n5itm"]
 [ext_resource type="Script" uid="uid://2ekyng230e8r" path="res://core/gameplay/player/player_input.gd" id="2_7f16e"]
@@ -16,6 +16,18 @@ properties/2/replication_mode = 0
 properties/3/path = NodePath(".:disable_steering")
 properties/3/spawn = true
 properties/3/replication_mode = 2
+properties/4/path = NodePath(".:primary_color")
+properties/4/spawn = true
+properties/4/replication_mode = 0
+properties/5/path = NodePath(".:secondary_color")
+properties/5/spawn = true
+properties/5/replication_mode = 0
+properties/6/path = NodePath(".:interior_color")
+properties/6/spawn = true
+properties/6/replication_mode = 0
+properties/7/path = NodePath(".:driver_color")
+properties/7/spawn = true
+properties/7/replication_mode = 0
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_q7o5m"]
 properties/0/path = NodePath(".:steering")
@@ -37,16 +49,16 @@ properties/5/path = NodePath(".:lights_on")
 properties/5/spawn = true
 properties/5/replication_mode = 1
 
-[node name="Player" type="Node"]
+[node name="Player" type="Node" unique_id=437232436]
 script = ExtResource("1_n5itm")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1998114169]
 replication_config = SubResource("SceneReplicationConfig_mia2f")
 
-[node name="Input" type="Node" parent="."]
+[node name="Input" type="Node" parent="." unique_id=515408403]
 script = ExtResource("2_7f16e")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Input"]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Input" unique_id=864015620]
 replication_config = SubResource("SceneReplicationConfig_q7o5m")
 
 [connection signal="reposition_requested" from="Input" to="." method="_on_input_reposition_requested"]
