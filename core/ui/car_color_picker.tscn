@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://2oirsw2g0tp0"]
+
+[ext_resource type="Script" uid="uid://dga7grx5gqd4a" path="res://core/ui/car_color_picker.gd" id="1_36e37"]
+
+[node name="CarColorPicker" type="HBoxContainer" unique_id=1731365425]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_36e37")
+
+[node name="Label" type="Label" parent="." unique_id=931118038]
+layout_mode = 2
+text = "Car color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="." unique_id=424262319]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Select color"
+edit_alpha = false
+edit_intensity = false
+
+[connection signal="color_changed" from="ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
+[connection signal="picker_created" from="ColorPickerButton" to="." method="_on_color_picker_button_picker_created"]
