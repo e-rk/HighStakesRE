@@ -1,23 +1,28 @@
-[gd_scene load_steps=3 format=3 uid="uid://cobfxotpk11ed"]
+[gd_scene format=3 uid="uid://cobfxotpk11ed"]
 
 [ext_resource type="Script" uid="uid://b3nohr312xlho" path="res://core/ui/config/player_config.gd" id="1_dfnna"]
 [ext_resource type="PackedScene" uid="uid://b00fb5ox2w4oh" path="res://core/ui/car_picker.tscn" id="2_lyx4f"]
+[ext_resource type="PackedScene" uid="uid://2oirsw2g0tp0" path="res://core/ui/car_color_picker.tscn" id="3_penbf"]
 
-[node name="PlayerConfig" type="VBoxContainer"]
+[node name="PlayerConfig" type="VBoxContainer" unique_id=206712019]
 script = ExtResource("1_dfnna")
 
-[node name="CarPicker" parent="." instance=ExtResource("2_lyx4f")]
+[node name="CarPicker" parent="." unique_id=1190513035 instance=ExtResource("2_lyx4f")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="CarColorPicker" parent="." unique_id=1731365425 instance=ExtResource("3_penbf")]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=610028688]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer" unique_id=1697607137]
 layout_mode = 2
 text = "Player name"
 
-[node name="PlayerName" type="LineEdit" parent="HBoxContainer"]
+[node name="PlayerName" type="LineEdit" parent="HBoxContainer" unique_id=103082941]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
@@ -26,4 +31,5 @@ max_length = 16
 
 [connection signal="player_config_changed" from="." to="." method="save_player"]
 [connection signal="car_selected" from="CarPicker" to="." method="_on_car_picker_car_selected"]
+[connection signal="color_changed" from="CarColorPicker" to="." method="_on_car_color_picker_color_changed"]
 [connection signal="text_submitted" from="HBoxContainer/PlayerName" to="." method="_on_player_name_text_submitted"]
