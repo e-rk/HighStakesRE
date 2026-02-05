@@ -25,6 +25,17 @@ func scale_light_energy(node: Node):
 
 func dict_to_color(value: Dictionary) -> Color:
 	return Color(value["red"], value["green"], value["blue"])
+	
+func dict_hsl_to_color(value: Dictionary) -> Color:
+	return Color.from_hsv(value["hue"] / 255.0, value["saturation"] / 255.0, value["value"] / 255.0)
+
+func dict_to_palette(value: Dictionary) -> CarColorSet:
+	var color_set = CarColorSet.new()
+	color_set.primary = self.dict_hsl_to_color(value["primary"])
+	color_set.secondary = self.dict_hsl_to_color(value["secondary"])
+	color_set.driver = self.dict_hsl_to_color(value["driver"])
+	color_set.interior = self.dict_hsl_to_color(value["interior"])
+	return color_set
 
 func _make_skybox(state: GLTFState) -> Cubemap:
 	var images = state.get_images()
@@ -117,9 +128,13 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 
 func process_car_extras(root: Node, data: Dictionary):
 	var dimensions = data["dimensions"]
+	var color_set: Array[CarColorSet]
+	color_set.assign(data["colors"].map(self.dict_to_palette))
+	
 	root.set_meta("dimensions", Vector3(dimensions[0], dimensions[1], dimensions[2]))
 	root.set_meta("performance", data["performance"])
 	root.set_meta("type", "car")
+	root.set_meta("color_set", color_set)
 
 func get_image_by_name(state: GLTFState, name: String) -> CompressedTexture2D:
 	var images = state.get_images()
