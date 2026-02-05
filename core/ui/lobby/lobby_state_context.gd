@@ -15,6 +15,7 @@ const race_scene = preload("res://core/gameplay/race.tscn")
 @onready var player_config = %PlayerConfig
 @onready var player_data_container = $PlayerDataContainer
 @onready var lobby_ui = $Interface
+@onready var car_viewer = %CarViewer
 
 @onready var lobby_state_joined = $"LobbyStateJoined"
 @onready var lobby_state_hosting = $"LobbyStateHosting"
@@ -128,7 +129,25 @@ func _on_ready_toggled(toggled_on):
 
 func _on_player_config_player_config_changed():
 	var local_data = player_data_container.get_local_player_data()
-	local_data.set_config(player_config.player)
+	var player = player_config.player
+	local_data.set_config(player)
+
+
+func _on_player_config_player_car_changed() -> void:
+	var player = player_config.player
+	var car = load(CarDB.get_car_by_uuid(player.car_uuid).path)
+	self.car_viewer.car = car
+	self.player_config.color_picker.colors = car.instantiate().palette
+
+
+func _on_player_config_player_color_changed() -> void:
+	var player = player_config.player
+	var color_set = CarColorSet.new()
+	color_set.primary = player.color_primary
+	color_set.secondary = player.color_secondary
+	color_set.interior = player.color_interior
+	color_set.driver = player.color_driver
+	self.car_viewer.color_set = color_set
 
 
 func _on_player_data_container_local_player_data_created(node):

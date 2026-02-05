@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://nq8vfo23dbql"]
+[gd_scene format=3 uid="uid://nq8vfo23dbql"]
 
 [ext_resource type="Script" uid="uid://c3utt4p0q5nfv" path="res://core/multiplayer/player_data.gd" id="1_33qj4"]
 
@@ -12,11 +12,23 @@ properties/1/replication_mode = 2
 properties/2/path = NodePath(".:player_status")
 properties/2/spawn = true
 properties/2/replication_mode = 2
+properties/3/path = NodePath(".:color_primary")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:color_secondary")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:color_interior")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:color_driver")
+properties/6/spawn = true
+properties/6/replication_mode = 2
 
-[node name="PlayerData" type="Node"]
+[node name="PlayerData" type="Node" unique_id=2043591738]
 script = ExtResource("1_33qj4")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1950825418]
 replication_config = SubResource("SceneReplicationConfig_iaiic")
 
 [connection signal="delta_synchronized" from="MultiplayerSynchronizer" to="." method="_on_multiplayer_synchronizer_delta_synchronized"]

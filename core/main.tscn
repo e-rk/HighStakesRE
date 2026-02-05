@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://dsfc26eqpq6ki" path="res://core/ui/config/game_config.tscn" id="3_mpyi5"]
 [ext_resource type="PackedScene" uid="uid://b06d2fypc8o5p" path="res://core/ui/join_game_dialog.tscn" id="5_fw77u"]
 [ext_resource type="PackedScene" uid="uid://blnopg2eg5tfb" path="res://core/ui/common/disconnect_dialog.tscn" id="6_0dax1"]
+[ext_resource type="PackedScene" uid="uid://cmbluw7dd6314" path="res://core/ui/car_viewer.tscn" id="6_510js"]
+[ext_resource type="PackedScene" uid="uid://cv0mpgnp34dt4" path="res://import/cars/B911/B911.glb" id="7_7ua4h"]
 [ext_resource type="PackedScene" uid="uid://dj051yp3mnerg" path="res://core/ui/host_game_dialog.tscn" id="7_stv8w"]
 [ext_resource type="Script" uid="uid://dnfs7jufbpobi" path="res://core/ui/lobby/lobby_state_context.gd" id="9_ea3qp"]
 [ext_resource type="PackedScene" uid="uid://hx8gqlpaxyc1" path="res://core/multiplayer/lobby_status.tscn" id="9_grfk7"]
@@ -51,6 +53,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="CarViewer" parent="Interface" unique_id=533039468 instance=ExtResource("6_510js")]
+unique_name_in_owner = true
+layout_mode = 1
+car = ExtResource("7_7ua4h")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Interface" unique_id=1502079629]
 layout_mode = 1
@@ -171,6 +178,8 @@ size_flags_vertical = 3
 [connection signal="player_config_changed" from="PlayerDataContainer" to="." method="_on_player_data_container_data_created"]
 [connection signal="player_data_removed" from="PlayerDataContainer" to="." method="_on_player_data_container_player_data_removed"]
 [connection signal="remote_player_data_created" from="PlayerDataContainer" to="." method="_on_player_data_container_data_created"]
+[connection signal="player_car_changed" from="Interface/VBoxContainer/PlayerConfig" to="." method="_on_player_config_player_car_changed"]
+[connection signal="player_color_changed" from="Interface/VBoxContainer/PlayerConfig" to="." method="_on_player_config_player_color_changed"]
 [connection signal="player_config_changed" from="Interface/VBoxContainer/PlayerConfig" to="." method="_on_player_config_player_config_changed"]
 [connection signal="toggled" from="Interface/HBoxContainer/Ready" to="." method="_on_ready_toggled"]
 [connection signal="pressed" from="Interface/HBoxContainer/StartRace" to="." method="start_game"]
