@@ -33,8 +33,9 @@ extends RigidBody3D
 
 @export var lights_on : bool:
 	set(value):
-		self._enable_lights(self.head_lights, lights_on)
 		lights_on = value
+		self._enable_lights(self.head_lights, value)
+		self._enable_lights(self.tail_lights, value)
 	get:
 		return lights_on
 
