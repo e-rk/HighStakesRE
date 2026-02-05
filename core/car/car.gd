@@ -38,6 +38,18 @@ extends RigidBody3D
 		self._enable_lights(self.tail_lights, value)
 	get:
 		return lights_on
+		
+@export var color : CarColorSet:
+	set(value):
+		color = value
+		self._set_car_color(value)
+	get:
+		return color
+		
+@export var palette: Array[CarColorSet]
+
+@export var car_texture: CarTexture
+
 
 const RAYCAST_DISTANCE = 10
 
@@ -86,10 +98,18 @@ func _ready():
 		self.brake_light_energy = self.brake_lights[0].light_energy
 	else:
 		self.brake_light_energy = 2 * tail_light_energy
+	if self.palette:
+		self.color = self.palette[0]
 
 func _enable_lights(lights: Array, visible: bool):
 	for light in lights:
 		light.visible = visible
+
+
+func _set_car_color(color: CarColorSet):
+	if self.car_texture:
+		self.car_texture.color_set = color
+
 
 func dimensions() -> Vector3:
 	return collider.shape.size

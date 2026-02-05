@@ -54,6 +54,68 @@ func make_rigid_bodies(scene: Node):
 	for object in objects:
 		self.make_rigid_body(scene, object)
 
+func apply_car_material(root: Node):
+	pass
+	var car_material = load("res://core/resources/materials/car_material.tres")
+	var materials = []
+	var matset = {}
+	var meshes = []
+	for child in root.get_children():
+		if child is MeshInstance3D:
+			meshes.append(child.mesh)
+			
+	for mesh in meshes:
+		for surf in mesh.get_surface_count():
+			matset[mesh.surface_get_material(surf)] = null
+	for k in matset:
+		materials.append(k)
+	var mapping = {}
+	for i in len(materials):
+		var material = materials[i]
+		if material is StandardMaterial3D and not material.refraction_enabled:
+			var mat = car_material.duplicate()
+			mapping[material] = mat
+			mat.set_shader_parameter("texture_albedo", material.albedo_texture)
+			mat.set_shader_parameter("roughness", material.roughness)
+			mat.set_shader_parameter("texture_metallic", material.metallic_texture)
+			mat.set_shader_parameter("texture_roughness", material.roughness_texture)
+			mat.set_shader_parameter("metallic_texture_channel", material.metallic_texture_channel)
+			mat.set_shader_parameter("uv1_scale", material.uv1_scale)
+			mat.set_shader_parameter("uv1_offset", material.uv1_offset)
+			mat.set_shader_parameter("uv2_scale", material.uv2_scale)
+			mat.set_shader_parameter("uv1_offset", material.uv1_offset)
+			mat.set_shader_parameter("specular", material.metallic_specular)
+			mat.set_shader_parameter("metallic", material.metallic)
+		else:
+			mapping[material] = material
+	for mesh in meshes:
+		for surf in mesh.get_surface_count():
+			mesh.surface_set_material(surf, mapping[mesh.surface_get_material(surf)])
+
+func _get_car_texture(car: Car) -> Texture2D:
+	for child in car.get_children():
+		if child is MeshInstance3D:
+			var surfaces = child.mesh.get_surface_count()
+			for i in range(surfaces):
+				var material = child.mesh.surface_get_material(i)
+				if material is StandardMaterial3D and not material.refraction_enabled:
+					return material.albedo_texture
+	return null
+
+func _process_car_texture(car: Car):
+	var texture = self._get_car_texture(car)
+	var image = texture.get_image()
+	var car_texture = CarTexture.create_from_base_image(image)
+	car.car_texture = car_texture
+	for child in car.get_children():
+		if child is MeshInstance3D:
+			var surfaces = child.mesh.get_surface_count()
+			for i in range(surfaces):
+				var material = child.mesh.surface_get_material(i)
+				if material is StandardMaterial3D and not material.refraction_enabled:
+					material.albedo_texture = car_texture
+
+
 func _post_import(scene):
 	if scene.get_meta("type") == "track":
 		var new_scene = RaceTrack.new()
@@ -83,11 +145,13 @@ func _post_import(scene):
 		return new_scene
 	elif scene.get_meta("type") == "car":
 		var dimensions = scene.get_meta("dimensions")
+		var colors: Array[CarColorSet] = scene.get_meta("color_set")
 		var new_scene: Node = load("res://core/car/car.tscn").instantiate()
 		var shadow = new_scene.get_child(0)
 		var collider = new_scene.get_child(2)
 		shadow.size = Vector3(dimensions.x, 1.5, dimensions.z) * 1.15
 		collider.shape.size = dimensions
+		new_scene.palette = colors
 		new_scene.name = scene.name
 		scene.replace_by(new_scene)
 		var performance = CarPerformance.new()
@@ -99,4 +163,7 @@ func _post_import(scene):
 				node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
 			self.make_wheel(node)
 		scene = new_scene
+		if colors:
+			scene.color = colors[0]
+		self._process_car_texture(scene)
 	return scene
