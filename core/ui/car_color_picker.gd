@@ -16,14 +16,14 @@ var color_picker
 signal color_changed;
 
 func _set_picker_colors():
+	var primary_colors = self.colors.map(func (x): return x.primary)
 	if self.color_picker:
 		for color in self.color_picker.get_presets():
 			self.color_picker.erase_preset(color)
-		var primary_colors = self.colors.map(func (x): return x.primary)
 		for color in primary_colors:
 			self.color_picker.add_preset(color)
-		if primary_colors:
-			self.color_picker.color = primary_colors[0]
+	if primary_colors:
+		self.color_picker_button.color = primary_colors[0]
 
 func _on_color_picker_button_color_changed(color: Color) -> void:
 	var color_set = self._get_closest_color_set(color)
