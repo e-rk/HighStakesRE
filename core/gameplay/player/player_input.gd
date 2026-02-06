@@ -35,6 +35,10 @@ signal reposition_requested
 var max_gear := CarTypes.Gear.GEAR_6
 
 
+func _enter_tree() -> void:
+	self.set_multiplayer_authority($"..".name.to_int())
+
+
 func shift_up():
 	self.gear += 1
 

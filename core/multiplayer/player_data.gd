@@ -17,7 +17,7 @@ extends Node
 signal player_data_changed
 
 
-func _ready():
+func _enter_tree() -> void:
 	if self.name.is_valid_int():
 		self.set_multiplayer_authority(self.name.to_int())
 

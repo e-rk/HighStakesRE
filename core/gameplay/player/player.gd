@@ -21,7 +21,6 @@ var authority = false
 func _ready():
 	assert(self.name.is_valid_int())
 	self.authority = self.name.to_int()
-	self.input.set_multiplayer_authority(self.name.to_int())
 	var color_set = CarColorSet.new()
 	color_set.primary = primary_color
 	color_set.secondary = secondary_color

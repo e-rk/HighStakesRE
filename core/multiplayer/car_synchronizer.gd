@@ -14,7 +14,6 @@ var body_state: PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state
 
 func _ready():
 	self.synchronized.connect(self._on_synchronized)
-	self.target.set_multiplayer_authority(str(target.name).to_int())
 	self.set_multiplayer_authority(1)
 
 
