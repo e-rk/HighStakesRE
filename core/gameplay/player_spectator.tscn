@@ -4,13 +4,13 @@
 [ext_resource type="Script" uid="uid://d2y1hi6r2x6nq" path="res://core/gameplay/player_spectator.gd" id="1_eomyr"]
 [ext_resource type="Shader" uid="uid://15332wfpffyw" path="res://core/resources/shader/rear_view_mirror.gdshader" id="3_lyypb"]
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_6jlnc"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_lyypb"]
 viewport_path = NodePath("RearViewMirror/SubViewport")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_cd8p5"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6jlnc"]
 resource_local_to_scene = true
 shader = ExtResource("3_lyypb")
-shader_parameter/viewport = SubResource("ViewportTexture_6jlnc")
+shader_parameter/viewport = SubResource("ViewportTexture_lyypb")
 
 [node name="PlayerSpectator" type="Node3D" unique_id=857663324]
 top_level = true
@@ -19,7 +19,7 @@ script = ExtResource("1_eomyr")
 [node name="PlayerUI" parent="." unique_id=1361609481 instance=ExtResource("1_08nnd")]
 
 [node name="RearViewMirror" parent="PlayerUI/HSplitContainer/RearViewMirror" index="0" unique_id=942523188]
-material = SubResource("ShaderMaterial_cd8p5")
+material = SubResource("ShaderMaterial_6jlnc")
 
 [node name="RearViewCamera" type="Camera3D" parent="PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport" index="0" unique_id=1764865971]
 unique_name_in_owner = true
