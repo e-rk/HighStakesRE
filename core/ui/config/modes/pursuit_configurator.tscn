@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://cr646pbsg8bgl"]
+[gd_scene format=3 uid="uid://cr646pbsg8bgl"]
 
 [ext_resource type="Script" uid="uid://dlp0wwxc051et" path="res://core/ui/config/modes/pursuit_configurator.gd" id="2_ih2sh"]
 
@@ -10,7 +10,7 @@ properties/1/path = NodePath("HBoxContainer2/TicketCount:value")
 properties/1/spawn = true
 properties/1/replication_mode = 1
 
-[node name="PursuitConfigurator" type="VBoxContainer"]
+[node name="PursuitConfigurator" type="VBoxContainer" unique_id=849467834]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -18,35 +18,35 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_ih2sh")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=998774432]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer" unique_id=1333905999]
 layout_mode = 2
 text = "Laps"
 
-[node name="LapNumber" type="SpinBox" parent="HBoxContainer"]
+[node name="LapNumber" type="SpinBox" parent="HBoxContainer" unique_id=477640959]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 1.0
 max_value = 16.0
 value = 1.0
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+[node name="HBoxContainer2" type="HBoxContainer" parent="." unique_id=777841300]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer2"]
+[node name="Label" type="Label" parent="HBoxContainer2" unique_id=1353608145]
 layout_mode = 2
 text = "Tickets"
 
-[node name="TicketCount" type="SpinBox" parent="HBoxContainer2"]
+[node name="TicketCount" type="SpinBox" parent="HBoxContainer2" unique_id=130894473]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 1.0
 max_value = 17.0
 value = 1.0
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=589325264]
 replication_config = SubResource("SceneReplicationConfig_5oukv")
 
 [connection signal="value_changed" from="HBoxContainer/LapNumber" to="." method="_on_lap_number_value_changed"]

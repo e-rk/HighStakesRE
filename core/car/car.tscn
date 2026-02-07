@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dd8wh1ccg1hn3"]
+[gd_scene format=3 uid="uid://dd8wh1ccg1hn3"]
 
 [ext_resource type="PhysicsMaterial" uid="uid://wo7b1vixch3t" path="res://core/resources/car-physics-material.tres" id="1_erlt3"]
 [ext_resource type="Script" uid="uid://un2jefdr7h8w" path="res://core/car/car.gd" id="1_iu3ke"]
@@ -39,7 +39,7 @@ properties/0/replication_mode = 1
 resource_local_to_scene = true
 size = Vector3(1.9, 1.3, 4.57605)
 
-[node name="Car" type="RigidBody3D"]
+[node name="Car" type="RigidBody3D" unique_id=1409579320]
 collision_layer = 8
 collision_mask = 74
 physics_material_override = ExtResource("1_erlt3")
@@ -50,7 +50,7 @@ continuous_cd = true
 script = ExtResource("1_iu3ke")
 metadata/_custom_type_script = "uid://un2jefdr7h8w"
 
-[node name="Shadow" type="Decal" parent="."]
+[node name="Shadow" type="Decal" parent="." unique_id=1613930068]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.39344, 0)
 layers = 3
 size = Vector3(2, 1.5, 2)
@@ -59,10 +59,10 @@ texture_orm = SubResource("GradientTexture2D_erlt3")
 albedo_mix = 0.0
 cull_mask = 3
 
-[node name="CarSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="CarSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=169063902]
 replication_config = SubResource("SceneReplicationConfig_erlt3")
 script = ExtResource("2_kivpk")
 metadata/_custom_type_script = "uid://bodsc1ioqdpjc"
 
-[node name="Collider" type="CollisionShape3D" parent="."]
+[node name="Collider" type="CollisionShape3D" parent="." unique_id=1215329231]
 shape = SubResource("BoxShape3D_kivpk")

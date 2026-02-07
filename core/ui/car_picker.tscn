@@ -1,15 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://b00fb5ox2w4oh"]
+[gd_scene format=3 uid="uid://b00fb5ox2w4oh"]
 
 [ext_resource type="Script" uid="uid://cjwc5b6114dic" path="res://core/ui/car_picker.gd" id="1_0bts6"]
 
-[node name="CarPicker" type="HBoxContainer"]
+[node name="CarPicker" type="HBoxContainer" unique_id=1950221189]
 script = ExtResource("1_0bts6")
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=822725996]
 layout_mode = 2
 text = "Selected car"
 
-[node name="CarSelection" type="OptionButton" parent="."]
+[node name="CarSelection" type="OptionButton" parent="." unique_id=718859950]
 layout_mode = 2
 
 [connection signal="item_selected" from="CarSelection" to="." method="_on_car_selection_item_selected"]

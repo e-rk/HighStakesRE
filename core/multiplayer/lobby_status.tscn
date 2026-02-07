@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://hx8gqlpaxyc1"]
+[gd_scene format=3 uid="uid://hx8gqlpaxyc1"]
 
 [ext_resource type="Script" uid="uid://bntfgjuto2tqd" path="res://core/multiplayer/lobby_status.gd" id="1_nq2q6"]
 
-[node name="LobbyStatus" type="PanelContainer"]
+[node name="LobbyStatus" type="PanelContainer" unique_id=1842036213]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -10,7 +10,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_nq2q6")
 
-[node name="PlayerList" type="Tree" parent="."]
+[node name="PlayerList" type="Tree" parent="." unique_id=1010200873]
 layout_mode = 2
 columns = 3
 column_titles_visible = true

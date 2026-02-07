@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://bo50eoiwwm13n"]
+[gd_scene format=3 uid="uid://bo50eoiwwm13n"]
 
 [ext_resource type="Script" uid="uid://bsbbkhvor3oy2" path="res://core/ui/game/minimap.gd" id="1_i3sxd"]
 
-[node name="MinimapBare" type="Control"]
+[node name="MinimapBare" type="Control" unique_id=2004499952]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

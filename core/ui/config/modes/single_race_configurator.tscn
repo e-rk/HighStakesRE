@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://cvfpcatdlp81m"]
+[gd_scene format=3 uid="uid://cvfpcatdlp81m"]
 
 [ext_resource type="Script" uid="uid://s5teamr276p2" path="res://core/ui/config/modes/single_race_configurator.gd" id="1_dtip5"]
 
@@ -7,26 +7,26 @@ properties/0/path = NodePath("HBoxContainer/LapNumber:value")
 properties/0/spawn = true
 properties/0/replication_mode = 2
 
-[node name="SingleRaceConfigurator" type="VBoxContainer"]
+[node name="SingleRaceConfigurator" type="VBoxContainer" unique_id=2135311150]
 offset_right = 123.0
 offset_bottom = 31.0
 script = ExtResource("1_dtip5")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=922601061]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer" unique_id=147688117]
 layout_mode = 2
 text = "Laps"
 
-[node name="LapNumber" type="SpinBox" parent="HBoxContainer"]
+[node name="LapNumber" type="SpinBox" parent="HBoxContainer" unique_id=1245978340]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 1.0
 max_value = 16.0
 value = 1.0
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=216012226]
 replication_config = SubResource("SceneReplicationConfig_6cqhs")
 
 [connection signal="value_changed" from="HBoxContainer/LapNumber" to="." method="_on_lap_number_value_changed"]

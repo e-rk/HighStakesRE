@@ -1,13 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://bdjcugue7syvn"]
+[gd_scene format=3 uid="uid://bdjcugue7syvn"]
 
 [ext_resource type="Script" uid="uid://dd7qm2oj420i5" path="res://core/multiplayer/player_data_container.gd" id="1_w3ibw"]
 
-[node name="PlayerDataContainer" type="Node"]
+[node name="PlayerDataContainer" type="Node" unique_id=553569414]
 script = ExtResource("1_w3ibw")
 
-[node name="Players" type="Node" parent="."]
+[node name="Players" type="Node" parent="." unique_id=788336884]
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=573483172]
 _spawnable_scenes = PackedStringArray("uid://nq8vfo23dbql")
 spawn_path = NodePath("../Players")
 

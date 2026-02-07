@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://cp2bymmahj6y0"]
+[gd_scene format=3 uid="uid://cp2bymmahj6y0"]
 
 [ext_resource type="Shader" uid="uid://dqpmlsn88w4xh" path="res://core/resources/shader/sky.gdshader" id="1_qg1f6"]
 [ext_resource type="Texture2D" uid="uid://cke1o61s6mb28" path="res://core/resources/clouds.tres" id="2_m4usb"]
@@ -34,6 +34,6 @@ ambient_light_energy = 0.5
 ssao_intensity = 6.0
 ssao_detail = 5.0
 
-[node name="Environment" type="WorldEnvironment"]
+[node name="Environment" type="WorldEnvironment" unique_id=1302428038]
 environment = SubResource("Environment_vjc7h")
 camera_attributes = ExtResource("2_qmg1d")

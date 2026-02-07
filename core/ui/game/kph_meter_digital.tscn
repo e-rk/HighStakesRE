@@ -1,31 +1,31 @@
-[gd_scene load_steps=3 format=3 uid="uid://bys21a36e3wlm"]
+[gd_scene format=3 uid="uid://bys21a36e3wlm"]
 
 [ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_3oumr"]
 [ext_resource type="Script" uid="uid://bj6qcwolb7teg" path="res://core/ui/game/kph_meter_digital.gd" id="2_g6ts4"]
 
-[node name="RpmMeterDigital" type="PanelContainer"]
+[node name="RpmMeterDigital" type="PanelContainer" unique_id=689928086]
 custom_minimum_size = Vector2(180, 180)
 offset_right = 180.0
 offset_bottom = 180.0
 theme = ExtResource("1_3oumr")
 script = ExtResource("2_g6ts4")
 
-[node name="Background" type="Panel" parent="."]
+[node name="Background" type="Panel" parent="." unique_id=444398080]
 z_index = -1
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1551576258]
 z_index = -1
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=1711062982]
 layout_mode = 2
 theme_type_variation = &"PanelHeader"
 text = "KPH"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="KphMeter" type="Label" parent="VBoxContainer"]
+[node name="KphMeter" type="Label" parent="VBoxContainer" unique_id=1637538547]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3

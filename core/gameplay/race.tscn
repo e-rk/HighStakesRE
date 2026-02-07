@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://fnr6x5fft0m6"]
+[gd_scene format=3 uid="uid://fnr6x5fft0m6"]
 
 [ext_resource type="Script" uid="uid://jm02kbbdh2ab" path="res://core/gameplay/race.gd" id="1_1qfiq"]
 [ext_resource type="Script" uid="uid://821871ckrc7m" path="res://core/gameplay/race_state_context.gd" id="2_p7ekf"]
@@ -9,24 +9,24 @@
 [ext_resource type="Script" uid="uid://qk2fyksu5u7f" path="res://core/gameplay/race_state_in_progress.gd" id="5_5jlev"]
 [ext_resource type="Script" uid="uid://r3x4s52bq436" path="res://core/gameplay/race_state.gd" id="9_suekg"]
 
-[node name="Race" type="Node"]
+[node name="Race" type="Node" unique_id=1235983309]
 script = ExtResource("1_1qfiq")
 
-[node name="RaceStateContext" type="Node" parent="."]
+[node name="RaceStateContext" type="Node" parent="." unique_id=198293670]
 script = ExtResource("2_p7ekf")
 initial_state = NodePath("RaceStateSetup")
 
-[node name="RaceStateSetup" type="Node" parent="RaceStateContext"]
+[node name="RaceStateSetup" type="Node" parent="RaceStateContext" unique_id=2064347773]
 script = ExtResource("4_yv50v")
 
-[node name="RaceStateWaitingForPlayers" type="Node" parent="RaceStateContext"]
+[node name="RaceStateWaitingForPlayers" type="Node" parent="RaceStateContext" unique_id=357093876]
 script = ExtResource("4_jqtk6")
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="RaceStateContext/RaceStateWaitingForPlayers"]
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="RaceStateContext/RaceStateWaitingForPlayers" unique_id=250536297]
 _spawnable_scenes = PackedStringArray("uid://cfwpo7o5qxn42")
 spawn_path = NodePath("../../PlayerContainer")
 
-[node name="MarginContainer" type="MarginContainer" parent="RaceStateContext/RaceStateWaitingForPlayers"]
+[node name="MarginContainer" type="MarginContainer" parent="RaceStateContext/RaceStateWaitingForPlayers" unique_id=1874573775]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -34,7 +34,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_top = 150
 
-[node name="WaitingMessage" type="Label" parent="RaceStateContext/RaceStateWaitingForPlayers/MarginContainer"]
+[node name="WaitingMessage" type="Label" parent="RaceStateContext/RaceStateWaitingForPlayers/MarginContainer" unique_id=1427122339]
 visible = false
 layout_mode = 2
 size_flags_vertical = 0
@@ -42,14 +42,14 @@ theme_override_font_sizes/font_size = 40
 text = "Waiting for players ..."
 horizontal_alignment = 1
 
-[node name="RaceStateStartCountdown" type="Node" parent="RaceStateContext"]
+[node name="RaceStateStartCountdown" type="Node" parent="RaceStateContext" unique_id=1476410540]
 script = ExtResource("4_r43nu")
 
-[node name="Timer" type="Timer" parent="RaceStateContext/RaceStateStartCountdown"]
+[node name="Timer" type="Timer" parent="RaceStateContext/RaceStateStartCountdown" unique_id=2027041058]
 wait_time = 3.0
 one_shot = true
 
-[node name="MarginContainer" type="MarginContainer" parent="RaceStateContext/RaceStateStartCountdown"]
+[node name="MarginContainer" type="MarginContainer" parent="RaceStateContext/RaceStateStartCountdown" unique_id=1576739452]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -57,7 +57,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_top = 150
 
-[node name="StartingMessage" type="Label" parent="RaceStateContext/RaceStateStartCountdown/MarginContainer"]
+[node name="StartingMessage" type="Label" parent="RaceStateContext/RaceStateStartCountdown/MarginContainer" unique_id=849925277]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -66,17 +66,17 @@ theme_override_font_sizes/font_size = 40
 text = "Starting in ..."
 horizontal_alignment = 1
 
-[node name="RaceStateInProgress" type="Node" parent="RaceStateContext"]
+[node name="RaceStateInProgress" type="Node" parent="RaceStateContext" unique_id=542861988]
 script = ExtResource("5_5jlev")
 
-[node name="RaceStateEnding" type="Node" parent="RaceStateContext"]
+[node name="RaceStateEnding" type="Node" parent="RaceStateContext" unique_id=839840191]
 script = ExtResource("4_nr0d0")
 
-[node name="Timer" type="Timer" parent="RaceStateContext/RaceStateEnding"]
+[node name="Timer" type="Timer" parent="RaceStateContext/RaceStateEnding" unique_id=1792170799]
 wait_time = 4.0
 one_shot = true
 
-[node name="MarginContainer" type="MarginContainer" parent="RaceStateContext/RaceStateEnding"]
+[node name="MarginContainer" type="MarginContainer" parent="RaceStateContext/RaceStateEnding" unique_id=575763516]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -84,7 +84,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_top = 150
 
-[node name="EndingMessage" type="Label" parent="RaceStateContext/RaceStateEnding/MarginContainer"]
+[node name="EndingMessage" type="Label" parent="RaceStateContext/RaceStateEnding/MarginContainer" unique_id=1867401076]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -93,10 +93,10 @@ theme_override_font_sizes/font_size = 40
 text = "Ending in ..."
 horizontal_alignment = 1
 
-[node name="RaceStateEnded" type="Node" parent="RaceStateContext"]
+[node name="RaceStateEnded" type="Node" parent="RaceStateContext" unique_id=1663305581]
 script = ExtResource("9_suekg")
 
-[node name="PlayerContainer" type="Node" parent="RaceStateContext"]
+[node name="PlayerContainer" type="Node" parent="RaceStateContext" unique_id=833897204]
 
 [connection signal="entered" from="RaceStateContext/RaceStateWaitingForPlayers" to="." method="_on_race_state_waiting_for_players_entered"]
 [connection signal="spawned" from="RaceStateContext/RaceStateWaitingForPlayers/MultiplayerSpawner" to="RaceStateContext/RaceStateWaitingForPlayers" method="_on_player_spawned"]

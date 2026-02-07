@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://cf011ecvi2pr7"]
+[gd_scene format=3 uid="uid://cf011ecvi2pr7"]
 
 [ext_resource type="Script" uid="uid://cq8hejt6ssjwc" path="res://core/ui/config/track_picker.gd" id="1_wyeq0"]
 [ext_resource type="Script" uid="uid://dnuqriykuyh2n" path="res://core/ui/common/syncable_option_button.gd" id="2_vo8gj"]
@@ -17,56 +17,56 @@ properties/3/path = NodePath("ConfigurePanel/VBoxContainer/MirrorButton:button_p
 properties/3/spawn = true
 properties/3/replication_mode = 2
 
-[node name="TrackPicker" type="VBoxContainer"]
+[node name="TrackPicker" type="VBoxContainer" unique_id=737587371]
 offset_right = 158.0
 offset_bottom = 58.0
 script = ExtResource("1_wyeq0")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1400866355]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer" unique_id=1073632012]
 layout_mode = 2
 text = "Selected track"
 
-[node name="TrackSelection" type="OptionButton" parent="HBoxContainer"]
+[node name="TrackSelection" type="OptionButton" parent="HBoxContainer" unique_id=1439302576]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("2_vo8gj")
 
-[node name="ConfigureButton" type="Button" parent="."]
+[node name="ConfigureButton" type="Button" parent="." unique_id=454366220]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Configure..."
 
-[node name="ConfigurePanel" type="PopupPanel" parent="."]
+[node name="ConfigurePanel" type="PopupPanel" parent="." unique_id=1000419857]
 title = "Track configuration"
 initial_position = 4
 size = Vector2i(125, 109)
 borderless = false
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ConfigurePanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigurePanel" unique_id=1861846785]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 121.0
 offset_bottom = 105.0
 
-[node name="NightButton" type="CheckButton" parent="ConfigurePanel/VBoxContainer"]
+[node name="NightButton" type="CheckButton" parent="ConfigurePanel/VBoxContainer" unique_id=991035991]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Night"
 
-[node name="WeatherButton" type="CheckButton" parent="ConfigurePanel/VBoxContainer"]
+[node name="WeatherButton" type="CheckButton" parent="ConfigurePanel/VBoxContainer" unique_id=1283133688]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Weather"
 
-[node name="MirrorButton" type="CheckButton" parent="ConfigurePanel/VBoxContainer"]
+[node name="MirrorButton" type="CheckButton" parent="ConfigurePanel/VBoxContainer" unique_id=1915444940]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Mirrored"
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=517991757]
 replication_config = SubResource("SceneReplicationConfig_lrg3q")
 
 [connection signal="syncable_item_selected" from="HBoxContainer/TrackSelection" to="." method="_on_track_selection_syncable_item_selected"]

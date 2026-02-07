@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://dj051yp3mnerg"]
+[gd_scene format=3 uid="uid://dj051yp3mnerg"]
 
 [ext_resource type="Script" uid="uid://t48sy8hauo72" path="res://core/ui/host_game_dialog.gd" id="1_fu45c"]
 
-[node name="HostGame" type="Button"]
+[node name="HostGame" type="Button" unique_id=1564839857]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 296.0
@@ -10,33 +10,33 @@ offset_bottom = 140.0
 text = "Host..."
 script = ExtResource("1_fu45c")
 
-[node name="HostGameDialog" type="AcceptDialog" parent="."]
+[node name="HostGameDialog" type="AcceptDialog" parent="." unique_id=1098318979]
 unique_name_in_owner = true
 title = "Host configuration"
 initial_position = 4
 ok_button_text = "Host"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HostGameDialog"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HostGameDialog" unique_id=1051399812]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 296.0
 offset_bottom = 140.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HostGameDialog/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HostGameDialog/VBoxContainer" unique_id=1833698217]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HostGameDialog/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="HostGameDialog/VBoxContainer/HBoxContainer" unique_id=4689446]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Host mode"
 horizontal_alignment = 1
 
-[node name="HostMode" type="OptionButton" parent="HostGameDialog/VBoxContainer/HBoxContainer"]
+[node name="HostMode" type="OptionButton" parent="HostGameDialog/VBoxContainer/HBoxContainer" unique_id=1271704349]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-item_count = 3
 selected = 0
+item_count = 3
 popup/item_0/text = "Local"
 popup/item_0/id = 0
 popup/item_1/text = "Private"
@@ -44,30 +44,30 @@ popup/item_1/id = 1
 popup/item_2/text = "Public"
 popup/item_2/id = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="HostGameDialog/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="HostGameDialog/VBoxContainer" unique_id=685765182]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HostGameDialog/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="HostGameDialog/VBoxContainer/HBoxContainer2" unique_id=499516920]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Lobby name"
 horizontal_alignment = 1
 
-[node name="LobbyName" type="LineEdit" parent="HostGameDialog/VBoxContainer/HBoxContainer2"]
+[node name="LobbyName" type="LineEdit" parent="HostGameDialog/VBoxContainer/HBoxContainer2" unique_id=1473966136]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HBoxContainer4" type="HBoxContainer" parent="HostGameDialog/VBoxContainer"]
+[node name="HBoxContainer4" type="HBoxContainer" parent="HostGameDialog/VBoxContainer" unique_id=683705117]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HostGameDialog/VBoxContainer/HBoxContainer4"]
+[node name="Label" type="Label" parent="HostGameDialog/VBoxContainer/HBoxContainer4" unique_id=227098300]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Port"
 horizontal_alignment = 1
 
-[node name="HostPort" type="SpinBox" parent="HostGameDialog/VBoxContainer/HBoxContainer4"]
+[node name="HostPort" type="SpinBox" parent="HostGameDialog/VBoxContainer/HBoxContainer4" unique_id=364182525]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3

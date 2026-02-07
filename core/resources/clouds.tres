@@ -1,4 +1,4 @@
-[gd_resource type="NoiseTexture2D" load_steps=3 format=3 uid="uid://cke1o61s6mb28"]
+[gd_resource type="NoiseTexture2D" format=3 uid="uid://cke1o61s6mb28"]
 
 [sub_resource type="Gradient" id="Gradient_qvvnp"]
 offsets = PackedFloat32Array(0, 0.295918, 0.535714)
@@ -11,7 +11,7 @@ frequency = 0.0057
 [resource]
 width = 2048
 height = 2048
-invert = true
-seamless = true
-color_ramp = SubResource("Gradient_qvvnp")
 noise = SubResource("FastNoiseLite_1eatf")
+color_ramp = SubResource("Gradient_qvvnp")
+seamless = true
+invert = true

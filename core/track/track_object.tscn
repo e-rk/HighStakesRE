@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://ddm51duhtweht"]
+[gd_scene format=3 uid="uid://ddm51duhtweht"]
 
 [ext_resource type="Script" uid="uid://pyl7ooos250t" path="res://core/track/track_object.gd" id="1_nfw00"]
 
-[node name="TrackObject" type="RigidBody3D"]
+[node name="TrackObject" type="RigidBody3D" unique_id=734204338]
 collision_layer = 64
 collision_mask = 127
 mass = 1000.0

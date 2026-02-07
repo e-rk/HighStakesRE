@@ -1,12 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://dvrbmgpwd8lrm"]
+[gd_scene format=3 uid="uid://dvrbmgpwd8lrm"]
 
 [ext_resource type="PackedScene" uid="uid://byytg52xlx8dy" path="res://core/utils/directory_watcher.tscn" id="1_bqaqg"]
 [ext_resource type="Script" uid="uid://tdofpp8t6qe7" path="res://core/db/track_db.gd" id="1_nxkox"]
 
-[node name="TrackDB" type="Node"]
+[node name="TrackDB" type="Node" unique_id=195525211]
 script = ExtResource("1_nxkox")
 
-[node name="DirectoryWatcher" parent="." instance=ExtResource("1_bqaqg")]
+[node name="DirectoryWatcher" parent="." unique_id=752397043 instance=ExtResource("1_bqaqg")]
 unique_name_in_owner = true
 directory = "res://import/tracks"
 mode = 1

@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://colfm2qj3jw7b"]
+[gd_scene format=3 uid="uid://colfm2qj3jw7b"]
 
 [ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_bx0lb"]
 [ext_resource type="Script" uid="uid://fy28vqn3bgc8" path="res://core/ui/game/rpm_meter_digital.gd" id="2_u64gp"]
@@ -9,29 +9,29 @@ draw_center = false
 border_width_bottom = 1
 border_color = Color(0.329412, 0.901961, 0.866667, 1)
 
-[node name="RpmMeterDigital" type="PanelContainer"]
+[node name="RpmMeterDigital" type="PanelContainer" unique_id=1304145063]
 custom_minimum_size = Vector2(180, 180)
 offset_right = 188.0
 offset_bottom = 180.0
 theme = ExtResource("1_bx0lb")
 script = ExtResource("2_u64gp")
 
-[node name="Background" type="Panel" parent="."]
+[node name="Background" type="Panel" parent="." unique_id=174795745]
 z_index = -1
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1568821562]
 z_index = -1
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=229062965]
 layout_mode = 2
 theme_type_variation = &"PanelHeader"
 text = "RPM X1000"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="RpmMeter" type="Label" parent="VBoxContainer"]
+[node name="RpmMeter" type="Label" parent="VBoxContainer" unique_id=2025636694]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -41,54 +41,54 @@ text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Gears" type="HBoxContainer" parent="VBoxContainer"]
+[node name="Gears" type="HBoxContainer" parent="VBoxContainer" unique_id=1833440737]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="N" type="Label" parent="VBoxContainer/Gears"]
+[node name="N" type="Label" parent="VBoxContainer/Gears" unique_id=1420577977]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PrimaryPanelValueMedium"
 text = "N"
 
-[node name="1" type="Label" parent="VBoxContainer/Gears"]
+[node name="1" type="Label" parent="VBoxContainer/Gears" unique_id=1551058094]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PrimaryPanelValueMedium"
 text = "1"
 
-[node name="2" type="Label" parent="VBoxContainer/Gears"]
+[node name="2" type="Label" parent="VBoxContainer/Gears" unique_id=1994286888]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PrimaryPanelValueMedium"
 text = "2"
 
-[node name="3" type="Label" parent="VBoxContainer/Gears"]
+[node name="3" type="Label" parent="VBoxContainer/Gears" unique_id=276958440]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PrimaryPanelValueMedium"
 text = "3"
 
-[node name="4" type="Label" parent="VBoxContainer/Gears"]
+[node name="4" type="Label" parent="VBoxContainer/Gears" unique_id=1287588149]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PrimaryPanelValueMedium"
 text = "4"
 
-[node name="5" type="Label" parent="VBoxContainer/Gears"]
+[node name="5" type="Label" parent="VBoxContainer/Gears" unique_id=1577806584]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PrimaryPanelValueMedium"
 text = "5"
 
-[node name="6" type="Label" parent="VBoxContainer/Gears"]
+[node name="6" type="Label" parent="VBoxContainer/Gears" unique_id=1613684847]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PrimaryPanelValueMedium"
 text = "6"
 
-[node name="R" type="Label" parent="VBoxContainer/Gears"]
+[node name="R" type="Label" parent="VBoxContainer/Gears" unique_id=1637568939]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PrimaryPanelValueMedium"

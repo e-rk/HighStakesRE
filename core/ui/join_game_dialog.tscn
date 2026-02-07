@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://b06d2fypc8o5p"]
+[gd_scene format=3 uid="uid://b06d2fypc8o5p"]
 
 [ext_resource type="Script" uid="uid://cd5y7vv5024cc" path="res://core/ui/join_game_dialog.gd" id="1_gp5kc"]
 
-[node name="JoinGame" type="Button"]
+[node name="JoinGame" type="Button" unique_id=1920011861]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 796.0
@@ -10,13 +10,13 @@ offset_bottom = 796.0
 text = "Join game..."
 script = ExtResource("1_gp5kc")
 
-[node name="JoinGameDialog" type="AcceptDialog" parent="."]
+[node name="JoinGameDialog" type="AcceptDialog" parent="." unique_id=690660761]
 unique_name_in_owner = true
 title = "Server browser"
 initial_position = 4
 size = Vector2i(400, 400)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="JoinGameDialog"]
+[node name="VBoxContainer" type="VBoxContainer" parent="JoinGameDialog" unique_id=1998410601]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -27,12 +27,12 @@ offset_bottom = -49.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Label" type="Label" parent="JoinGameDialog/VBoxContainer"]
+[node name="Label" type="Label" parent="JoinGameDialog/VBoxContainer" unique_id=1444460830]
 layout_mode = 2
 text = "Available servers"
 horizontal_alignment = 1
 
-[node name="ServerList" type="ItemList" parent="JoinGameDialog/VBoxContainer"]
+[node name="ServerList" type="ItemList" parent="JoinGameDialog/VBoxContainer" unique_id=978110981]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -40,23 +40,23 @@ auto_height = true
 item_count = 1
 item_0/text = "localhost"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="JoinGameDialog/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="JoinGameDialog/VBoxContainer" unique_id=1019824764]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="JoinGameDialog/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="JoinGameDialog/VBoxContainer/HBoxContainer" unique_id=18997450]
 layout_mode = 2
 text = "Address"
 
-[node name="ServerAddress" type="LineEdit" parent="JoinGameDialog/VBoxContainer/HBoxContainer"]
+[node name="ServerAddress" type="LineEdit" parent="JoinGameDialog/VBoxContainer/HBoxContainer" unique_id=1309304580]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label2" type="Label" parent="JoinGameDialog/VBoxContainer/HBoxContainer"]
+[node name="Label2" type="Label" parent="JoinGameDialog/VBoxContainer/HBoxContainer" unique_id=248363670]
 layout_mode = 2
 text = "Port"
 
-[node name="ServerPort" type="SpinBox" parent="JoinGameDialog/VBoxContainer/HBoxContainer"]
+[node name="ServerPort" type="SpinBox" parent="JoinGameDialog/VBoxContainer/HBoxContainer" unique_id=839638969]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 65535.0

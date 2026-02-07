@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://dyaeadu4s2csp"]
+[gd_scene format=3 uid="uid://dyaeadu4s2csp"]
 
 [ext_resource type="Script" uid="uid://cy4mpi6r22qex" path="res://core/ui/config/modes/rule_configurator.gd" id="1_scn7g"]
 [ext_resource type="PackedScene" uid="uid://bxxaadjg00dar" path="res://core/multiplayer/on_demand_synchronizer.tscn" id="2_0akbo"]
@@ -9,76 +9,76 @@ properties/0/path = NodePath("HBoxContainer/ModeSelector:selected_uuid")
 properties/0/spawn = true
 properties/0/replication_mode = 2
 
-[node name="RuleConfigurator" type="VBoxContainer"]
+[node name="RuleConfigurator" type="VBoxContainer" unique_id=1892849769]
 offset_right = 143.0
 offset_bottom = 58.0
 script = ExtResource("1_scn7g")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=491342607]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer" unique_id=1761606263]
 layout_mode = 2
 text = "Game mode"
 
-[node name="ModeSelector" type="OptionButton" parent="HBoxContainer"]
+[node name="ModeSelector" type="OptionButton" parent="HBoxContainer" unique_id=1890572055]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
 script = ExtResource("2_486de")
 
-[node name="ConfigureButton" type="Button" parent="."]
+[node name="ConfigureButton" type="Button" parent="." unique_id=267941287]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Configure..."
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=2125551790]
 replication_config = SubResource("SceneReplicationConfig_q8dv4")
 
-[node name="Configurator" type="PopupPanel" parent="."]
+[node name="Configurator" type="PopupPanel" parent="." unique_id=718917742]
 unique_name_in_owner = true
 title = "Configurator"
 initial_position = 4
 size = Vector2i(307, 100)
 borderless = false
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Configurator"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Configurator" unique_id=1231651777]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 303.0
 offset_bottom = 96.0
 
-[node name="ConfiguratorContainer" type="MarginContainer" parent="Configurator/VBoxContainer"]
+[node name="ConfiguratorContainer" type="MarginContainer" parent="Configurator/VBoxContainer" unique_id=1045254938]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Configurator/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Configurator/VBoxContainer" unique_id=2021361647]
 layout_mode = 2
 
-[node name="SetButton" type="Button" parent="Configurator/VBoxContainer/HBoxContainer"]
+[node name="SetButton" type="Button" parent="Configurator/VBoxContainer/HBoxContainer" unique_id=243207007]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Set"
 
-[node name="CancelButton" type="Button" parent="Configurator/VBoxContainer/HBoxContainer"]
+[node name="CancelButton" type="Button" parent="Configurator/VBoxContainer/HBoxContainer" unique_id=1700549848]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Cancel"
 
-[node name="LoadButton" type="Button" parent="Configurator/VBoxContainer/HBoxContainer"]
+[node name="LoadButton" type="Button" parent="Configurator/VBoxContainer/HBoxContainer" unique_id=1649412649]
 layout_mode = 2
 text = "Load..."
 
-[node name="SaveButton" type="Button" parent="Configurator/VBoxContainer/HBoxContainer"]
+[node name="SaveButton" type="Button" parent="Configurator/VBoxContainer/HBoxContainer" unique_id=265987001]
 layout_mode = 2
 text = "Save..."
 
-[node name="OnDemandSynchronizer" parent="." instance=ExtResource("2_0akbo")]
+[node name="OnDemandSynchronizer" parent="." unique_id=1808172170 instance=ExtResource("2_0akbo")]
 sync_on_ready = true
 
-[node name="LoadDialog" type="FileDialog" parent="."]
+[node name="LoadDialog" type="FileDialog" parent="." unique_id=532960531]
 title = "Open a File"
 initial_position = 4
 size = Vector2i(392, 500)
@@ -88,7 +88,7 @@ file_mode = 0
 access = 1
 use_native_dialog = true
 
-[node name="SaveDialog" type="FileDialog" parent="."]
+[node name="SaveDialog" type="FileDialog" parent="." unique_id=2033847393]
 initial_position = 4
 size = Vector2i(530, 500)
 ok_button_text = "Save"
