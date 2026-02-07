@@ -12,9 +12,12 @@ var body_state: PhysicsDirectBodyState3D = PhysicsServer3D.body_get_direct_state
 }
 
 
+func _enter_tree() -> void:
+	self.set_multiplayer_authority(1)
+
+
 func _ready():
 	self.synchronized.connect(self._on_synchronized)
-	self.set_multiplayer_authority(1)
 
 
 func _physics_process(_delta: float):
