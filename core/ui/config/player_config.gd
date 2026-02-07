@@ -24,6 +24,8 @@ func apply_config(config: PlayerConfig):
 	player_name.text = config.player_name
 	self.player = config
 	self.player_config_changed.emit()
+	self.player_car_changed.emit()
+	self.player_color_changed.emit()
 
 
 func save_player():

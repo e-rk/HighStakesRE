@@ -149,6 +149,7 @@ func _on_player_config_player_color_changed() -> void:
 	color_set.interior = player.color_interior
 	color_set.driver = player.color_driver
 	self.car_viewer.color_set = color_set
+	self.player_config.color_picker.selected_color_set = color_set
 
 
 func _on_player_data_container_local_player_data_created(node):

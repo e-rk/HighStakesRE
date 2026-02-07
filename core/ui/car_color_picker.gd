@@ -7,23 +7,24 @@ extends HBoxContainer
 	get():
 		return colors
 		
-@export var selected_color_set: CarColorSet = null
+@export var selected_color_set: CarColorSet:
+	set(value):
+		selected_color_set = value
+		self.color_picker_button.color = value.primary
+	get:
+		return selected_color_set
 
 @onready var color_picker_button: ColorPickerButton = %ColorPickerButton
-
-var color_picker
 
 signal color_changed;
 
 func _set_picker_colors():
 	var primary_colors = self.colors.map(func (x): return x.primary)
-	if self.color_picker:
-		for color in self.color_picker.get_presets():
-			self.color_picker.erase_preset(color)
-		for color in primary_colors:
-			self.color_picker.add_preset(color)
-	if primary_colors:
-		self.color_picker_button.color = primary_colors[0]
+	var color_picker = self.color_picker_button.get_picker()
+	for color in color_picker.get_presets():
+		color_picker.erase_preset(color)
+	for color in primary_colors:
+		color_picker.add_preset(color)
 
 func _on_color_picker_button_color_changed(color: Color) -> void:
 	var color_set = self._get_closest_color_set(color)
@@ -33,11 +34,6 @@ func _on_color_picker_button_color_changed(color: Color) -> void:
 	color_set.primary = color
 	selected_color_set = color_set
 	self.color_changed.emit()
-
-
-func _on_color_picker_button_picker_created() -> void:
-	color_picker = self.color_picker_button.get_picker()
-	self._set_picker_colors()
 
 func _get_closest_color_set(color: Color) -> CarColorSet:
 	var distance = INF

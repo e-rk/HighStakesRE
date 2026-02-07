@@ -3,7 +3,7 @@ extends SubViewportContainer
 @export var car: PackedScene:
 	set(value):
 		car = value
-		self._on_car_changed.call_deferred()
+		self._on_car_changed()
 	get:
 		return car
 		
@@ -38,6 +38,8 @@ func _on_car_changed():
 			car_instance.queue_free()
 			car_instance = null
 		car_instance = car.instantiate()
+		if self.color_set:
+			car_instance.color = self.color_set
 		self.viewport.add_child(car_instance)
 		car_instance.position = Vector3.UP * (car_instance.dimensions().y / 2)
 		car_instance.rotation = rotation

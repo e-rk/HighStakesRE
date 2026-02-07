@@ -22,4 +22,3 @@ edit_alpha = false
 edit_intensity = false
 
 [connection signal="color_changed" from="ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
-[connection signal="picker_created" from="ColorPickerButton" to="." method="_on_color_picker_button_picker_created"]

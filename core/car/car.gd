@@ -98,8 +98,6 @@ func _ready():
 		self.brake_light_energy = self.brake_lights[0].light_energy
 	else:
 		self.brake_light_energy = 2 * tail_light_energy
-	if self.palette:
-		self.color = self.palette[0]
 
 func _enable_lights(lights: Array, visible: bool):
 	for light in lights:
