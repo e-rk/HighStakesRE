@@ -154,6 +154,7 @@ func _on_player_config_player_color_changed() -> void:
 func _on_player_data_container_local_player_data_created(node):
 	node.set_config(player_config.player)
 	self._set_local_status(Constants.PlayerStatus.IN_LOBBY)
+	self.lobby_status.set_player_data(node)
 
 
 func _on_show_lobby_toggled(toggled_on):

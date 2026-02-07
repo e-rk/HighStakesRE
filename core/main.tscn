@@ -173,7 +173,6 @@ size_flags_vertical = 3
 [connection signal="despawned" from="MultiplayerSpawner" to="." method="_on_race_finished"]
 [connection signal="spawned" from="MultiplayerSpawner" to="." method="_on_race_standby"]
 [connection signal="all_players_standby" from="PlayerDataContainer" to="." method="_on_player_data_container_all_players_standby"]
-[connection signal="local_player_data_created" from="PlayerDataContainer" to="." method="_on_player_data_container_data_created"]
 [connection signal="local_player_data_created" from="PlayerDataContainer" to="." method="_on_player_data_container_local_player_data_created"]
 [connection signal="player_config_changed" from="PlayerDataContainer" to="." method="_on_player_data_container_data_created"]
 [connection signal="player_data_removed" from="PlayerDataContainer" to="." method="_on_player_data_container_player_data_removed"]

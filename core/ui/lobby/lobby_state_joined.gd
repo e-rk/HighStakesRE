@@ -4,6 +4,7 @@ extends State
 
 
 func enter():
+	context.player_container.clear()
 	context.start_race_button.disabled = true
 	context.game_config.disable()
 	context.lobby_window.show()
