@@ -30,11 +30,12 @@ func dict_hsl_to_color(value: Dictionary) -> Color:
 	return Color.from_hsv(value["hue"] / 255.0, value["saturation"] / 255.0, value["value"] / 255.0)
 
 func dict_to_palette(value: Dictionary) -> CarColorSet:
-	var color_set = CarColorSet.new()
-	color_set.primary = self.dict_hsl_to_color(value["primary"])
-	color_set.secondary = self.dict_hsl_to_color(value["secondary"])
-	color_set.driver = self.dict_hsl_to_color(value["driver"])
-	color_set.interior = self.dict_hsl_to_color(value["interior"])
+	var color_set = CarColorSet.from_colors(
+		self.dict_hsl_to_color(value["primary"]),
+		self.dict_hsl_to_color(value["secondary"]),
+		self.dict_hsl_to_color(value["driver"]),
+		self.dict_hsl_to_color(value["interior"])
+	)
 	return color_set
 
 func _make_skybox(state: GLTFState) -> Cubemap:

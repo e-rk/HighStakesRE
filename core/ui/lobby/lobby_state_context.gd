@@ -143,11 +143,7 @@ func _on_player_config_player_car_changed() -> void:
 
 func _on_player_config_player_color_changed() -> void:
 	var player = player_config.player
-	var color_set = CarColorSet.new()
-	color_set.primary = player.color_primary
-	color_set.secondary = player.color_secondary
-	color_set.interior = player.color_interior
-	color_set.driver = player.color_driver
+	var color_set = player.get_color_set()
 	self.car_viewer.color_set = color_set
 	self.player_config.color_picker.selected_color_set = color_set
 

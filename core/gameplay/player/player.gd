@@ -21,11 +21,7 @@ var authority = false
 func _ready():
 	assert(self.name.is_valid_int())
 	self.authority = self.name.to_int()
-	var color_set = CarColorSet.new()
-	color_set.primary = primary_color
-	color_set.secondary = secondary_color
-	color_set.interior = interior_color
-	color_set.driver = driver_color
+	var color_set = CarColorSet.from_colors(primary_color, secondary_color, driver_color, interior_color)
 	var car = CarDB.get_car_by_uuid(self.car_uuid)
 	self.car = load(car.path).instantiate()
 	self.car.global_transform = initial_transform
