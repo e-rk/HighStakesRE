@@ -1,6 +1,6 @@
 {
-	"speedtools": "0.27.0",
-	"godot": "4.6",
-	"blender": "5.0.1",
-	"spt-pipeline": "0.1.0"
+    "speedtools": "0.28.0",
+    "godot": "4.6",
+    "blender": "5.0.1",
+    "spt-pipeline": "0.1.0"
 }

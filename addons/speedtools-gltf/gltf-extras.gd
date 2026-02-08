@@ -145,6 +145,28 @@ func get_image_by_name(state: GLTFState, name: String) -> CompressedTexture2D:
 			return images[i]
 	return null
 
+
+func _load_track_streams(root: Node, sample: Dictionary):
+	var position = sample["location"]
+	var params = {}
+	for data in sample["samples"]:
+		var player = AudioStreamPlayer3D.new()
+		root.add_child(player, true)
+		player.owner = root
+		player.position = Vector3(position[0], position[1], position[2])
+		var decoded = Marshalls.base64_to_raw(data).decompress(10000000, FileAccess.COMPRESSION_GZIP)
+		var wav = AudioStreamWAV.load_from_buffer(decoded, params)
+		player.stream = wav
+		player.autoplay = true
+		player.attenuation_filter_cutoff_hz = 20500
+		player.max_distance = 500
+		player.max_db = 0
+
+func _make_sources(root: Node, data: Dictionary):
+	if data.has("audio_sources"):
+		for source in data["audio_sources"]:
+			self._load_track_streams(root, source)
+
 func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
 	var node = self.create_environment(state, data["environment"])
 	root.add_child(node)
@@ -157,6 +179,7 @@ func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
 	var json_images = state.json["images"]
 	var json_textures = state.json["textures"]
 	var images = state.get_images()
+	self._make_sources(root, data)
 
 	for i in len(json_materials):
 		var material = json_materials[i]
