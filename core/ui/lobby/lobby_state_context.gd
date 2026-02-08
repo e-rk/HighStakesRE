@@ -136,9 +136,11 @@ func _on_player_config_player_config_changed():
 
 func _on_player_config_player_car_changed() -> void:
 	var player = player_config.player
-	var car = load(CarDB.get_car_by_uuid(player.car_uuid).path)
-	self.car_viewer.car = car
-	self.player_config.color_picker.colors = car.instantiate().palette
+	var car_data = CarDB.get_car_by_uuid(player.car_uuid)
+	if car_data:
+		var car = load(car_data.path)
+		self.car_viewer.car = car
+		self.player_config.color_picker.colors = car.instantiate().palette
 
 
 func _on_player_config_player_color_changed() -> void:

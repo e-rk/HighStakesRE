@@ -15,7 +15,9 @@ class CarData:
 
 
 func get_car_by_uuid(uuid: String) -> CarData:
-	return cars[uuid]
+	if cars.has(uuid):
+		return cars[uuid]
+	return null
 
 
 func _on_directory_watcher_content_changed():
