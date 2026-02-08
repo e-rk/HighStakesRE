@@ -2,5 +2,6 @@
     "speedtools": "0.28.0",
     "godot": "4.6",
     "blender": "5.0.1",
-    "spt-pipeline": "0.1.0"
+    "spt-pipeline": "0.1.0",
+    "ffmpeg": "8.0.1"
 }
