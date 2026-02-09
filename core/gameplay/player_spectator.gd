@@ -31,12 +31,12 @@ func set_target_position(position: Vector3):
 	self.camera_arm.spring_length = position.length()
 
 
-func player_to_minimap_data(node: Node) -> Dictionary:
+func player_to_minimap_data(spectated_racer: Racer, node: Node) -> Dictionary:
 	var racer = node as Racer
 	return {
 		"global_position": racer.car.global_position,
-		"emphasis": false,
-		"color": Color.BLUE,
+		"emphasis": racer == spectated_racer,
+		"color": racer.car.color.primary,
 	}
 
 
@@ -70,7 +70,7 @@ func interpolate_camera(car: Car) -> Vector3:
 
 func _physics_process(delta):
 	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
-	var player_data = get_tree().get_nodes_in_group(&"Racers").map(player_to_minimap_data)
+	var player_data = get_tree().get_nodes_in_group(&"Racers").map(func(x): return player_to_minimap_data(racer, x))
 	if racer:
 		main_camera.position = self.interpolate_camera(racer.car)
 		main_camera.look_at(racer.car.position + Vector3(0, 1, 0))
