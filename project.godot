@@ -31,11 +31,15 @@ enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/speedtool
 [importer_defaults]
 
 scene={
+&"animation/remove_immutable_tracks": false,
 &"import_script/path": "res://addons/speedtools-gltf/post-import.gd",
 &"meshes/force_disable_compression": true
 }
 texture={
 &"detect_3d/compress_to": 0
+}
+animation_library={
+&"animation/remove_immutable_tracks": false
 }
 
 [input]
