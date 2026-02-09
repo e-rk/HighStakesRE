@@ -17,11 +17,12 @@ You must own the original game and convert the cars and tracks yourself locally.
 ## Requirements
 
 * Blender 5.0.1
-* Godot 4.6
+* Godot 4.6 (bundled)
+* FFmpeg 8.0.1 (bundled)
 
 ## Automated setup instructions
 
-1. Download the latest [bundle][4] found under `Assets`. The bundle contains the remake project files, `speedtool` addon for Blender and Godot engine.
+1. Download the latest [bundle][4] found under `Assets`. The bundle contains the remake project files, `speedtool` addon for Blender, FFmpeg, and Godot engine.
 2. Run `installer_windows.exe` of `installer_linux` depending on your operating system
 3. Provide path to the directory containing the original NFS4 High Stakes game
 4. Provide path to Blender executable.
