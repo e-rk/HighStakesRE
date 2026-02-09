@@ -20,7 +20,9 @@ func get_track_by_uuid(uuid: String) -> TrackData:
 
 func _on_directory_watcher_content_changed():
 	var tracks = {}
-	for file in watcher.files:
+	var files = watcher.files.duplicate()
+	files.sort()
+	for file in files:
 		var path = "%s/%s/%s.glb.import" % [watcher.directory, file, file]
 		if not FileAccess.file_exists(path):
 			continue
