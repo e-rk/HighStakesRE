@@ -383,8 +383,8 @@ func detune_to_linear(val: int) -> int:
 		return (ret * (CENTS[len(CENTS) + idx] + 0x100) >> 9)
 	return (ret * (ENVELOPE[idx] + 0x100)) >> 9
 
-func pitch_calculate(pitch_value: int, unknown: int) -> int:
-	var val = unknown + ((pitch_value - 64) * 1800 >> 6)
+func pitch_calculate(pitch_value: int, unknown1: int, unknown2: int) -> int:
+	var val = unknown2 + ((pitch_value - 64) * unknown1 >> 6)
 	var detuned = self.detune_to_linear(val)
 	var res = (detuned * 4096) >> 0xc
 	return res
@@ -423,13 +423,15 @@ func _physics_process(delta: float) -> void:
 			#print (roundi(pitch), ", ", xxx, ", ", res / 4096.0)
 			
 			var step1 = sample.pitch_unknown2
-			var step2 = step1 + (sample.pitch_unknown2 - 60) * -100
-			
+			var step2 = step1 + (sample.pitch_unknown0 - 60) * -100
+			print(sample.pitch_unknown2)
 			#print(step2)
+			var unknown2 = step2
+			#print(unknown2)
+			#print(sample.pitch_unknown1)
+			var test = pitch_calculate(pitch, sample.pitch_unknown1 * 100, unknown2)
 			
-			var test = pitch_calculate(pitch, 1)
-			
-			print(test)
+			#print(test)
 			
 			vols.append(t * v)
 			#print(j, " ", v)
