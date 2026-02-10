@@ -128,17 +128,18 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 	return OK
 
 
-func _load_stream(sample: Dictionary) -> EngineSample:
+func _load_stream(entry: Dictionary) -> EngineSample:
 	var params = {}
+	var sample = entry["samples"][0]
 	var decoded = Marshalls.base64_to_raw(sample["sample"]).decompress(1000000, FileAccess.COMPRESSION_GZIP)
 	var wav = AudioStreamWAV.load_from_buffer(decoded, params)
 	var result = EngineSample.new()
 	result.sample = wav
-	result.rear = sample["is_rear"]
+	result.rear = entry["is_rear"]
 	result.pitch_unknown0 = sample["pitch_unknown0"]
 	result.pitch_unknown1 = sample["pitch_unknown1"]
 	result.pitch_unknown2 = sample["pitch_unknown2"]
-	for table in sample["tables"]:
+	for table in entry["tables"]:
 		result.volume_tables.append(table["volume"])
 		result.pitch_tables.append(table["pitch"])
 		result.is_load_table.append(table["type"] == "load")
