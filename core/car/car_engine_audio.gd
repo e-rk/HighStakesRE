@@ -7,8 +7,6 @@ extends AudioStreamPlayer3D
 var ids = {}
 var loads = []
 
-var time = 0
-
 func _ready() -> void:
 	var playback = self.get_stream_playback() as AudioStreamPlaybackPolyphonic
 	var stream = self.stream as EngineAudio
@@ -389,18 +387,11 @@ func pitch_calculate(pitch_value: int, unknown1: int, unknown2: int) -> int:
 	var res = (detuned * 4096) >> 0xc
 	return res
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta: float) -> void:
-	#print(self.get_stream_playback().is_stream_playing(self.s))
 	var playback = self.get_stream_playback() as AudioStreamPlaybackPolyphonic
-	time += delta * 100
 	var idx = self.get_idx()
-	#var idx = round(pingpong(time, 511))
-	#var idx = clamp(self.index, 0, 511)
 	var throttle = car.current_throttle
 
-	#print(pitch)
-	var vols = []
 	for id in self.ids:
 		var sample = self.ids[id]["s"]
 		for j in len(sample.volume_tables):
@@ -409,36 +400,14 @@ func _physics_process(delta: float) -> void:
 			var volume = sample.volume_tables[j][idx]
 			var pitch = sample.pitch_tables[j][idx]
 			var v = remap(volume, 0, 127, 0.0, 1.0)
-			#var p = remap(pitch, 0, 127, 0.53, 4.2)
-			#var p = remap(pitch, -128, 127, 0.09, 4.2)
-			var p = 0.50995 * 2**(0.016192 * pitch)
 			var t = throttle
 			
 			if not sample.is_load_table[j]:
 				t = 1.0 - t
 			
-			var xxx = 1800 + (roundi(pitch) - 64) * 1800 >> 6
-			var detuned = self.detune_to_linear(xxx)
-			var res = detuned * 4096 >> 0xc
-			#print (roundi(pitch), ", ", xxx, ", ", res / 4096.0)
-			
 			var step1 = sample.pitch_unknown2
 			var step2 = step1 + (sample.pitch_unknown0 - 60) * -100
-			print(sample.pitch_unknown2)
-			#print(step2)
 			var unknown2 = step2
-			#print(unknown2)
-			#print(sample.pitch_unknown1)
 			var test = pitch_calculate(pitch, sample.pitch_unknown1 * 100, unknown2)
-			
-			#print(test)
-			
-			vols.append(t * v)
-			#print(j, " ", v)
 			playback.set_stream_volume(id, linear_to_db(t * v))
-			#playback.set_stream_volume(id, 0)
 			playback.set_stream_pitch_scale(id, (test / 4096.0))
-			#playback.set_stream_pitch_scale(id, 1)
-			#print(pitch_log)
-	#print(vols)
-	#print(linear_to_db(0.5))
