@@ -1,4 +1,3 @@
-@tool
 extends AudioStreamPolyphonic
 class_name EngineAudio
 
