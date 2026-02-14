@@ -128,21 +128,25 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 	return OK
 
 
-func _load_stream(entry: Dictionary) -> EngineSample:
+func _load_stream(entry: Dictionary) -> Array[EngineSample]:
 	var params = {}
 	var sample = entry["samples"][0]
 	var decoded = Marshalls.base64_to_raw(sample["sample"]).decompress(1000000, FileAccess.COMPRESSION_GZIP)
 	var wav = AudioStreamWAV.load_from_buffer(decoded, params)
-	var result = EngineSample.new()
-	result.sample = wav
-	result.rear = entry["is_rear"]
-	result.pitch_unknown0 = sample["pitch_unknown0"]
-	result.pitch_unknown1 = sample["pitch_unknown1"]
-	result.pitch_unknown2 = sample["pitch_unknown2"]
+	var result: Array[EngineSample] = []
 	for table in entry["tables"]:
-		result.volume_tables.append(table["volume"])
-		result.pitch_tables.append(table["pitch"])
-		result.is_load_table.append(table["type"] == "load")
+		var engine_sample = EngineSample.new()
+		engine_sample.sample = wav
+		engine_sample.rear = entry["is_rear"]
+		engine_sample.pitch_unknown0 = sample["pitch_unknown0"]
+		engine_sample.pitch_unknown1 = sample["pitch_unknown1"]
+		engine_sample.pitch_unknown2 = sample["pitch_unknown2"]
+		var table_resource = EngineSampleTable.new()
+		table_resource.volume.assign(table["volume"])
+		table_resource.pitch.assign(table["pitch"])
+		table_resource.is_load = table["type"] == "load"
+		engine_sample.table = table_resource
+		result.append(engine_sample)
 	return result
 
 
@@ -156,21 +160,8 @@ func process_car_extras(root: Node, data: Dictionary):
 	root.set_meta("type", "car")
 	root.set_meta("color_set", color_set)
 	var engine_audio = EngineAudio.new()
-	var i = 0
 	for sample in data["engine_samples"]:
-		engine_audio.samples.append(self._load_stream(sample))
-		#if i == 0:
-			#engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x24.wav")
-		#if i == 1:
-			#engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x25.wav")
-		#if i == 2:
-			#engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x26.wav")
-		#if i == 3:
-			#engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x27.wav")
-		#if i == 4:
-			#engine_audio.samples[-1].sample = load("res://import/audio/front_out_0x28.wav")
-		#engine_audio.samples[-1].sample.loop_mode = 1
-		i += 1
+		engine_audio.samples.append_array(self._load_stream(sample))
 	var emitter = preload("res://core/car/car_engine_audio.tscn").instantiate()
 	emitter.stream = engine_audio
 	root.add_child(emitter)
