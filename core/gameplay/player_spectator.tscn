@@ -18,10 +18,10 @@ script = ExtResource("1_eomyr")
 
 [node name="PlayerUI" parent="." unique_id=1361609481 instance=ExtResource("1_08nnd")]
 
-[node name="RearViewMirror" parent="PlayerUI/HSplitContainer/RearViewMirror" index="0" unique_id=942523188]
+[node name="RearViewMirror" parent="PlayerUI/HSplitContainer/RearViewMirror" parent_id_path=PackedInt32Array(1361609481, 909807405) index="0" unique_id=942523188]
 material = SubResource("ShaderMaterial_6jlnc")
 
-[node name="RearViewCamera" type="Camera3D" parent="PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport" index="0" unique_id=1764865971]
+[node name="RearViewCamera" type="Camera3D" parent="PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport" parent_id_path=PackedInt32Array(1361609481, 909807405, 826522085) index="0" unique_id=1764865971]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.034)
 fov = 40.0

@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://dowhytgk2pns0"]
+
+[ext_resource type="Script" uid="uid://bbb7pajrgd1gl" path="res://core/car/car_engine_audio.gd" id="7_pjrvn"]
+
+[node name="CarEngineAudio" type="AudioStreamPlayer3D" unique_id=1082149087]
+unit_size = 33.97
+autoplay = true
+max_polyphony = 20
+bus = &"Engines"
+doppler_tracking = 2
+script = ExtResource("7_pjrvn")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=883987469]
+transform = Transform3D(1, 0, 0, 0, 0.971163, 0.238415, 0, -0.238415, 0.971163, 0, 0.786156, 8.78288)

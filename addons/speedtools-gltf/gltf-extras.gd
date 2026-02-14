@@ -127,6 +127,29 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 		checked_node.set_meta("surface_type", surface_type)
 	return OK
 
+
+func _load_stream(entry: Dictionary) -> Array[EngineSample]:
+	var params = {}
+	var sample = entry["samples"][0]
+	var decoded = Marshalls.base64_to_raw(sample["sample"]).decompress(1000000, FileAccess.COMPRESSION_GZIP)
+	var wav = AudioStreamWAV.load_from_buffer(decoded, params)
+	var result: Array[EngineSample] = []
+	for table in entry["tables"]:
+		var engine_sample = EngineSample.new()
+		engine_sample.sample = wav
+		engine_sample.rear = entry["is_rear"]
+		engine_sample.pitch_unknown0 = sample["pitch_unknown0"]
+		engine_sample.pitch_unknown1 = sample["pitch_unknown1"]
+		engine_sample.pitch_unknown2 = sample["pitch_unknown2"]
+		var table_resource = EngineSampleTable.new()
+		table_resource.volume.assign(table["volume"])
+		table_resource.pitch.assign(table["pitch"])
+		table_resource.is_load = table["type"] == "load"
+		engine_sample.table = table_resource
+		result.append(engine_sample)
+	return result
+
+
 func process_car_extras(root: Node, data: Dictionary):
 	var dimensions = data["dimensions"]
 	var color_set: Array[CarColorSet]
@@ -136,6 +159,13 @@ func process_car_extras(root: Node, data: Dictionary):
 	root.set_meta("performance", data["performance"])
 	root.set_meta("type", "car")
 	root.set_meta("color_set", color_set)
+	var engine_audio = EngineAudio.new()
+	for sample in data["engine_samples"]:
+		engine_audio.samples.append_array(self._load_stream(sample))
+	var emitter = preload("res://core/car/car_engine_audio.tscn").instantiate()
+	emitter.stream = engine_audio
+	root.add_child(emitter)
+	emitter.owner = root
 
 func get_image_by_name(state: GLTFState, name: String) -> CompressedTexture2D:
 	var images = state.get_images()
