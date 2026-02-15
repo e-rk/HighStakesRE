@@ -77,6 +77,9 @@ var brake_light_energy : float = 0.0
 
 @onready var collider: CollisionShape3D = $Collider
 @onready var interior_camera: Camera3D = $"Interior camera"
+@onready var interior_wheel = self.find_child("*wheel*")
+@onready var rpm_meter: MeshInstance3D = self.find_child("*RPM*")
+@onready var mph_meter: MeshInstance3D = self.find_child("*MPH*")
 
 
 func _ready():
@@ -99,6 +102,8 @@ func _ready():
 		self.brake_light_energy = self.brake_lights[0].light_energy
 	else:
 		self.brake_light_energy = 2 * tail_light_energy
+	if not self.interior_wheel:
+		self.interior_wheel = self.find_child("*Steering*")
 
 func _enable_lights(lights: Array, visible: bool):
 	for light in lights:
@@ -179,12 +184,27 @@ func keep_height_above_ground(positional_attributes: Dictionary):
 		self.global_position = pos
 
 
+func _turn_meter(meter: MeshInstance3D, value: float, value_start: float, value_stop: float):
+	var regex = RegEx.create_from_string(".*\\((0_\\d+) to (0_\\d+)\\).*")
+	var search = regex.search(meter.name)
+	var start = float(search.get_string(1).replace("_", ".")) * TAU
+	var stop = float(search.get_string(2).replace("_", ".")) * TAU
+	var rotation = remap(value, value_start, value_stop, start, stop)
+	meter.rotation = rotation * Vector3.MODEL_FRONT
+
+
 func _process(delta: float):
 	var velocity_local = self.basis.inverse() * self.linear_velocity * delta
 	var wheel_turn = (self.current_steering / 128.0) * (PI / 4)
 	for child in self.get_children().filter(func(x): return x is CarWheel):
 		child.step_rotation(velocity_local.z)
 		child.turn = wheel_turn
+	if self.interior_wheel:
+		self.interior_wheel.rotation = remap(self.current_steering, -128.0, 128.0, deg_to_rad(90), deg_to_rad(-90)) * Vector3.MODEL_FRONT
+	if self.rpm_meter:
+		self._turn_meter(self.rpm_meter, self.current_rpm, self.performance.engine_min_rpm(), self.performance.engine_redline_rpm())
+	if self.mph_meter:
+		self._turn_meter(self.mph_meter, self.linear_velocity.length(), 0, self.performance.max_velocity())
 
 
 func _integrate_forces(state: PhysicsDirectBodyState3D):
