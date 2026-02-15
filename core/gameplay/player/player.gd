@@ -26,6 +26,7 @@ func _ready():
 	self.car = load(car.path).instantiate()
 	self.car.global_transform = initial_transform
 	self.add_child(self.car)
+	self.car.owner = self
 	self.car.color = color_set
 	self.input.set_max_gear(self.car.max_gear())
 
