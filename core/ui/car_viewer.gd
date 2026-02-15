@@ -14,8 +14,8 @@ extends SubViewportContainer
 	get:
 		return color_set
 
-@onready var viewport = %CarViewport
-@onready var camera = %Camera3D
+@onready var viewport: SubViewport = %CarViewport
+@onready var camera: Camera3D = %CarViewerCamera
 
 var car_instance: Car
 const spin_angular_velocity = -2 * PI / 6
