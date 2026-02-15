@@ -18,6 +18,13 @@ extends HBoxContainer
 
 signal color_changed;
 
+func _ready() -> void:
+	var color_picker = self.color_picker_button.get_picker()
+	color_picker.can_add_swatches = false
+	color_picker.hex_visible = false
+	color_picker.sliders_visible = false
+	color_picker.deferred_mode = true
+
 func _set_picker_colors():
 	var primary_colors = self.colors.map(func (x): return x.primary)
 	var color_picker = self.color_picker_button.get_picker()
