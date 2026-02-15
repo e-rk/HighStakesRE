@@ -51,16 +51,20 @@ func pitch_calculate(pitch_value: int) -> float:
 	return linear / 4096.0
 
 
-func volume_calculate(volume_value: int, is_load: bool, throttle: float) -> float:
+func volume_calculate(volume_value: int, is_load: bool, throttle: float, rear_front_factor: float) -> float:
 	var volume_linear = remap(volume_value, 0, 127, 0.0, 1.0)
 	var t = throttle
 	if not is_load:
 		t = 1.0 - t
-	return linear_to_db(t * volume_linear)
+	rear_front_factor = remap(rear_front_factor, -1.0, 1.0, 0.0, 1.0)
+	if not self.rear:
+		rear_front_factor = 1.0 - rear_front_factor
+	rear_front_factor = transition_function(127 * rear_front_factor)
+	return linear_to_db(t * volume_linear * rear_front_factor)
 
 
-func get_volume_for_idx(idx: int, throttle: float) -> float:
-	return volume_calculate(table.volume[idx], table.is_load, throttle)
+func get_volume_for_idx(idx: int, throttle: float, rear_front_factor: float) -> float:
+	return volume_calculate(table.volume[idx], table.is_load, throttle, rear_front_factor)
 
 
 func get_pitch_for_idx(idx: int) -> float:
