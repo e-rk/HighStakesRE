@@ -76,6 +76,7 @@ var tail_light_energy : float = 0.0
 var brake_light_energy : float = 0.0
 
 @onready var collider: CollisionShape3D = $Collider
+@onready var interior_camera: Camera3D = $"Interior camera"
 
 
 func _ready():
@@ -108,6 +109,9 @@ func _set_car_color(color: CarColorSet):
 	if self.car_texture:
 		self.car_texture.color_set = color
 
+
+func get_interior_camera() -> Camera3D:
+	return self.interior_camera
 
 func dimensions() -> Vector3:
 	return collider.shape.size

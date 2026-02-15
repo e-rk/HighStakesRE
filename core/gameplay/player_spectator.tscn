@@ -38,11 +38,12 @@ max_distance = 60.0
 size = Vector3(50.005, 15, 50.008)
 origin_offset = Vector3(0, 1, 0)
 cull_mask = 1047553
-reflection_mask = 1047558
+reflection_mask = 1047566
 
 [node name="MainCamera" type="Camera3D" parent="." unique_id=1594213212]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 top_level = true
+cull_mask = 1048567
 doppler_tracking = 2
 current = true
 fov = 70.8

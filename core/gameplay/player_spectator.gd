@@ -14,8 +14,14 @@ extends Node3D
 @onready var main_camera: Camera3D = $MainCamera
 @onready var target: Marker3D = $CameraArm/CameraTarget
 
+enum CameraMode {
+	HELI,
+	INTERIOR,
+}
+
 var factor = 0.25
 var previous_global_offset = Vector3.ZERO
+var camera_mode: CameraMode = CameraMode.HELI
 
 
 func _ready() -> void:
@@ -84,3 +90,15 @@ func _physics_process(delta):
 		ui.set_laps(racer.laps, self.race_laps)
 		ui.set_current_lap_time(racer.current_lap_time)
 		ui.set_last_lap_time(racer.last_lap_time)
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("change_camera"):
+		var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
+		match camera_mode:
+			CameraMode.HELI:
+				if racer and racer.car.get_interior_camera():
+					racer.car.get_interior_camera().make_current()
+					camera_mode = CameraMode.INTERIOR
+			CameraMode.INTERIOR:
+				main_camera.make_current()
+				camera_mode = CameraMode.HELI

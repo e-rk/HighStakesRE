@@ -15,6 +15,7 @@ enum VisualLayer {
 	TRACK = 0,
 	OPPONENTS = 1,
 	PLAYER = 2,
+	PLAYER_INTERIOR = 3,
 }
 
 enum PlayerStatus { UNKNOWN, IN_LOBBY, IN_LOBBY_READY, IN_GAME_STANDBY, IN_GAME_PLAYING }

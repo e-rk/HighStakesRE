@@ -43,6 +43,7 @@ render_target_update_mode = 4
 [node name="Camera3D" type="Camera3D" parent="CarViewport" unique_id=128376634]
 unique_name_in_owner = true
 transform = Transform3D(0.8571676, -0.10796154, 0.50359577, 0, 0.97778326, 0.20961864, -0.51503825, -0.17967819, 0.83812416, 4.3615136, 2.0086958, 6.013069)
+cull_mask = 1048567
 h_offset = -1.0
 projection = 2
 current = true
@@ -61,7 +62,7 @@ data = SubResource("VoxelGIData_embue")
 
 [node name="ReflectionProbe" type="ReflectionProbe" parent="CarViewport" unique_id=138242057]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.595088, 0)
-cull_mask = 1048571
+cull_mask = 1048563
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="CarViewport" unique_id=1306063627]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)

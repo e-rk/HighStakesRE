@@ -109,6 +109,9 @@ func _process_car_texture(car: Car):
 	car.car_texture = car_texture
 	for child in car.get_children():
 		if child is MeshInstance3D:
+			var extras = child.get_meta("extras", {})
+			if extras.get("SPT_interior", false):
+				continue
 			var surfaces = child.mesh.get_surface_count()
 			for i in range(surfaces):
 				var material = child.mesh.surface_get_material(i)
@@ -160,7 +163,14 @@ func _post_import(scene):
 		new_scene.performance = performance
 		for node in new_scene.get_children():
 			if node is VisualInstance3D:
-				node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
+				var extras = node.get_meta("extras", {})
+				if extras.get("SPT_interior", false):
+					node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR])
+				else:
+					node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
+			if node is Camera3D:
+				node.cull_mask = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR, Constants.VisualLayer.TRACK, Constants.VisualLayer.OPPONENTS])
+				node.fov = 60
 			self.make_wheel(node)
 		scene = new_scene
 		if colors:
