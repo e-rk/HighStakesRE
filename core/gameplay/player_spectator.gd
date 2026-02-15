@@ -22,10 +22,12 @@ enum CameraMode {
 var factor = 0.25
 var previous_global_offset = Vector3.ZERO
 var camera_mode: CameraMode = CameraMode.HELI
-
+var initial_arm_rotation = Basis.IDENTITY
+var stiffen_camera = false
 
 func _ready() -> void:
 	self.set_target_position(Vector3(0.0, 1.8, -5.2))
+	self.initial_arm_rotation = self.camera_arm.basis
 
 
 func set_waypoints(waypoints: Array):
@@ -74,12 +76,30 @@ func interpolate_camera(car: Car) -> Vector3:
 	return next_position
 
 
+func rotate_camera(angle: float):
+	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
+	if racer:
+		var target_basis = self.initial_arm_rotation.rotated(Vector3.UP, angle)
+		self.camera_arm.basis = target_basis
+		self.main_camera.basis = target_basis
+		self.update_camera()
+		self.main_camera.reset_physics_interpolation()
+
+func update_camera():
+	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
+	if racer:
+		if self.stiffen_camera:
+			self.main_camera.position = self.camera_arm.to_global(self.target.position)
+		else:
+			self.main_camera.position = self.interpolate_camera(racer.car)
+		self.main_camera.look_at(racer.car.position + Vector3(0, 1, 0))
+
+
 func _physics_process(delta):
 	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
 	var player_data = get_tree().get_nodes_in_group(&"Racers").map(func(x): return player_to_minimap_data(racer, x))
+	update_camera()
 	if racer:
-		main_camera.position = self.interpolate_camera(racer.car)
-		main_camera.look_at(racer.car.position + Vector3(0, 1, 0))
 		self.global_transform = racer.car.global_transform
 		ui.set_speed(racer.car.linear_velocity.length())
 		ui.set_rpm(racer.car.current_rpm)
@@ -91,14 +111,31 @@ func _physics_process(delta):
 		ui.set_current_lap_time(racer.current_lap_time)
 		ui.set_last_lap_time(racer.last_lap_time)
 
+
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("change_camera"):
 		var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
+		var interior_camera = racer.car.get_interior_camera()
 		match camera_mode:
-			CameraMode.HELI:
-				if racer and racer.car.get_interior_camera():
-					racer.car.get_interior_camera().make_current()
-					camera_mode = CameraMode.INTERIOR
+			CameraMode.HELI when interior_camera:
+				interior_camera.make_current()
+				camera_mode = CameraMode.INTERIOR
 			CameraMode.INTERIOR:
 				main_camera.make_current()
 				camera_mode = CameraMode.HELI
+	if event.is_action_pressed("look_back"):
+		self.stiffen_camera = true;
+		self.rotate_camera(PI)
+	elif event.is_action_pressed("look_right"):
+		self.stiffen_camera = true;
+		self.rotate_camera(-PI/2)
+	elif event.is_action_pressed("look_left"):
+		self.stiffen_camera = true;
+		self.rotate_camera(PI/2)
+	else:
+		var actions = ["look_back", "look_right", "look_left"]
+		for action in actions:
+			if event.is_action_released(action):
+				self.stiffen_camera = false
+				self.rotate_camera(0)
+				break

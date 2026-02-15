@@ -23,7 +23,8 @@ material = SubResource("ShaderMaterial_6jlnc")
 
 [node name="RearViewCamera" type="Camera3D" parent="PlayerUI/HSplitContainer/RearViewMirror/RearViewMirror/SubViewport" parent_id_path=PackedInt32Array(1361609481, 909807405, 826522085) index="0" unique_id=1764865971]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.034)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.003825)
+cull_mask = 1048563
 fov = 40.0
 far = 200.0
 
