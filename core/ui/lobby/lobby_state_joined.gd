@@ -12,6 +12,7 @@ func enter():
 
 
 func leave():
+	context.back_to_menu()
 	super()
 
 
