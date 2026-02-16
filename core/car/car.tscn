@@ -47,6 +47,7 @@ center_of_mass_mode = 1
 can_sleep = false
 custom_integrator = true
 continuous_cd = true
+max_contacts_reported = 10
 script = ExtResource("1_iu3ke")
 metadata/_custom_type_script = "uid://un2jefdr7h8w"
 
@@ -66,3 +67,13 @@ metadata/_custom_type_script = "uid://bodsc1ioqdpjc"
 
 [node name="Collider" type="CollisionShape3D" parent="." unique_id=1215329231]
 shape = SubResource("BoxShape3D_kivpk")
+
+[node name="RoadRaycasts" type="Node3D" parent="." unique_id=1245838686]
+
+[node name="Down" type="RayCast3D" parent="RoadRaycasts" unique_id=969740341]
+enabled = false
+target_position = Vector3(0, -10, 0)
+
+[node name="Up" type="RayCast3D" parent="RoadRaycasts" unique_id=376931072]
+enabled = false
+target_position = Vector3(0, 10, 0)

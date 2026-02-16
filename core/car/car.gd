@@ -51,8 +51,6 @@ extends RigidBody3D
 @export var car_texture: CarTexture
 
 
-const RAYCAST_DISTANCE = 10
-
 var current_rpm := 0.0
 var current_steering := 0.0
 var current_throttle := 0.0
@@ -80,6 +78,9 @@ var brake_light_energy : float = 0.0
 @onready var interior_wheel = self.find_child("*wheel*")
 @onready var rpm_meter: MeshInstance3D = self.find_child("*RPM*")
 @onready var mph_meter: MeshInstance3D = self.find_child("*MPH*")
+@onready var road_raycasts: Node3D = $RoadRaycasts
+@onready var road_raycast_down: RayCast3D = $RoadRaycasts/Down
+@onready var road_raycast_up: RayCast3D = $RoadRaycasts/Up
 
 
 func _ready():
@@ -126,18 +127,23 @@ func max_gear() -> CarTypes.Gear:
 	return self.performance.max_gear()
 
 
-func do_raycast_down(position: Vector3) -> Dictionary:
-	var ray_to = position + Vector3.DOWN * RAYCAST_DISTANCE
-	var mask = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_ROAD])
-	var query = PhysicsRayQueryParameters3D.create(position, ray_to, mask)
-	return get_world_3d().direct_space_state.intersect_ray(query)
-
-
-func distance_above_ground(raycast_result: Dictionary) -> float:
-	var result = INF
-	if raycast_result:
-		var ground_pos = raycast_result["position"]
-		result = self.global_position.y - ground_pos.y
+func _do_road_raycasts(position: Vector3) -> Dictionary:
+	self.road_raycasts.global_position = position
+	self.road_raycasts.force_update_transform()
+	self.road_raycast_down.force_raycast_update()
+	self.road_raycast_up.force_raycast_update()
+	var collision_position = Vector3(position.x, -INF, position.z)
+	var normal = Vector3.UP
+	if self.road_raycast_down.is_colliding():
+		collision_position = self.road_raycast_down.get_collision_point()
+		normal = self.road_raycast_down.get_collision_normal()
+	elif self.road_raycast_up.is_colliding():
+		collision_position = self.road_raycast_up.get_collision_point()
+		normal = -self.road_raycast_up.get_collision_normal()
+	var result = {
+		"distance": (position.y - collision_position.y),
+		"normal": normal,
+	}
 	return result
 
 
@@ -147,20 +153,13 @@ func basis_from_normal(normal: Vector3) -> Basis:
 	return Basis(-x, normal, z)
 
 
-func basis_to_road(raycast_result: Dictionary) -> Basis:
-	var result = self.basis
-	if raycast_result:
-		var normal = raycast_result["normal"]
-		result = basis_from_normal(normal)
-	return result
-
-
 func get_positional_attributes(position: Vector3) -> Dictionary:
-	var raycast_result = self.do_raycast_down(position)
+	var result = self._do_road_raycasts(position)
 	return {
-		"distance_above_ground": self.distance_above_ground(raycast_result),
-		"basis_to_road": self.basis_to_road(raycast_result),
+		"distance_above_ground": result["distance"],
+		"basis_to_road": self.basis_from_normal(result["normal"]),
 	}
+
 
 
 func get_current_positional_attributes() -> Dictionary:
@@ -178,9 +177,8 @@ func check_contact_with_ground(positional_attributes: Dictionary) -> bool:
 
 func keep_height_above_ground(positional_attributes: Dictionary):
 	if check_contact_with_ground(positional_attributes):
-		var collision = self.do_raycast_down(self.global_position)
 		var pos = self.global_position
-		pos.y = collision["position"].y + 0.5  # 0.6
+		pos.y = pos.y - positional_attributes["distance_above_ground"] + 0.5  # 0.6
 		self.global_position = pos
 
 
