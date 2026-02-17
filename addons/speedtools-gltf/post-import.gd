@@ -16,10 +16,13 @@ func make_wheel(node: Node):
 		wheel.is_front = true
 	wheel_mesh.free()
 
-func set_wall_collision(node: Node):
-	if node is StaticBody3D and node.name.contains("not_driveable"):
-		node.collision_layer = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_WALLS])
-		node.collision_mask = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_WALLS])
+func set_colliders(node: Node):
+	if node is StaticBody3D:
+		if node.name.contains("not_driveable"):
+			node.collision_layer = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_WALLS])
+			node.collision_mask = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_WALLS])
+		for child in node.get_children():
+			child.shape.backface_collision = true
 
 func make_rigid_body(scene: Node, node: Node):
 	var object = preload("res://core/track/track_object.tscn").instantiate()
@@ -126,7 +129,7 @@ func _post_import(scene):
 		scene.replace_by(new_scene)
 		self.make_rigid_bodies(new_scene)
 		for child in new_scene.get_children():
-			self.set_wall_collision(child)
+			self.set_colliders(child)
 		var animation_player = new_scene.find_child("AnimationPlayer") as AnimationPlayer
 		if animation_player:
 			var animation_library = animation_player.get_animation_library(&"")
