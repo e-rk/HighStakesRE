@@ -165,7 +165,8 @@ func _post_import(scene):
 		new_scene.mass = performance.mass()
 		new_scene.performance = performance
 		for node in new_scene.get_children():
-			if node is VisualInstance3D:
+			if node is GeometryInstance3D:
+				node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED
 				var extras = node.get_meta("extras", {})
 				if extras.get("SPT_interior", false):
 					node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR])
