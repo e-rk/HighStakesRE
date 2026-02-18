@@ -31,5 +31,5 @@ func remove_player_data(data: PlayerData):
 func _set_player_data(data: PlayerData):
 	var ti = self.tree_items[data.get_player_id()]
 	ti.set_text(0, data.player_name)
-	ti.set_text(1, data.car_uuid)
+	ti.set_text(1, data.car_uuid.get_basename().get_file())
 	ti.set_text(2, Constants.player_status_to_str(data.player_status))
