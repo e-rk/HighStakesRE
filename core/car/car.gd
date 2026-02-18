@@ -36,6 +36,10 @@ extends RigidBody3D
 		lights_on = value
 		self._enable_lights(self.head_lights, value)
 		self._enable_lights(self.tail_lights, value)
+		if self.interior_dashboard_lit:
+			self.interior_dashboard_lit.visible = value
+		if self.dashboard_lit:
+			self.dashboard_lit.visible = value
 	get:
 		return lights_on
 		
@@ -48,7 +52,7 @@ extends RigidBody3D
 		
 @export var palette: Array[CarColorSet]
 
-@export var car_texture: CarTexture
+@export var car_textures: Array[CarTexture] = []
 
 
 var current_rpm := 0.0
@@ -75,9 +79,11 @@ var brake_light_energy : float = 0.0
 
 @onready var collider: CollisionShape3D = $Collider
 @onready var interior_camera: Camera3D = $"Interior camera"
-@onready var interior_wheel = self.find_child("*wheel*")
-@onready var rpm_meter: MeshInstance3D = self.find_child("*RPM*")
-@onready var mph_meter: MeshInstance3D = self.find_child("*MPH*")
+@onready var interior_wheel = $steering
+@onready var rpm_meter: MeshInstance3D = $tachometer
+@onready var mph_meter: MeshInstance3D = $speedometer
+@onready var interior_dashboard_lit: MeshInstance3D = $interior_dashboard_lit
+@onready var dashboard_lit: MeshInstance3D = $dashboard_lit
 @onready var road_raycasts: Node3D = $RoadRaycasts
 @onready var road_raycast_down: RayCast3D = $RoadRaycasts/Down
 @onready var road_raycast_up: RayCast3D = $RoadRaycasts/Up
@@ -112,8 +118,8 @@ func _enable_lights(lights: Array, visible: bool):
 
 
 func _set_car_color(color: CarColorSet):
-	if self.car_texture:
-		self.car_texture.color_set = color
+	for texture in self.car_textures:
+		texture.color_set = color
 
 
 func get_interior_camera() -> Camera3D:
@@ -182,15 +188,6 @@ func keep_height_above_ground(positional_attributes: Dictionary):
 		self.global_position = pos
 
 
-func _turn_meter(meter: MeshInstance3D, value: float, value_start: float, value_stop: float):
-	var regex = RegEx.create_from_string(".*\\((0_\\d+) to (0_\\d+)\\).*")
-	var search = regex.search(meter.name)
-	var start = float(search.get_string(1).replace("_", ".")) * TAU
-	var stop = float(search.get_string(2).replace("_", ".")) * TAU
-	var rotation = remap(value, value_start, value_stop, start, stop)
-	meter.rotation = rotation * Vector3.MODEL_FRONT
-
-
 func _process(delta: float):
 	var velocity_local = self.basis.inverse() * self.linear_velocity * delta
 	var wheel_turn = (self.current_steering / 128.0) * (PI / 4)
@@ -200,9 +197,9 @@ func _process(delta: float):
 	if self.interior_wheel:
 		self.interior_wheel.rotation = remap(self.current_steering, -128.0, 128.0, deg_to_rad(90), deg_to_rad(-90)) * Vector3.MODEL_FRONT
 	if self.rpm_meter:
-		self._turn_meter(self.rpm_meter, self.current_rpm, self.performance.engine_min_rpm(), self.performance.engine_redline_rpm())
+		self.rpm_meter.value = remap(self.current_rpm, self.performance.engine_min_rpm(), self.performance.engine_redline_rpm(), 0.0, 1.0)
 	if self.mph_meter:
-		self._turn_meter(self.mph_meter, self.linear_velocity.length(), 0, self.performance.max_velocity())
+		self.mph_meter.value = remap(self.linear_velocity.length(), 0, self.performance.max_velocity(), 0.0, 1.0)
 
 
 func _integrate_forces(state: PhysicsDirectBodyState3D):

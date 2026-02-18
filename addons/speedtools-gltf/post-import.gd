@@ -16,6 +16,22 @@ func make_wheel(node: Node):
 		wheel.is_front = true
 	wheel_mesh.free()
 
+func make_meter(node: Node) -> CarMeter:
+	var meter_mesh = node as MeshInstance3D
+	var regex = RegEx.create_from_string(".*\\((0_\\d+) to (0_\\d+)\\).*")
+	var search = regex.search(meter_mesh.name)
+	var start = float(search.get_string(1).replace("_", "."))
+	var stop = float(search.get_string(2).replace("_", "."))
+	var meter = CarMeter.new()
+	meter.start = start
+	meter.stop = stop
+	meter.name = meter_mesh.name
+	meter.mesh = meter_mesh.mesh
+	meter_mesh.replace_by(meter)
+	meter.transform = meter_mesh.transform
+	meter_mesh.free()
+	return meter
+
 func set_colliders(node: Node):
 	if node is StaticBody3D:
 		if node.name.contains("not_driveable"):
@@ -95,31 +111,31 @@ func apply_car_material(root: Node):
 		for surf in mesh.get_surface_count():
 			mesh.surface_set_material(surf, mapping[mesh.surface_get_material(surf)])
 
-func _get_car_texture(car: Car) -> Texture2D:
-	for child in car.get_children():
-		if child is MeshInstance3D:
-			var surfaces = child.mesh.get_surface_count()
-			for i in range(surfaces):
-				var material = child.mesh.surface_get_material(i)
-				if material is StandardMaterial3D and not material.refraction_enabled:
-					return material.albedo_texture
-	return null
 
 func _process_car_texture(car: Car):
-	var texture = self._get_car_texture(car)
-	var image = texture.get_image()
-	var car_texture = CarTexture.create_from_base_image(image)
-	car.car_texture = car_texture
+	var image_to_parts = {}
 	for child in car.get_children():
 		if child is MeshInstance3D:
-			var extras = child.get_meta("extras", {})
-			if extras.get("SPT_interior", false):
-				continue
-			var surfaces = child.mesh.get_surface_count()
+			for i in range(child.mesh.get_surface_count()):
+				var surface = child.mesh.surface_get_material(i) as StandardMaterial3D
+				if surface.refraction_enabled:
+					continue
+				var surf_image = surface.albedo_texture.get_image() as Image
+				var prev = image_to_parts.get(surf_image, [])
+				prev.append(child)
+				image_to_parts[surf_image] = prev
+				break
+	var car_textures: Array[CarTexture] = []
+	for image in image_to_parts:
+		var car_texture = CarTexture.create_from_base_image(image)
+		car_textures.append(car_texture)
+		for part in image_to_parts[image]:
+			var surfaces = part.mesh.get_surface_count()
 			for i in range(surfaces):
-				var material = child.mesh.surface_get_material(i)
-				if material is StandardMaterial3D and not material.refraction_enabled:
+				var material = part.mesh.surface_get_material(i) as StandardMaterial3D
+				if not material.refraction_enabled:
 					material.albedo_texture = car_texture
+	car.car_textures = car_textures
 
 
 func _post_import(scene):
@@ -175,9 +191,24 @@ func _post_import(scene):
 			if node is Camera3D:
 				node.cull_mask = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR, Constants.VisualLayer.TRACK, Constants.VisualLayer.OPPONENTS])
 				node.fov = 60
-			self.make_wheel(node)
+			if node.name.contains("_whl"):
+				self.make_wheel(node)
+			elif node.name.contains("_RPM"):
+				node = self.make_meter(node)
+				node.name = "tachometer"
+			elif node.name.contains("_MPH"):
+				node = self.make_meter(node)
+				node.name = "speedometer"
 		scene = new_scene
 		if colors:
 			scene.color = colors[0]
 		self._process_car_texture(scene)
+		var interior_dashboard = scene.find_child("interior_dashboard_lit")
+		if interior_dashboard is MeshInstance3D:
+			interior_dashboard.position += -0.001 * Vector3.MODEL_FRONT
+			var material = interior_dashboard.mesh.surface_get_material(0) as StandardMaterial3D
+			material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		var dashbaord = scene.find_child("dashboard_lit")
+		if dashbaord is MeshInstance3D:
+			dashbaord.position += -0.001 * Vector3.MODEL_FRONT
 	return scene
