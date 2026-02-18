@@ -23,3 +23,11 @@ func get_closest_transform(position: Vector3) -> Transform3D:
 
 func offset_normalized(position: Vector3) -> float:
 	return self.waypoints.get_closest_offset(position) / self.waypoints.get_baked_length()
+
+
+func offset(position: Vector3) -> float:
+	return self.waypoints.get_closest_offset(position)
+
+
+func length() -> float:
+	return self.waypoints.get_baked_length()

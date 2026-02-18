@@ -23,8 +23,16 @@ func get_waypoints() -> Array[Vector3]:
 	return waypoints.get_points()
 
 
-func progress_along_track(position: Vector3) -> float:
+func progress_along_track_normalized(position: Vector3) -> float:
 	return waypoints.offset_normalized(position)
+
+
+func progress_along_track(position: Vector3) -> float:
+	return waypoints.offset(position)
+
+
+func track_length() -> float:
+	return waypoints.length()
 
 
 func get_closest_transform(position: Vector3) -> Transform3D:
