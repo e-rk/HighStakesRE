@@ -37,7 +37,8 @@ func _check_end_conditions(racers):
 
 
 func _physics_process(delta):
-	var racers = get_tree().get_nodes_in_group(&"Racers")
+	var racers: Array[Racer] = []
+	racers.assign(get_tree().get_nodes_in_group(&"Racers"))
 	for racer in racers:
 		var progress = self.track.progress_along_track(racer.car.global_position)
 		var prev_progress = racer.track_progress
