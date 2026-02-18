@@ -69,11 +69,12 @@ var gear_shift_counter = 0
 var shifted_down = false
 var g_transfer := 0.0
 var has_contact_with_ground := true
-var head_lights := []
-var tail_lights := []
-var brake_lights := []
-var directional_lights := []
-var reverse_lights := []
+var head_lights: Array[Light3D] = []
+var tail_lights: Array[Light3D] = []
+var brake_lights: Array[Light3D] = []
+var directional_lights: Array[Light3D] = []
+var reverse_lights: Array[Light3D] = []
+var siren_lights: Array[Light3D] = []
 var tail_light_energy : float = 0.0
 var brake_light_energy : float = 0.0
 
@@ -93,11 +94,12 @@ func _ready():
 	if handling_model == null:
 		handling_model = HandlingModelRE.new()
 	var nodes = self.get_children().filter(func(x): return x is Light3D)
-	self.head_lights = nodes.filter(func(x): return x.name.begins_with("headlight"))
-	self.tail_lights = nodes.filter(func(x): return x.name.begins_with("taillight"))
-	self.brake_lights = nodes.filter(func(x): return x.name.begins_with("brakelight"))
-	self.reverse_lights = nodes.filter(func(x): return x.name.begins_with("reverse"))
-	self.directional_lights = nodes.filter(func(x): return x.name.begins_with("directional"))
+	self.head_lights.assign(nodes.filter(func(x): return x.name.begins_with("headlight")))
+	self.tail_lights.assign(nodes.filter(func(x): return x.name.begins_with("taillight")))
+	self.brake_lights.assign(nodes.filter(func(x): return x.name.begins_with("brakelight")))
+	self.reverse_lights.assign(nodes.filter(func(x): return x.name.begins_with("reverse")))
+	self.directional_lights.assign(nodes.filter(func(x): return x.name.begins_with("directional")))
+	self.siren_lights.assign(nodes.filter(func(x): return x.name.begins_with("siren")))
 	self._enable_lights(self.head_lights, self.lights_on)
 	self._enable_lights(self.tail_lights, self.lights_on)
 	self._enable_lights(self.brake_lights, false)
@@ -167,7 +169,6 @@ func get_positional_attributes(position: Vector3) -> Dictionary:
 	}
 
 
-
 func get_current_positional_attributes() -> Dictionary:
 	return self.get_positional_attributes(self.global_position)
 
@@ -186,6 +187,16 @@ func keep_height_above_ground(positional_attributes: Dictionary):
 		var pos = self.global_position
 		pos.y = pos.y - positional_attributes["distance_above_ground"] + 0.5  # 0.6
 		self.global_position = pos
+
+
+func is_police() -> bool:
+	return not self.siren_lights.is_empty()
+
+
+func is_siren_active() -> bool:
+	if self.siren_lights:
+		return self.siren_lights[0].visible
+	return false
 
 
 func _process(delta: float):
