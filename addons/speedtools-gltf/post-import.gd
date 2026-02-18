@@ -73,6 +73,11 @@ func make_rigid_bodies(scene: Node):
 	for object in objects:
 		self.make_rigid_body(scene, object)
 
+func double_sided_shadows(scene: Node):
+	for child in scene.get_children():
+		if child is MeshInstance3D:
+			child.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED
+
 func apply_car_material(root: Node):
 	pass
 	var car_material = load("res://core/resources/materials/car_material.tres")
@@ -144,6 +149,7 @@ func _post_import(scene):
 		new_scene.name = scene.name
 		scene.replace_by(new_scene)
 		self.make_rigid_bodies(new_scene)
+		self.double_sided_shadows(new_scene)
 		for child in new_scene.get_children():
 			self.set_colliders(child)
 		var animation_player = new_scene.find_child("AnimationPlayer") as AnimationPlayer
