@@ -16,6 +16,7 @@ signal reposition_requested
 
 var car: Car = null
 var authority = false
+var previous_gear: int = 0
 
 
 func _ready():
@@ -28,7 +29,6 @@ func _ready():
 	self.add_child(self.car)
 	self.car.owner = self
 	self.car.color = color_set
-	self.input.set_max_gear(self.car.max_gear())
 
 
 func is_local() -> bool:
@@ -41,7 +41,11 @@ func _physics_process(_delta):
 		car.throttle = input.throttle
 		car.steering = input.steering
 		car.handbrake = input.handbrake
-		car.gear = input.gear
+		var input_gear = self.input.gear
+		if self.previous_gear != input_gear:
+			# Gear change by difference to avoid duplicated states.
+			car.gear += (input_gear - previous_gear)
+		self.previous_gear = input_gear
 	else:
 		car.brake = 1.0
 		car.throttle = 0.0

@@ -20,11 +20,7 @@ extends Node
 	get:
 		return brake
 
-@export var gear := CarTypes.Gear.NEUTRAL:
-	set(value):
-		gear = clamp(value, CarTypes.Gear.REVERSE, self.max_gear)
-	get:
-		return gear
+@export var gear: int = 0
 
 @export var handbrake := false
 
@@ -32,32 +28,18 @@ extends Node
 
 signal reposition_requested
 
-var max_gear := CarTypes.Gear.GEAR_6
-
 
 func _enter_tree() -> void:
 	self.set_multiplayer_authority($"..".name.to_int())
-
-
-func shift_up():
-	self.gear += 1
-
-
-func shift_down():
-	self.gear -= 1
-
-
-func set_max_gear(value: CarTypes.Gear):
-	self.max_gear = value
 
 
 func _input(event: InputEvent):
 	if self.get_multiplayer_authority() != multiplayer.get_unique_id():
 		return
 	if event.is_action_pressed("shift_up"):
-		self.shift_up()
+		self.gear += 1
 	if event.is_action_pressed("shift_down"):
-		self.shift_down()
+		self.gear -= 1
 	if event.is_action_pressed("lights"):
 		self.lights_on = not self.lights_on
 	self.steering = Input.get_axis("turn_right", "turn_left")

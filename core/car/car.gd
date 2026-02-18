@@ -271,6 +271,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D):
 	self._enable_lights(self.brake_lights, self.current_brake > 0)
 	self._enable_lights(self.tail_lights, self.current_brake > 0 || self.lights_on)
 	self._enable_lights(self.reverse_lights,self.current_gear == CarTypes.Gear.REVERSE)
+	self.gear = self.current_gear
 	var tail_light_energy = self.tail_light_energy
 	if self.current_brake > 0:
 		tail_light_energy = self.brake_light_energy
