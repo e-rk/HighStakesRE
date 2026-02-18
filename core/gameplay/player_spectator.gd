@@ -107,6 +107,7 @@ func _show_next_player():
 	players[next].add_to_group(&"SpectatedPlayer")
 	self.update_camera()
 
+
 func _update_ui(player: Player):
 	pass
 

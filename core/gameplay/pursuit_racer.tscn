@@ -1,9 +1,59 @@
 [gd_scene format=3 uid="uid://cdwr1m3wai7jo"]
 
-[ext_resource type="PackedScene" uid="uid://bvwn0englnh07" path="res://core/gameplay/racer.tscn" id="1_jwlb1"]
 [ext_resource type="Script" uid="uid://dd6l7eabawqqg" path="res://core/gameplay/pursuit_racer.gd" id="2_02qxm"]
 
-[node name="Racer" unique_id=535307839 instance=ExtResource("1_jwlb1")]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ve02a"]
+properties/0/path = NodePath(".:laps")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:max_laps")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:best_lap_time")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:track_progress")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:lap_start_timestamp")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:tickets")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:bust_score")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath(".:busted_timestamp")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath(".:busted")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath(".:arrested")
+properties/9/spawn = true
+properties/9/replication_mode = 2
 
-[node name="PursuitRacer" type="Node" parent="." index="1" unique_id=942784694 groups=["PursuitRacers"]]
+[node name="PursuitRacer" type="Node" unique_id=535307839 groups=["PursuitRacers"]]
 script = ExtResource("2_02qxm")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=56999824]
+replication_interval = 0.05
+delta_interval = 0.05
+replication_config = SubResource("SceneReplicationConfig_ve02a")
+
+[node name="RacerInfo" type="VBoxContainer" parent="." unique_id=2101105799]
+custom_minimum_size = Vector2(200, 50)
+offset_right = 40.0
+offset_bottom = 40.0
+alignment = 1
+
+[node name="PlayerName" type="Label" parent="RacerInfo" unique_id=360522186]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Unknown"
+
+[node name="BustedMeter" type="ProgressBar" parent="RacerInfo" unique_id=1891908585]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+show_percentage = false

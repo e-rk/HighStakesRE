@@ -21,6 +21,6 @@ static func get_config_interface() -> Control:
 
 
 func get_race_logic() -> Node:
-	var node = preload("res://core/gameplay/modes/single_race.tscn").instantiate()
+	var node = preload("res://core/gameplay/modes/pursuit.tscn").instantiate()
 	node.rules = self
 	return node

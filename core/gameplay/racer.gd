@@ -7,6 +7,8 @@ extends Node
 @export var track_progress := 0.80
 @export var lap_start_timestamp: int = 0
 
+@onready var player: Player = $".."
+
 
 func start_timer():
 	self.lap_start_timestamp = Time.get_ticks_msec()

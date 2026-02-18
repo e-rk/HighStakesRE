@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://c7h2ri3buxs3p"]
+
+[ext_resource type="Script" uid="uid://dmujgwske55bx" path="res://core/gameplay/pursuit_police.gd" id="1_rhykl"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_rhykl"]
+properties/0/path = NodePath(".:tickets_given")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:state")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:target")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+
+[node name="PursuitPolice" type="Node" unique_id=1249966932 groups=["Police"]]
+script = ExtResource("1_rhykl")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1116694685]
+replication_interval = 0.05
+delta_interval = 0.05
+replication_config = SubResource("SceneReplicationConfig_rhykl")

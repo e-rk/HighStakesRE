@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://s0tq0djmeygr"]
+
+[ext_resource type="Script" uid="uid://dxrw0m0l70kv" path="res://core/gameplay/modes/pursuit.gd" id="1_s6l5e"]
+[ext_resource type="PackedScene" uid="uid://cuo7um5xrdifo" path="res://core/gameplay/player_spectator.tscn" id="2_vhk6i"]
+[ext_resource type="Script" uid="uid://bwpdh3vexeejy" path="res://core/gameplay/pursuit_player_spectator.gd" id="3_tkmnw"]
+[ext_resource type="PackedScene" uid="uid://pwgwatjtewlu" path="res://core/ui/game/lap_timer.tscn" id="4_1cs63"]
+[ext_resource type="Shader" uid="uid://15332wfpffyw" path="res://core/resources/shader/rear_view_mirror.gdshader" id="4_1dh6p"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_1dh6p"]
+viewport_path = NodePath("RearViewMirror/SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1cs63"]
+resource_local_to_scene = true
+shader = ExtResource("4_1dh6p")
+shader_parameter/viewport = SubResource("ViewportTexture_1dh6p")
+
+[sub_resource type="LabelSettings" id="LabelSettings_lsa7r"]
+font_size = 62
+outline_size = 20
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Pursuit" type="Node" unique_id=1969784956]
+script = ExtResource("1_s6l5e")
+
+[node name="PlayerSpectator" parent="." unique_id=857663324 instance=ExtResource("2_vhk6i")]
+script = ExtResource("3_tkmnw")
+race_laps = 2
+
+[node name="LapTimer" parent="PlayerSpectator/PlayerUI/HSplitContainer" parent_id_path=PackedInt32Array(857663324, 1361609481, 1215995952) index="0" unique_id=1164055734 instance=ExtResource("4_1cs63")]
+layout_mode = 2
+
+[node name="RearViewMirror" parent="PlayerSpectator/PlayerUI/HSplitContainer/RearViewMirror" parent_id_path=PackedInt32Array(857663324, 1361609481, 909807405) index="0" unique_id=942523188]
+material = SubResource("ShaderMaterial_1cs63")
+
+[node name="MarginContainer" type="MarginContainer" parent="PlayerSpectator/PlayerUI" parent_id_path=PackedInt32Array(857663324, 1361609481) index="2" unique_id=1700215275]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -375.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 150
+
+[node name="TicketedMessage" type="Label" parent="PlayerSpectator/PlayerUI/MarginContainer" unique_id=362065757]
+visible = false
+layout_mode = 2
+text = "TICKETED"
+label_settings = SubResource("LabelSettings_lsa7r")
+horizontal_alignment = 1
+
+[node name="ArrestedMessage" type="Label" parent="PlayerSpectator/PlayerUI/MarginContainer" unique_id=780917990]
+visible = false
+layout_mode = 2
+text = "ARRESTED"
+label_settings = SubResource("LabelSettings_lsa7r")
+horizontal_alignment = 1
+
+[editable path="PlayerSpectator"]
+[editable path="PlayerSpectator/PlayerUI"]
+[editable path="PlayerSpectator/PlayerUI/HSplitContainer/RearViewMirror"]
