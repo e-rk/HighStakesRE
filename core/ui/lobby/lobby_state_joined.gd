@@ -18,6 +18,7 @@ func leave():
 
 func disconnected():
 	self.disconnected_popup.show()
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	context.set_state(context.lobby_state_disconnected)
 
 
