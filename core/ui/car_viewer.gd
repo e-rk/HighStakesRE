@@ -26,7 +26,7 @@ func _ready() -> void:
 func _set_car(scene: PackedScene):
 	pass
 
-func _process(delta):
+func _physics_process(delta: float) -> void:
 	if self.car_instance:
 		self.car_instance.rotate(Vector3.UP, spin_angular_velocity * delta)
 		
