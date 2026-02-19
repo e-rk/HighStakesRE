@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cdwr1m3wai7jo"]
+
+[ext_resource type="PackedScene" uid="uid://bvwn0englnh07" path="res://core/gameplay/racer.tscn" id="1_jwlb1"]
+[ext_resource type="Script" uid="uid://dd6l7eabawqqg" path="res://core/gameplay/pursuit_racer.gd" id="2_02qxm"]
+
+[node name="Racer" unique_id=535307839 instance=ExtResource("1_jwlb1")]
+
+[node name="PursuitRacer" type="Node" parent="." index="1" unique_id=942784694 groups=["PursuitRacers"]]
+script = ExtResource("2_02qxm")

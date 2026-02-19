@@ -88,6 +88,7 @@ var brake_light_energy : float = 0.0
 @onready var road_raycasts: Node3D = $RoadRaycasts
 @onready var road_raycast_down: RayCast3D = $RoadRaycasts/Down
 @onready var road_raycast_up: RayCast3D = $RoadRaycasts/Up
+@onready var synchronizer: CarSynchronizer = $CarSynchronizer
 
 
 func _ready():
@@ -187,6 +188,10 @@ func keep_height_above_ground(positional_attributes: Dictionary):
 		var pos = self.global_position
 		pos.y = pos.y - positional_attributes["distance_above_ground"] + 0.5  # 0.6
 		self.global_position = pos
+
+
+func enable_sync(enable: bool) -> void:
+	self.synchronizer.public_visibility = enable
 
 
 func is_police() -> bool:

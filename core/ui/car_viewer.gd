@@ -45,6 +45,7 @@ func _on_car_changed():
 		car_instance.rotation = rotation
 		car_instance.lights_on = true
 		car_instance.freeze = true
+		car_instance.enable_sync(false)
 
 func _on_car_color_changed():
 	if car_instance:
