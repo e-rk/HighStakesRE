@@ -42,9 +42,9 @@ func set_target_position(position: Vector3):
 func player_to_minimap_data(spectated_racer: Racer, node: Node) -> Dictionary:
 	var racer = node as Racer
 	return {
-		"global_position": racer.car.global_position,
+		"global_position": racer.player.car.global_position,
 		"emphasis": racer == spectated_racer,
-		"color": racer.car.color.primary,
+		"color": racer.player.car.color.primary,
 	}
 
 
@@ -91,31 +91,31 @@ func update_camera():
 		if self.stiffen_camera:
 			self.main_camera.position = self.camera_arm.to_global(self.target.position)
 		else:
-			self.main_camera.position = self.interpolate_camera(racer.car)
-		self.main_camera.look_at(racer.car.position + Vector3(0, 1, 0))
+			self.main_camera.position = self.interpolate_camera(racer.player.car)
+		self.main_camera.look_at(racer.player.car.position + Vector3(0, 1, 0))
 
 
 func _physics_process(delta):
-	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
+	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer") as Racer
 	var player_data = get_tree().get_nodes_in_group(&"Racers").map(func(x): return player_to_minimap_data(racer, x))
 	update_camera()
 	if racer:
-		self.global_transform = racer.car.global_transform
-		ui.set_speed(racer.car.linear_velocity.length())
-		ui.set_rpm(racer.car.current_rpm)
-		ui.set_gear(racer.car.gear)
-		ui.set_minimap_center(racer.car.global_position)
-		ui.set_minimap_rotation(racer.car.global_rotation.y)
+		self.global_transform = racer.player.car.global_transform
+		ui.set_speed(racer.player.car.linear_velocity.length())
+		ui.set_rpm(racer.player.car.current_rpm)
+		ui.set_gear(racer.player.car.gear)
+		ui.set_minimap_center(racer.player.car.global_position)
+		ui.set_minimap_rotation(racer.player.car.global_rotation.y)
 		ui.set_minimap_players(player_data)
 		ui.set_laps(racer.laps, self.race_laps)
-		ui.set_current_lap_time(racer.current_lap_time)
-		ui.set_last_lap_time(racer.last_lap_time)
+		ui.set_current_lap_time(racer.current_lap_time())
+		ui.set_last_lap_time(racer.get_best_lap_time())
 
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("change_camera"):
 		var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
-		var interior_camera = racer.car.get_interior_camera()
+		var interior_camera = racer.player.car.get_interior_camera()
 		match camera_mode:
 			CameraMode.HELI when interior_camera:
 				interior_camera.make_current()

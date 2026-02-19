@@ -18,6 +18,10 @@ config/name="Velocity"
 run/main_scene="uid://drxrxxcoribky"
 config/features=PackedStringArray("4.6", "Forward Plus")
 
+[audio]
+
+buses/default_bus_layout="uid://bn2naccrcif5a"
+
 [autoload]
 
 CarDB="*res://core/db/car_db.tscn"
@@ -27,6 +31,10 @@ GameModeDB="*res://core/db/mode_db.gd"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/speedtools-gltf/plugin.cfg")
+
+[global_group]
+
+Racers="Group for racers"
 
 [importer_defaults]
 

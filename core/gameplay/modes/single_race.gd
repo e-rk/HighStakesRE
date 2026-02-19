@@ -17,10 +17,9 @@ func get_spawn_position(_player: Player) -> Transform3D:
 
 
 func player_spawned(player: Player):
-	var racer = Racer.new()
-	racer.car = player.car
+	var racer = preload("res://core/gameplay/racer.tscn").instantiate()
 	player.add_child(racer)
-	racer.add_to_group(&"Racers")
+	racer.owner = player
 	if player.is_local():
 		racer.add_to_group(&"SpectatedRacer")
 
@@ -29,6 +28,8 @@ func _ready():
 	var waypoints = self.track.get_waypoints()
 	self.spectator.set_waypoints(waypoints)
 	self.spectator.race_laps = self.rules.num_laps
+	if self.get_multiplayer_authority() != multiplayer.get_unique_id():
+		self.set_physics_process(false)
 
 
 func _check_end_conditions(racers):
@@ -40,10 +41,13 @@ func _physics_process(delta):
 	var racers: Array[Racer] = []
 	racers.assign(get_tree().get_nodes_in_group(&"Racers"))
 	for racer in racers:
-		var progress = self.track.progress_along_track(racer.car.global_position)
+		var progress = self.track.progress_along_track(racer.player.car.global_position)
 		var prev_progress = racer.track_progress
 		if prev_progress > 0.9 and progress < 0.1:
 			racer.laps += 1
+			if racer.laps > racer.max_laps:
+				racer.capture_time()
+			racer.max_laps = max(racer.laps, racer.max_laps)
 		elif prev_progress < 0.1 and progress > 0.9:
 			racer.laps -= 1
 		racer.track_progress = progress

@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bvwn0englnh07"]
+
+[ext_resource type="Script" uid="uid://bsvao0d5pdtkc" path="res://core/gameplay/racer.gd" id="1_f31vq"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_vdifc"]
+properties/0/path = NodePath(".:max_laps")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:track_progress")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:laps")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:best_lap_time")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:lap_start_timestamp")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
+[node name="Racer" type="Node" unique_id=535307839 groups=["Racers"]]
+script = ExtResource("1_f31vq")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=582471048]
+replication_config = SubResource("SceneReplicationConfig_vdifc")
