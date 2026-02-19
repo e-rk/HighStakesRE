@@ -62,6 +62,8 @@ func peer_connected(id: int):
 
 func peer_disconnected(id: int):
 	self.current_state.peer_disconnected(id)
+	if self.race:
+		self.race.despawn_player(id)
 
 
 func game_started():
