@@ -14,5 +14,9 @@ func player_spawned(player: Player):
 	pass
 
 
+func start():
+	pass
+
+
 func reposition_allowed() -> bool:
 	return true

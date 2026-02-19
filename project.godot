@@ -35,6 +35,9 @@ enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/speedtool
 [global_group]
 
 Racers="Group for racers"
+PursuitRacers="Racer in pursuit mode"
+Police="Group for police players"
+Players="Group for all human players in game"
 
 [importer_defaults]
 

@@ -10,6 +10,7 @@ func enter():
 			self._on_racer_controller_reposition_requested.bind(player)
 		)
 	context.race_logic.set_physics_process(true)
+	context.race_logic.start()
 	super()
 
 

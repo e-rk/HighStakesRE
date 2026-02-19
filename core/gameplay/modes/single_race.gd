@@ -24,6 +24,17 @@ func player_spawned(player: Player):
 		racer.add_to_group(&"SpectatedRacer")
 
 
+func start():
+	var players: Array[Player]
+	players.assign(get_tree().get_nodes_in_group(&"Players"))
+	for player in players:
+		player.disable_steering = false
+	var racers: Array[Racer]
+	racers.assign(get_tree().get_nodes_in_group(&"Racers"))
+	for racer in racers:
+		racer.start_timer()
+
+
 func _ready():
 	var waypoints = self.track.get_waypoints()
 	self.spectator.set_waypoints(waypoints)
