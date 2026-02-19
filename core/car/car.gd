@@ -42,7 +42,14 @@ extends RigidBody3D
 			self.dashboard_lit.visible = value
 	get:
 		return lights_on
-		
+
+@export var siren_on : bool:
+	set(value):
+		siren_on = value
+		self._enable_lights(self.siren_lights, value)
+	get:
+		return siren_on
+
 @export var color : CarColorSet:
 	set(value):
 		color = value
