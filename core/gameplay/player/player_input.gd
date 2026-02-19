@@ -26,6 +26,8 @@ extends Node
 
 @export var lights_on := false
 
+@export var siren_on := false
+
 signal reposition_requested
 
 
@@ -42,6 +44,8 @@ func _input(event: InputEvent):
 		self.gear -= 1
 	if event.is_action_pressed("lights"):
 		self.lights_on = not self.lights_on
+	if event.is_action_pressed("siren"):
+		self.siren_on = not self.siren_on
 	self.steering = Input.get_axis("turn_right", "turn_left")
 	self.handbrake = Input.is_action_pressed("handbrake")
 	self.throttle = Input.get_action_strength("accelerate")

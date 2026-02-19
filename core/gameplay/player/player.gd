@@ -36,23 +36,23 @@ func is_local() -> bool:
 
 
 func _physics_process(_delta):
+	var input_gear = self.input.gear
 	if not self.disable_steering:
 		car.brake = input.brake
-		car.throttle = input.throttle
 		car.steering = input.steering
 		car.handbrake = input.handbrake
-		var input_gear = self.input.gear
 		if self.previous_gear != input_gear:
 			# Gear change by difference to avoid duplicated states.
 			car.gear += (input_gear - previous_gear)
-		self.previous_gear = input_gear
 	else:
 		car.brake = 1.0
-		car.throttle = 0.0
 		car.handbrake = false
 		car.gear = CarTypes.Gear.NEUTRAL
+		car.steering = 0.0
+	self.previous_gear = input_gear
+	car.throttle = input.throttle
 	car.lights_on = input.lights_on
-
+	car.siren_on = input.siren_on
 
 func _on_input_reposition_requested():
 	self.reposition_requested.emit()

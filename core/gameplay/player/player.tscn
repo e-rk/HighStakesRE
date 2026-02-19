@@ -48,9 +48,13 @@ properties/4/replication_mode = 1
 properties/5/path = NodePath(".:lights_on")
 properties/5/spawn = true
 properties/5/replication_mode = 1
+properties/6/path = NodePath(".:siren_on")
+properties/6/spawn = true
+properties/6/replication_mode = 1
 
-[node name="Player" type="Node" unique_id=437232436]
+[node name="Player" type="Node" unique_id=437232436 groups=["Players"]]
 script = ExtResource("1_n5itm")
+disable_steering = true
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1998114169]
 replication_config = SubResource("SceneReplicationConfig_mia2f")
