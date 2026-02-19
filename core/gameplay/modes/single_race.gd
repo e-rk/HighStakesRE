@@ -18,10 +18,10 @@ func get_spawn_position(_player: Player) -> Transform3D:
 
 func player_spawned(player: Player):
 	var racer = preload("res://core/gameplay/racer.tscn").instantiate()
-	player.add_child(racer)
+	player.add_child(racer, true)
 	racer.owner = player
 	if player.is_local():
-		racer.add_to_group(&"SpectatedRacer")
+		player.add_to_group(&"SpectatedPlayer")
 
 
 func start():

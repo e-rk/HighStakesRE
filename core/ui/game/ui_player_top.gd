@@ -4,7 +4,6 @@ class_name PlayerUI
 @onready var rpm_meter = %RpmMeter
 @onready var speed_meter = %SpeedMeter
 @onready var minimap_window = %MinimapWindow
-@onready var lap_timer = %LapTimer
 
 
 func set_rpm(rpm: float):
@@ -37,11 +36,3 @@ func set_minimap_waypoints(waypoints: Array):
 
 func set_laps(racer_laps: int, overall_laps: int):
 	minimap_window.set_laps(racer_laps, overall_laps)
-
-
-func set_current_lap_time(value: float):
-	lap_timer.set_current_time(value)
-
-
-func set_last_lap_time(value: float):
-	lap_timer.set_last_time(value)

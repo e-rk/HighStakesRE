@@ -1,20 +1,19 @@
 [gd_scene format=3 uid="uid://n6ecpp4f60w8"]
 
 [ext_resource type="Script" uid="uid://dutq8ncjrd42f" path="res://core/ui/game/ui_player_top.gd" id="1_u41d7"]
-[ext_resource type="PackedScene" uid="uid://pwgwatjtewlu" path="res://core/ui/game/lap_timer.tscn" id="1_x1foh"]
 [ext_resource type="PackedScene" uid="uid://bys21a36e3wlm" path="res://core/ui/game/kph_meter_digital.tscn" id="2_gd0ag"]
 [ext_resource type="PackedScene" uid="uid://b5plb6024tl3w" path="res://core/ui/game/rear_view_mirror.tscn" id="3_q0m1n"]
 [ext_resource type="PackedScene" uid="uid://colfm2qj3jw7b" path="res://core/ui/game/rpm_meter_digital.tscn" id="4_85hwj"]
 [ext_resource type="Shader" uid="uid://15332wfpffyw" path="res://core/resources/shader/rear_view_mirror.gdshader" id="5_rxey2"]
 [ext_resource type="PackedScene" uid="uid://51iduyulvjlr" path="res://core/ui/game/minimap_window.tscn" id="6_mcqk3"]
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_4js0d"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_wf2gq"]
 viewport_path = NodePath("RearViewMirror/SubViewport")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_4fte8"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rxey2"]
 resource_local_to_scene = true
 shader = ExtResource("5_rxey2")
-shader_parameter/viewport = SubResource("ViewportTexture_4js0d")
+shader_parameter/viewport = SubResource("ViewportTexture_wf2gq")
 
 [node name="PlayerUI" type="Control" unique_id=1095061311]
 layout_mode = 3
@@ -35,10 +34,6 @@ offset_right = 436.0
 offset_bottom = 120.0
 grow_horizontal = 2
 
-[node name="LapTimer" parent="HSplitContainer" unique_id=97060873 instance=ExtResource("1_x1foh")]
-unique_name_in_owner = true
-layout_mode = 2
-
 [node name="SpeedMeter" parent="HSplitContainer" unique_id=161675891 instance=ExtResource("2_gd0ag")]
 unique_name_in_owner = true
 layout_mode = 2
@@ -49,7 +44,7 @@ layout_mode = 2
 size_flags_vertical = 0
 
 [node name="RearViewMirror" parent="HSplitContainer/RearViewMirror" index="0" unique_id=942523188]
-material = SubResource("ShaderMaterial_4fte8")
+material = SubResource("ShaderMaterial_rxey2")
 
 [node name="RpmMeter" parent="HSplitContainer" unique_id=2086987129 instance=ExtResource("4_85hwj")]
 unique_name_in_owner = true

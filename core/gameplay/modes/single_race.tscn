@@ -2,8 +2,31 @@
 
 [ext_resource type="Script" uid="uid://dm1redrh35g2e" path="res://core/gameplay/modes/single_race.gd" id="1_ir3hg"]
 [ext_resource type="PackedScene" uid="uid://cuo7um5xrdifo" path="res://core/gameplay/player_spectator.tscn" id="2_2vlpj"]
+[ext_resource type="Script" uid="uid://c212ro43u86b5" path="res://core/gameplay/single_race_player_spectator.gd" id="3_g0028"]
+[ext_resource type="PackedScene" uid="uid://pwgwatjtewlu" path="res://core/ui/game/lap_timer.tscn" id="4_aqoin"]
+[ext_resource type="Shader" uid="uid://15332wfpffyw" path="res://core/resources/shader/rear_view_mirror.gdshader" id="5_d0sg6"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_2mt4l"]
+viewport_path = NodePath("RearViewMirror/SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4kn04"]
+resource_local_to_scene = true
+shader = ExtResource("5_d0sg6")
+shader_parameter/viewport = SubResource("ViewportTexture_2mt4l")
 
 [node name="SingleRace" type="Node" unique_id=363735448]
 script = ExtResource("1_ir3hg")
 
 [node name="PlayerSpectator" parent="." unique_id=1034804860 instance=ExtResource("2_2vlpj")]
+script = ExtResource("3_g0028")
+race_laps = 2
+
+[node name="LapTimer" parent="PlayerSpectator/PlayerUI/HSplitContainer" parent_id_path=PackedInt32Array(1034804860, 1361609481, 1215995952) index="0" unique_id=1164055734 instance=ExtResource("4_aqoin")]
+layout_mode = 2
+
+[node name="RearViewMirror" parent="PlayerSpectator/PlayerUI/HSplitContainer/RearViewMirror" parent_id_path=PackedInt32Array(1034804860, 1361609481, 909807405) index="0" unique_id=942523188]
+material = SubResource("ShaderMaterial_4kn04")
+
+[editable path="PlayerSpectator"]
+[editable path="PlayerSpectator/PlayerUI"]
+[editable path="PlayerSpectator/PlayerUI/HSplitContainer/RearViewMirror"]

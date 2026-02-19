@@ -1,13 +1,5 @@
 extends Node3D
 
-@export var racer: Racer = null:
-	set(value):
-		racer = value
-	get:
-		return racer
-
-@export var race_laps: int = 2
-
 @onready var ui: PlayerUI = $PlayerUI
 @onready var camera_arm: SpringArm3D = $CameraArm
 @onready var reflection: ReflectionProbe = $ReflectionProbe
@@ -39,13 +31,20 @@ func set_target_position(position: Vector3):
 	self.camera_arm.spring_length = position.length()
 
 
-func player_to_minimap_data(spectated_racer: Racer, node: Node) -> Dictionary:
-	var racer = node as Racer
+func player_to_minimap_data(spectated_player: Player, node: Node) -> Dictionary:
+	var player = node as Player
 	return {
-		"global_position": racer.player.car.global_position,
-		"emphasis": racer == spectated_racer,
-		"color": racer.player.car.color.primary,
+		"global_position": player.car.global_position,
+		"emphasis": player == spectated_player,
+		"color": player.car.color.primary,
 	}
+
+
+func _collect_minimap_data() -> Array[Dictionary]:
+	var result: Array[Dictionary]
+	var player = get_tree().get_first_node_in_group(&"SpectatedPlayer") as Player
+	result.assign(get_tree().get_nodes_in_group(&"Players").map(func(x): return player_to_minimap_data(player, x)))
+	return result
 
 
 func _acceleration_factor(forward_acceleration: float, camera_factor) -> Vector3:
@@ -77,7 +76,7 @@ func interpolate_camera(car: Car) -> Vector3:
 
 
 func rotate_camera(angle: float):
-	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
+	var racer = get_tree().get_first_node_in_group(&"SpectatedPlayer")
 	if racer:
 		var target_basis = self.initial_arm_rotation.rotated(Vector3.UP, angle)
 		self.camera_arm.basis = target_basis
@@ -86,36 +85,40 @@ func rotate_camera(angle: float):
 		self.main_camera.reset_physics_interpolation()
 
 func update_camera():
-	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
-	if racer:
+	var player = get_tree().get_first_node_in_group(&"SpectatedPlayer")
+	if player:
 		if self.stiffen_camera:
 			self.main_camera.position = self.camera_arm.to_global(self.target.position)
 		else:
-			self.main_camera.position = self.interpolate_camera(racer.player.car)
-		self.main_camera.look_at(racer.player.car.position + Vector3(0, 1, 0))
+			self.main_camera.position = self.interpolate_camera(player.car)
+		self.main_camera.look_at(player.car.position + Vector3(0, 1, 0))
+
+func _update_ui(player: Player):
+	pass
 
 
-func _physics_process(delta):
-	var racer = get_tree().get_first_node_in_group(&"SpectatedRacer") as Racer
-	var player_data = get_tree().get_nodes_in_group(&"Racers").map(func(x): return player_to_minimap_data(racer, x))
-	update_camera()
-	if racer:
-		self.global_transform = racer.player.car.global_transform
-		ui.set_speed(racer.player.car.linear_velocity.length())
-		ui.set_rpm(racer.player.car.current_rpm)
-		ui.set_gear(racer.player.car.gear)
-		ui.set_minimap_center(racer.player.car.global_position)
-		ui.set_minimap_rotation(racer.player.car.global_rotation.y)
+func _physics_process(delta: float) -> void:
+	self.update_camera()
+
+
+func _process(delta):
+	var player = get_tree().get_first_node_in_group(&"SpectatedPlayer") as Player
+	var player_data = self._collect_minimap_data()
+	if player:
+		self.global_transform = player.car.global_transform
+		ui.set_speed(player.car.linear_velocity.length())
+		ui.set_rpm(player.car.current_rpm)
+		ui.set_gear(player.car.gear)
+		ui.set_minimap_center(player.car.global_position)
+		ui.set_minimap_rotation(player.car.global_rotation.y)
 		ui.set_minimap_players(player_data)
-		ui.set_laps(racer.laps, self.race_laps)
-		ui.set_current_lap_time(racer.current_lap_time())
-		ui.set_last_lap_time(racer.get_best_lap_time())
+		self._update_ui(player)
 
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("change_camera"):
-		var racer = get_tree().get_first_node_in_group(&"SpectatedRacer")
-		var interior_camera = racer.player.car.get_interior_camera()
+		var player = get_tree().get_first_node_in_group(&"SpectatedPlayer") as Player
+		var interior_camera = player.car.get_interior_camera()
 		match camera_mode:
 			CameraMode.HELI when interior_camera:
 				interior_camera.make_current()
