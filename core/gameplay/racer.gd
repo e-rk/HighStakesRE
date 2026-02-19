@@ -8,9 +8,6 @@ extends Node
 @export var lap_start_timestamp: int = 0
 
 
-@onready var player: Player = $".."
-
-
 func start_timer():
 	self.lap_start_timestamp = Time.get_ticks_msec()
 
@@ -28,5 +25,7 @@ func get_best_lap_time():
 
 
 func current_lap_time() -> float:
+	if self.lap_start_timestamp == 0:
+		return 0.0
 	var current_ticks = Time.get_ticks_msec()
 	return (current_ticks - self.lap_start_timestamp) / 1000.0
