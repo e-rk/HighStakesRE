@@ -84,14 +84,28 @@ func rotate_camera(angle: float):
 		self.update_camera()
 		self.main_camera.reset_physics_interpolation()
 
-func update_camera():
+func update_camera(immediate: bool = false):
 	var player = get_tree().get_first_node_in_group(&"SpectatedPlayer")
 	if player:
-		if self.stiffen_camera:
+		self.global_transform = player.car.global_transform
+		if self.stiffen_camera or immediate:
+			self.force_update_transform()
 			self.main_camera.position = self.camera_arm.to_global(self.target.position)
 		else:
 			self.main_camera.position = self.interpolate_camera(player.car)
 		self.main_camera.look_at(player.car.position + Vector3(0, 1, 0))
+
+func _show_next_player():
+	var players: Array[Player]
+	var player = get_tree().get_first_node_in_group(&"SpectatedPlayer")
+	players.assign(get_tree().get_nodes_in_group(&"Players"))
+	var index = players.find(player)
+	var next = 0
+	if index >= 0:
+		next = (index + 1) % players.size()
+	player.remove_from_group(&"SpectatedPlayer")
+	players[next].add_to_group(&"SpectatedPlayer")
+	self.update_camera()
 
 func _update_ui(player: Player):
 	pass
@@ -105,7 +119,6 @@ func _process(delta):
 	var player = get_tree().get_first_node_in_group(&"SpectatedPlayer") as Player
 	var player_data = self._collect_minimap_data()
 	if player:
-		self.global_transform = player.car.global_transform
 		ui.set_speed(player.car.linear_velocity.length())
 		ui.set_rpm(player.car.current_rpm)
 		ui.set_gear(player.car.gear)
@@ -142,3 +155,5 @@ func _input(event: InputEvent) -> void:
 				self.stiffen_camera = false
 				self.rotate_camera(0)
 				break
+	if event.is_action_pressed("show_next_player"):
+		self._show_next_player()
