@@ -14,6 +14,10 @@ func set_gear(gear: CarTypes.Gear):
 	rpm_meter.set_gear(gear)
 
 
+func set_max_gear(gear: CarTypes.Gear):
+	rpm_meter.set_max_gear(gear)
+
+
 func set_speed(speed: float):
 	speed_meter.set_speed(speed)
 

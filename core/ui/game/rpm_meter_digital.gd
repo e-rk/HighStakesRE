@@ -3,6 +3,8 @@ extends Control
 @onready var rpm_meter = %RpmMeter
 @onready var gears = %Gears
 
+var visible_gears: CarTypes.Gear = CarTypes.Gear.GEAR_6
+
 
 func gear_to_node(gear: CarTypes.Gear) -> Label:
 	var gear_str = ""
@@ -37,3 +39,14 @@ func set_gear(gear: CarTypes.Gear):
 		child.set("theme_override_colors/font_color", Color.GRAY)
 	var node = gear_to_node(gear)
 	node.set("theme_override_colors/font_color", Color.WHITE)
+
+
+func set_max_gear(gear: CarTypes.Gear):
+	if gear == self.visible_gears:
+		return
+	for i in (CarTypes.Gear.GEAR_6 + 1):
+		if i > gear:
+			self.gear_to_node(i).hide()
+		else:
+			self.gear_to_node(i).show()
+	self.visible_gears = gear

@@ -126,6 +126,7 @@ func _process(delta):
 		ui.set_minimap_center(player.car.global_position)
 		ui.set_minimap_rotation(player.car.global_rotation.y)
 		ui.set_minimap_players(player_data)
+		ui.set_max_gear(player.car.max_gear())
 		self._update_ui(player)
 
 
