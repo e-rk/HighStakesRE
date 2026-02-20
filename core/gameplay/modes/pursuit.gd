@@ -184,7 +184,7 @@ func _process_racers(delta: float):
 	var racers: Array[Racer]
 	racers.assign(get_tree().get_nodes_in_group(&"PursuitRacers"))
 	for racer in racers:
-		var progress = self.track.progress_along_track(racer.player.car.global_position)
+		var progress = self.track.progress_along_track_normalized(racer.player.car.global_position)
 		var prev_progress = racer.track_progress
 		if prev_progress > 0.9 and progress < 0.1:
 			racer.laps += 1
