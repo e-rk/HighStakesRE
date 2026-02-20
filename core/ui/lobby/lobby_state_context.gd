@@ -86,6 +86,7 @@ func _input(event):
 func _on_race_finished(race):
 	self._set_local_status(Constants.PlayerStatus.IN_LOBBY)
 	self.back_to_menu()
+	multiplayer.multiplayer_peer.refuse_new_connections = false
 
 
 func back_to_menu():
@@ -163,6 +164,7 @@ func _on_show_lobby_toggled(toggled_on):
 
 
 func _on_game_start_requested():
+	multiplayer.multiplayer_peer.refuse_new_connections = true
 	var instance = race_scene.instantiate()
 	instance.ready.connect(self._on_race_standby.bind(instance))
 	race = instance
