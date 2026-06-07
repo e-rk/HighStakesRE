@@ -1,0 +1,329 @@
+[gd_resource type="Resource" script_class="AiPersonalities" format=3 uid="uid://ck1ogs0uy60cv"]
+
+[ext_resource type="Script" uid="uid://7sy4k42kwe3x" path="res://core/resources/config/ai_personality.gd" id="1_y8dsf"]
+[ext_resource type="Script" uid="uid://cipwmxoc7cx5d" path="res://core/resources/config/ai_personalities.gd" id="2_qpdyf"]
+
+[sub_resource type="Resource" id="Resource_y8dsf"]
+script = ExtResource("1_y8dsf")
+name = "Blaze"
+preferred_primary_colors = Array[Color]([Color(0.8532539, 0.7131922, 0.22857878, 1)])
+preferred_color_probability = 0.5
+hair_colors = Array[Color]([Color(0.96656615, 0.8117604, 0.27100304, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_qpdyf"]
+script = ExtResource("1_y8dsf")
+name = "Sanguine"
+preferred_primary_colors = Array[Color]([Color(0.7488936, 0.22178647, 0.21195917, 1)])
+preferred_color_probability = 0.2
+hair_colors = Array[Color]([Color(0.61495197, 0.14643098, 0.14643098, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_g8oba"]
+script = ExtResource("1_y8dsf")
+name = "Kingfisher"
+preferred_primary_colors = Array[Color]([Color(0.05, 0.42, 0.78, 1)])
+preferred_color_probability = 0.65
+hair_colors = Array[Color]([Color(0.08, 0.58, 0.92, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_wbpcs"]
+script = ExtResource("1_y8dsf")
+name = "Wasabi"
+preferred_primary_colors = Array[Color]([Color(0.35, 0.82, 0.12, 1)])
+preferred_color_probability = 0.55
+hair_colors = Array[Color]([Color(0.45, 0.95, 0.18, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_245ku"]
+script = ExtResource("1_y8dsf")
+name = "Foxglove"
+preferred_primary_colors = Array[Color]([Color(0.52, 0.08, 0.72, 1)])
+preferred_color_probability = 0.6
+hair_colors = Array[Color]([Color(0.65, 0.12, 0.88, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_fmylr"]
+script = ExtResource("1_y8dsf")
+name = "Ace"
+preferred_primary_colors = Array[Color]([Color(0.92, 0.93, 0.9, 1)])
+preferred_color_probability = 0.4
+hair_colors = Array[Color]([Color(0.97, 0.98, 0.95, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_3vdiu"]
+script = ExtResource("1_y8dsf")
+name = "King"
+preferred_primary_colors = Array[Color]([Color(0.8104588, 0.014829074, 0.19103403, 1)])
+preferred_color_probability = 0.75
+hair_colors = Array[Color]([Color(0.9709216, 0.90209264, 0.19760844, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_k5lhg"]
+script = ExtResource("1_y8dsf")
+name = "Riptide"
+preferred_primary_colors = Array[Color]([Color(0.05, 0.78, 0.88, 1)])
+preferred_color_probability = 0.65
+hair_colors = Array[Color]([Color(0.08, 0.92, 0.96, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_2ij0d"]
+script = ExtResource("1_y8dsf")
+name = "Rook"
+preferred_primary_colors = Array[Color]([Color(0.1, 0.1, 0.12, 1)])
+preferred_color_probability = 0.25
+hair_colors = Array[Color]([Color(0.15, 0.15, 0.18, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_05wnq"]
+script = ExtResource("1_y8dsf")
+name = "Tungsten"
+preferred_primary_colors = Array[Color]([Color(0.35, 0.38, 0.42, 1)])
+preferred_color_probability = 0.35
+hair_colors = Array[Color]([Color(0.45, 0.48, 0.52, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_fgk1q"]
+script = ExtResource("1_y8dsf")
+name = "Moxie"
+preferred_primary_colors = Array[Color]([Color(0.88, 0.12, 0.55, 1)])
+preferred_color_probability = 0.7
+hair_colors = Array[Color]([Color(0.96, 0.18, 0.68, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_i0umv"]
+script = ExtResource("1_y8dsf")
+name = "Quicklime"
+preferred_primary_colors = Array[Color]([Color(0.88, 0.92, 0.78, 1)])
+preferred_color_probability = 0.45
+hair_colors = Array[Color]([Color(0.94, 0.97, 0.85, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_67g25"]
+script = ExtResource("1_y8dsf")
+name = "Paprika"
+preferred_primary_colors = Array[Color]([Color(0.85, 0.35, 0.08, 1)])
+preferred_color_probability = 0.6
+hair_colors = Array[Color]([Color(0.95, 0.5, 0.12, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_o6nqa"]
+script = ExtResource("1_y8dsf")
+name = "Umbra"
+preferred_primary_colors = Array[Color]([Color(0.12, 0.08, 0.14, 1)])
+preferred_color_probability = 0.2
+hair_colors = Array[Color]([Color(0.18, 0.12, 0.22, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_saia1"]
+script = ExtResource("1_y8dsf")
+name = "Cinder Ella"
+preferred_primary_colors = Array[Color]([Color(0.88, 0.55, 0.08, 1)])
+preferred_color_probability = 0.55
+hair_colors = Array[Color]([Color(0.96, 0.72, 0.15, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_0d3ti"]
+script = ExtResource("1_y8dsf")
+name = "Tempest"
+preferred_primary_colors = Array[Color]([Color(0.1, 0.15, 0.6, 1)])
+preferred_color_probability = 0.6
+hair_colors = Array[Color]([Color(0.15, 0.22, 0.78, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_jjych"]
+script = ExtResource("1_y8dsf")
+name = "Vixen"
+preferred_primary_colors = Array[Color]([Color(0.88, 0.38, 0.05, 1)])
+preferred_color_probability = 0.65
+hair_colors = Array[Color]([Color(0.96, 0.52, 0.1, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_bvfrt"]
+script = ExtResource("1_y8dsf")
+name = "Hawthorn"
+preferred_primary_colors = Array[Color]([Color(0.65, 0.08, 0.1, 1)])
+preferred_color_probability = 0.5
+hair_colors = Array[Color]([Color(0.8, 0.12, 0.15, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_ucuwv"]
+script = ExtResource("1_y8dsf")
+name = "Kestrel"
+preferred_primary_colors = Array[Color]([Color(0.65, 0.32, 0.08, 1)])
+preferred_color_probability = 0.45
+hair_colors = Array[Color]([Color(0.78, 0.45, 0.12, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_qnrun"]
+script = ExtResource("1_y8dsf")
+name = "Nimbus"
+preferred_primary_colors = Array[Color]([Color(0.62, 0.65, 0.68, 1)])
+preferred_color_probability = 0.35
+hair_colors = Array[Color]([Color(0.72, 0.75, 0.78, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_axsc8"]
+script = ExtResource("1_y8dsf")
+name = "Afterburn"
+preferred_primary_colors = Array[Color]([Color(0.95, 0.45, 0.05, 1)])
+preferred_color_probability = 0.7
+hair_colors = Array[Color]([Color(0.98, 0.62, 0.12, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_i3ard"]
+script = ExtResource("1_y8dsf")
+name = "Starling"
+preferred_primary_colors = Array[Color]([Color(0.28, 0.08, 0.45, 1)])
+preferred_color_probability = 0.4
+hair_colors = Array[Color]([Color(0.38, 0.12, 0.58, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_436bt"]
+script = ExtResource("1_y8dsf")
+name = "Torch Song"
+preferred_primary_colors = Array[Color]([Color(0.96, 0.38, 0.02, 1)])
+preferred_color_probability = 0.75
+hair_colors = Array[Color]([Color(0.99, 0.55, 0.06, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_clec6"]
+script = ExtResource("1_y8dsf")
+name = "Espresso"
+preferred_primary_colors = Array[Color]([Color(0.08, 0.05, 0.03, 1)])
+preferred_color_probability = 0.2
+hair_colors = Array[Color]([Color(0.15, 0.1, 0.06, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_4ufgr"]
+script = ExtResource("1_y8dsf")
+name = "Brimstone"
+preferred_primary_colors = Array[Color]([Color(0.88, 0.85, 0.08, 1)])
+preferred_color_probability = 0.6
+hair_colors = Array[Color]([Color(0.95, 0.92, 0.15, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_vnnpf"]
+script = ExtResource("1_y8dsf")
+name = "Pyrite"
+preferred_primary_colors = Array[Color]([Color(0.78, 0.68, 0.18, 1)])
+preferred_color_probability = 0.55
+hair_colors = Array[Color]([Color(0.88, 0.78, 0.28, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_cpq2p"]
+script = ExtResource("1_y8dsf")
+name = "Quasar"
+preferred_primary_colors = Array[Color]([Color(0.18, 0.08, 0.78, 1)])
+preferred_color_probability = 0.65
+hair_colors = Array[Color]([Color(0.28, 0.12, 0.92, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_v2dpv"]
+script = ExtResource("1_y8dsf")
+name = "Ferrite"
+preferred_primary_colors = Array[Color]([Color(0.38, 0.12, 0.08, 1)])
+preferred_color_probability = 0.35
+hair_colors = Array[Color]([Color(0.52, 0.18, 0.12, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_fpmoh"]
+script = ExtResource("1_y8dsf")
+name = "Ichor"
+preferred_primary_colors = Array[Color]([Color(0.82, 0.72, 0.15, 1)])
+preferred_color_probability = 0.5
+hair_colors = Array[Color]([Color(0.92, 0.84, 0.25, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_i33yk"]
+script = ExtResource("1_y8dsf")
+name = "Smoke Ring"
+preferred_primary_colors = Array[Color]([Color(0.55, 0.05, 0.05, 1)])
+preferred_color_probability = 0.4
+hair_colors = Array[Color]([Color(0.7, 0.08, 0.08, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_a8cac"]
+script = ExtResource("1_y8dsf")
+name = "Driftwood"
+preferred_primary_colors = Array[Color]([Color(0.65, 0.52, 0.32, 1)])
+preferred_color_probability = 0.3
+hair_colors = Array[Color]([Color(0.78, 0.65, 0.42, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_brrjb"]
+script = ExtResource("1_y8dsf")
+name = "Switchblade"
+preferred_primary_colors = Array[Color]([Color(0.72, 0.75, 0.8, 1)])
+preferred_color_probability = 0.55
+hair_colors = Array[Color]([Color(0.84, 0.87, 0.92, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_nx2qp"]
+script = ExtResource("1_y8dsf")
+name = "Phosphor"
+preferred_primary_colors = Array[Color]([Color(0.92, 0.95, 0.88, 1)])
+preferred_color_probability = 0.45
+hair_colors = Array[Color]([Color(0.96, 0.98, 0.92, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_k7vtm"]
+script = ExtResource("1_y8dsf")
+name = "Thunderclap"
+preferred_primary_colors = Array[Color]([Color(0.55, 0.08, 0.88, 1)])
+preferred_color_probability = 0.7
+hair_colors = Array[Color]([Color(0.68, 0.15, 0.96, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_p3ywb"]
+script = ExtResource("1_y8dsf")
+name = "Strychnine"
+preferred_primary_colors = Array[Color]([Color(0.08, 0.45, 0.1, 1)])
+preferred_color_probability = 0.55
+hair_colors = Array[Color]([Color(0.12, 0.62, 0.15, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_h8rjf"]
+script = ExtResource("1_y8dsf")
+name = "Steelhead"
+preferred_primary_colors = Array[Color]([Color(0.55, 0.68, 0.82, 1)])
+preferred_color_probability = 0.5
+hair_colors = Array[Color]([Color(0.68, 0.8, 0.92, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_t5mdk"]
+script = ExtResource("1_y8dsf")
+name = "Alchemy"
+preferred_primary_colors = Array[Color]([Color(0.88, 0.72, 0.08, 1)])
+preferred_color_probability = 0.6
+hair_colors = Array[Color]([Color(0.96, 0.85, 0.18, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_w6zcg"]
+script = ExtResource("1_y8dsf")
+name = "Gallium"
+preferred_primary_colors = Array[Color]([Color(0.78, 0.8, 0.85, 1)])
+preferred_color_probability = 0.4
+hair_colors = Array[Color]([Color(0.88, 0.9, 0.94, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_b4nls"]
+script = ExtResource("1_y8dsf")
+name = "Crestfallen"
+preferred_primary_colors = Array[Color]([Color(0.32, 0.38, 0.55, 1)])
+preferred_color_probability = 0.45
+hair_colors = Array[Color]([Color(0.42, 0.5, 0.68, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[sub_resource type="Resource" id="Resource_e9ukh"]
+script = ExtResource("1_y8dsf")
+name = "Petrel"
+preferred_primary_colors = Array[Color]([Color(0.22, 0.28, 0.38, 1)])
+preferred_color_probability = 0.35
+hair_colors = Array[Color]([Color(0.32, 0.38, 0.52, 1)])
+metadata/_custom_type_script = "uid://7sy4k42kwe3x"
+
+[resource]
+script = ExtResource("2_qpdyf")
+personalities = Array[ExtResource("1_y8dsf")]([SubResource("Resource_y8dsf"), SubResource("Resource_qpdyf"), SubResource("Resource_g8oba"), SubResource("Resource_wbpcs"), SubResource("Resource_245ku"), SubResource("Resource_fmylr"), SubResource("Resource_3vdiu"), SubResource("Resource_k5lhg"), SubResource("Resource_2ij0d"), SubResource("Resource_05wnq"), SubResource("Resource_fgk1q"), SubResource("Resource_i0umv"), SubResource("Resource_67g25"), SubResource("Resource_o6nqa"), SubResource("Resource_saia1"), SubResource("Resource_0d3ti"), SubResource("Resource_jjych"), SubResource("Resource_bvfrt"), SubResource("Resource_ucuwv"), SubResource("Resource_qnrun"), SubResource("Resource_axsc8"), SubResource("Resource_i3ard"), SubResource("Resource_436bt"), SubResource("Resource_clec6"), SubResource("Resource_4ufgr"), SubResource("Resource_vnnpf"), SubResource("Resource_cpq2p"), SubResource("Resource_v2dpv"), SubResource("Resource_fpmoh"), SubResource("Resource_i33yk"), SubResource("Resource_a8cac"), SubResource("Resource_brrjb"), SubResource("Resource_nx2qp"), SubResource("Resource_k7vtm"), SubResource("Resource_p3ywb"), SubResource("Resource_h8rjf"), SubResource("Resource_t5mdk"), SubResource("Resource_w6zcg"), SubResource("Resource_b4nls"), SubResource("Resource_e9ukh")])
+metadata/_custom_type_script = "uid://cipwmxoc7cx5d"
