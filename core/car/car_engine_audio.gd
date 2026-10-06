@@ -2,42 +2,57 @@ extends AudioStreamPlayer3D
 
 @export_range(0, 511) var index: int
 
-@onready var car = $".."
+@onready var car: Car = $".."
 
-var ids = {}
-var played_streams = {}
+var ids: Dictionary = {}
+var voices: Array[Voice] = []
+
+
+class Voice:
+	var sample: EngineSample
+	var id: int
+	var cents: int
+	var volume: int
+
 
 func _ready() -> void:
-	var playback = self.get_stream_playback() as AudioStreamPlaybackPolyphonic
-	var engine_stream = self.stream as EngineAudio
-	for sample in engine_stream.samples:
-		var id = playback.play_stream(sample.sample)
-		self.played_streams[sample] = id
+	var playback := self.get_stream_playback() as AudioStreamPlaybackPolyphonic
+	var engine_stream := self.stream as EngineAudio
+	for sample: EngineSample in engine_stream.samples:
+		var voice := Voice.new()
+		voice.sample = sample
+		voice.id = playback.play_stream(sample.sample)
+		voice.cents = sample.play_detune(EngineSample.NOTE, randi())
+		voice.volume = sample.play_volume(EngineSample.VELOCITY, randi())
+		self.voices.append(voice)
 
 
 func get_idx() -> int:
-	var rpm = car.current_rpm
-	var performance = car.performance
-	var engine_redline_rpm = performance.engine_redline_rpm
-	var engine_min_rpm = performance.engine_min_rpm()
-	var div = ((engine_redline_rpm / 2) + engine_redline_rpm) * 100
-	var factor = 0x73
-	var rpmfact = (rpm - engine_min_rpm / 2) * 0x200
-	var idx = round(factor * rpmfact / div)
+	var rpm: float = car.current_rpm
+	var performance: CarPerformance = car.performance
+	var engine_redline_rpm: int = performance.engine_redline_rpm
+	var engine_min_rpm: int = performance.engine_min_rpm()
+	var div: int = ((engine_redline_rpm >> 1) + engine_redline_rpm) * 100
+	var factor: int = 0x73
+	var rpmfact: float = (rpm - (engine_min_rpm >> 1)) * 0x200
+	var idx: int = roundi(factor * rpmfact / div)
 	return clampi(idx, 0, 511)
 
 
+func get_front_rear_mix() -> int:
+	var camera_offset: Vector3 = car.global_position - get_viewport().get_camera_3d().global_position
+	var forward: int = roundi(camera_offset.dot(car.global_basis.z) * 65536.0)
+	var distance: int = roundi(camera_offset.length())
+	return EngineSample.front_rear_mix(forward, distance)
+
+
 func _physics_process(_delta: float) -> void:
-	var playback = self.get_stream_playback() as AudioStreamPlaybackPolyphonic
-	var idx = self.get_idx()
-	var local_camera_position = self.to_local(get_viewport().get_camera_3d().global_position)
-	var basis_forward = self.basis.tdotz(local_camera_position)
-	var distance = local_camera_position.length()
-	var throttle = car.current_throttle
-	var rear_fron_factor = basis_forward / distance
-	for played_stream in self.played_streams:
-		var id = self.played_streams[played_stream]
-		var pitch = played_stream.get_pitch_for_idx(idx)
-		var volume = played_stream.get_volume_for_idx(idx, throttle, rear_fron_factor)
-		playback.set_stream_volume(id, volume)
-		playback.set_stream_pitch_scale(id, pitch)
+	var playback := self.get_stream_playback() as AudioStreamPlaybackPolyphonic
+	var idx: int = self.get_idx()
+	var gas: int = EngineSample.gas_from_throttle(car.current_throttle)
+	var mix: int = self.get_front_rear_mix()
+	for voice: Voice in self.voices:
+		var pitch: float = voice.sample.get_pitch_for_idx(idx, voice.cents)
+		var volume: float = voice.sample.get_volume_for_idx(idx, gas, mix, voice.volume)
+		playback.set_stream_volume(voice.id, volume)
+		playback.set_stream_pitch_scale(voice.id, pitch)

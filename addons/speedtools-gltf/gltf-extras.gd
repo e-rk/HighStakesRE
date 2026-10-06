@@ -160,24 +160,30 @@ func finalize_static_bodies(state: GLTFState, node: Node):
 
 
 func _load_stream(entry: Dictionary) -> Array[EngineSample]:
-	var params = {}
-	var sample = entry["samples"][0]
-	var decoded = Marshalls.base64_to_raw(sample["sample"]).decompress(1000000, FileAccess.COMPRESSION_GZIP)
-	var wav = AudioStreamWAV.load_from_buffer(decoded, params)
-	var result: Array[EngineSample] = []
-	for table in entry["tables"]:
-		var engine_sample = EngineSample.new()
-		engine_sample.sample = wav
-		engine_sample.rear = entry["is_rear"]
-		engine_sample.pitch_unknown0 = sample["pitch_unknown0"]
-		engine_sample.pitch_unknown1 = sample["pitch_unknown1"]
-		engine_sample.pitch_unknown2 = sample["pitch_unknown2"]
-		var table_resource = EngineSampleTable.new()
+	var params: Dictionary = {}
+	var tables: Array[EngineSampleTable] = []
+	for table: Dictionary in entry["tables"]:
+		var table_resource := EngineSampleTable.new()
 		table_resource.volume.assign(table["volume"])
 		table_resource.pitch.assign(table["pitch"])
 		table_resource.is_load = table["type"] == "load"
-		engine_sample.table = table_resource
-		result.append(engine_sample)
+		tables.append(table_resource)
+	var result: Array[EngineSample] = []
+	for sample: Dictionary in entry["samples"]:
+		var decoded: PackedByteArray = Marshalls.base64_to_raw(sample["sample"]).decompress(1000000, FileAccess.COMPRESSION_GZIP)
+		var wav: AudioStreamWAV = AudioStreamWAV.load_from_buffer(decoded, params)
+		for table_resource: EngineSampleTable in tables:
+			var engine_sample := EngineSample.new()
+			engine_sample.sample = wav
+			engine_sample.rear = entry["is_rear"]
+			engine_sample.root_key = int(sample["root_key"])
+			engine_sample.pitch_bend_range = int(sample["pitch_bend_range"])
+			engine_sample.detune = int(sample["detune"])
+			engine_sample.volume = int(sample["volume"])
+			engine_sample.volume_random_range = int(sample["volume_random_range"])
+			engine_sample.detune_random_range = int(sample["detune_random_range"])
+			engine_sample.table = table_resource
+			result.append(engine_sample)
 	return result
 
 
