@@ -7,8 +7,6 @@ var model: HandlingModelRE
 
 var result := HandlingModelRE.HandlingOutput.new()
 
-const EPSILON = 1
-
 
 func before_all():
 	self.model = HandlingModelRE.new()
@@ -39,8 +37,6 @@ func make_params(data: Dictionary) -> HandlingModelRE.HandlingState:
 	result.has_contact_with_ground = !self.is_airborne(data)
 	result.weather = 0
 	result.rpm = self.rpm(data)
-	#result.speed_xz = self.speed_xz(data)
-	#result.slip_angle = self.slip_angle(data)
 	result.road_surface = self.road_surface(data)
 	result.g_transfer = self.g_transfer(data)
 	result.gravity_vector = Vector3(0, -9.81, 0)
@@ -50,6 +46,8 @@ func make_params(data: Dictionary) -> HandlingModelRE.HandlingState:
 	result.handbrake_accumulator = self.handbrake_accumulator(data)
 	result.gear_shift_counter = (int(data.unknown_engine_value2) >> 0x10)
 	result.shifted_down = data.unknown_engine_value != "0"
+	result.controls_locked = data.controls_locked != "0"
+	result.traction_suspended = data.traction_suspended != "0"
 	result.wheels = [
 		{"type": CarTypes.Wheel.FRONT_RIGHT, "road_surface": self.wheel_road_surface(data, 0)},
 		{"type": CarTypes.Wheel.FRONT_LEFT, "road_surface": self.wheel_road_surface(data, 1)},
@@ -69,21 +67,22 @@ func body(data: Dictionary):
 	var expected_steering = float(data.result_current_steering)
 	var expected_throttle = float(data.result_throttle)
 	var expected_brake = float(data.result_brake)
-	var wheel_data = Dictionary()
-	if is_equal_approx(1.0, expected_brake):
-		pass
-	self.model.traction_pipeline(params, result)
-	var ttt = result.brake
-	var msg = " gear=" + str(params.gear) \
+	var msg = " row=" + str(self.current_line) \
+			+ " gear=" + str(params.gear) \
 			+ " hb=" + str(params.handbrake) \
 			+ " v=" + str(params.linear_velocity) \
 			+ " w=" + str(params.angular_velocity) \
 			+ " bi=" + str(params.brake_input)
-	assert_eq(result.rpm, expected_rpm, "rpm" + msg)
-	assert_eq(result.lost_grip, expected_handbrake, msg)
-	assert_eq(result.gear, expected_gear, "gear" + msg)
-	assert_almost_eq(result.linear_velocity, expected_velocity, Vector3.ONE * 0.01, "vel" + msg)
-	assert_almost_eq(result.angular_velocity, expected_angular, Vector3.ONE * 0.001, msg)
-	assert_almost_eq(result.current_steering, expected_steering, 0.001, msg)
-	assert_almost_eq(result.throttle, expected_throttle, 0.001, "thr" + msg)
-	assert_almost_eq(result.brake, expected_brake, 0.001, msg)
+	self.model.traction_pipeline(params, result)
+	assert_eq(params.rpm, expected_rpm, "rpm" + msg)
+	assert_eq(params.lost_grip, expected_handbrake, "lost grip" + msg)
+	assert_eq(params.gear, expected_gear, "gear" + msg)
+	assert_almost_eq(params.linear_velocity, expected_velocity, Vector3.ONE * 0.01, "vel" + msg)
+	assert_almost_eq(params.angular_velocity, expected_angular, Vector3.ONE * 0.001, "ang" + msg)
+	assert_almost_eq(params.current_steering, expected_steering, 0.001, "steer" + msg)
+	assert_almost_eq(params.throttle, expected_throttle, 0.001, "thr" + msg)
+	assert_almost_eq(params.brake, expected_brake, 0.001, "brake" + msg)
+	if data.result_g_transfer != "":
+		assert_almost_eq(params.g_transfer, float(data.result_g_transfer), 0.01, "g transfer" + msg)
+	if data.result_handbrake_accumulator != "":
+		assert_eq(params.handbrake_accumulator, int(data.result_handbrake_accumulator), "hb acc" + msg)

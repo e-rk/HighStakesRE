@@ -23,7 +23,7 @@ func make_params(data: Dictionary) -> HandlingModelRE.HandlingState:
 	result.performance = self.performance
 	result.g_transfer = self.g_transfer(data)
 	result.weather = self.weather(data)
-	result.unknown_bool = data.unknown_bool != "0"
+	result.drivetrain_overload = data.unknown_bool != "0"
 	return result
 
 
@@ -33,5 +33,5 @@ func body(data: Dictionary):
 	var result = self.model.g_transfer_damp(params)
 	var msg = "gt=" + str(params["g_transfer"]) \
 			+ " weather=" + str(params["weather"]) \
-			+ " unk=" + str(params["unknown_bool"])
+			+ " overload=" + str(params.drivetrain_overload)
 	assert_almost_eq(result, expected, EPSILON, msg)

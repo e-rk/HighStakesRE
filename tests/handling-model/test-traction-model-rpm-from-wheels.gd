@@ -21,9 +21,9 @@ func make_params(data: Dictionary) -> HandlingModelRE.TractionState:
 
 func body(data: Dictionary):
 	var params = self.make_params(data)
-	var expected_rpm = float(data.result_rpm_from_wheels)
-	var result = self.model.rpm_from_wheels(params)
+	var expected_rpm := roundi(float(data.result_rpm_from_wheels))
+	var result := self.model.rpm_from_velocity_rounded(params)
 	var msg = "v.z=" + str(params.linear_velocity.z) \
 			+ " gear=" + str(params.gear) \
-			+ " res=" + str(result)
-	assert_eq(round(result), expected_rpm, msg)
+			+ " res=" + str(self.model.rpm_from_velocity(params))
+	assert_eq(result, expected_rpm, msg)

@@ -27,6 +27,7 @@ func make_params(data: Dictionary) -> HandlingModelRE.HandlingState:
 	result.timestep = 1.0 / 32.0
 	result.gear = self.gear(data)
 	result.current_steering = self.steering(data)
+	result.gravity_vector = Vector3(0, -9.81, 0)
 	return result
 
 

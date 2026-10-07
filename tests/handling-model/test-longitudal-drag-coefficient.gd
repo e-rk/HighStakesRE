@@ -16,14 +16,14 @@ func get_csv() -> FileAccess:
 	return FileAccess.open("res://tests/handling-model/data/longitudal_drag_coefficient.csv", FileAccess.READ)
 
 
-func make_params(data: Dictionary) -> Dictionary:
-	var result = Dictionary()
-	result["performance"] = self.performance
+func make_params(_data: Dictionary) -> HandlingModelRE.HandlingState:
+	var result := HandlingModelRE.HandlingState.new()
+	result.performance = self.performance
 	return result
 
 
 func body(data: Dictionary):
-	var params = self.make_params(data)
-	var expected = float(data["longitudal_drag_coefficient"])
-	var result = self.model.longitudal_drag_coefficient(params)
+	var params := self.make_params(data)
+	var expected := float(data["longitudal_drag_coefficient"])
+	var result := self.model.longitudal_drag_coefficient(params)
 	assert_almost_eq(result, expected, EPSILON)

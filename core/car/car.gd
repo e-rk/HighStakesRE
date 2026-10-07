@@ -17,6 +17,8 @@ extends RigidBody3D
 
 @export var handbrake: bool = false
 
+@export var controls_locked: bool = false
+
 @export_range(0.0, 1.0) var brake: float = 0.0:
 	set(value):
 		brake = clamp(value, 0.0, 1.0)
@@ -352,6 +354,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	handling_model_params.brake = self.current_brake
 	handling_model_params.turn_input = self.steering
 	handling_model_params.handbrake = self.handbrake
+	handling_model_params.controls_locked = self.controls_locked
 	handling_model_params.inertia_inv = state.inverse_inertia
 	handling_model_params.road_surface = 0
 	handling_model_params.weather = 0
@@ -364,7 +367,6 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	handling_model_params.gear_shift_counter = self.gear_shift_counter
 	handling_model_params.shifted_down = self.shifted_down
 	handling_model_params.g_transfer = self.g_transfer
-	handling_model_params.unknown_bool = false
 	handling_model_params.dimensions = self.dimensions()
 
 	handling_model.process(handling_model_params, handling_model_output)

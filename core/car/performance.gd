@@ -60,7 +60,7 @@ func has_spoiler() -> bool:
 
 
 func front_brake_bias() -> float:
-	return front_bias_brake_ratio
+	return clampf(front_bias_brake_ratio, 0.3, 0.75)
 
 
 func lateral_grip_multiplier() -> float:

@@ -26,6 +26,6 @@ func make_params(data: Dictionary) -> HandlingModelRE.HandlingState:
 func body(data: Dictionary):
 	var params = self.make_params(data)
 	var expected = int(data.result_handbrake_accumulator)
-	var result = self.model.update_handbrake_accumulator(params)
+	var result = self.model.step_handbrake_accumulator(params, params.handbrake_accumulator)
 	var msg = "hb=" + str(params.handbrake) + " hba=" + str(params.handbrake_accumulator)
 	assert_eq(result, expected, msg)

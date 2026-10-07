@@ -1,0 +1,5 @@
+global_angular_velocity_x,global_angular_velocity_y,global_angular_velocity_z,result_global_angular_velocity_x,result_global_angular_velocity_y,result_global_angular_velocity_z
+0.3,-0.5,1,0.3,-0.5,1
+2.5,-2.41,0,2.4000001,-2.4000001,0
+-3,10,2.39,-2.4000001,2.4000001,2.39
+0,0,0,0,0,0

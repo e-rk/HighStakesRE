@@ -34,6 +34,7 @@ func make_params(data: Dictionary) -> HandlingModelRE.HandlingState:
 func body(data: Dictionary):
 	var params = self.make_params(data)
 	var expected = Vector3(float(data.result_global_linear_velocity_x), float(data.result_global_linear_velocity_y), float(data.result_global_linear_velocity_z))
+	params.stop_moving_sideways = self.model.is_moving_sideways_locked(params)
 	self.model.prevent_moving_sideways_cm(params, result)
 	var msg = "thr=" + str(params.throttle) + " brk=" + str(params.brake) + " str=" + str(params.current_steering) + " v=" + str(params.linear_velocity)
 	assert_almost_eq(result.linear_velocity, expected, EPSILON * Vector3.ONE, msg)

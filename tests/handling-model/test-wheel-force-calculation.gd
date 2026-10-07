@@ -29,6 +29,7 @@ func make_params(data: Dictionary) -> HandlingModelRE.HandlingState:
 	result.throttle = self.throttle(data)
 	result.handbrake = self.handbrake(data)
 	result.lost_grip = false
+	result.handbrake_accumulator = self.handbrake_accumulator(data)
 	result.inertia_inv = self.inertia_inv(data)
 	result.mass = self.mass(data)
 	result.has_contact_with_ground = !self.is_airborne(data)
@@ -46,12 +47,12 @@ func body(data: Dictionary):
 	var wheel_data = HandlingModelRE.WheelData.new()
 	wheel_data.traction = self.wheel_traction(data)
 	wheel_data.grip = self.wheel_lateral_grip(data)
+	wheel_data.downforce = self.wheel_downforce2(data)
+	wheel_data.handbrake_accumulator = self.model.step_handbrake_accumulator(params, params.handbrake_accumulator)
 	if self.wheel_is_front(data):
 		wheel_data.type = CarTypes.Wheel.FRONT_LEFT
 	else:
 		wheel_data.type = CarTypes.Wheel.REAR_LEFT
-	if expected.is_equal_approx(Vector3(2.863228, 0, 0.345538)):
-		pass
 	var result = self.model.wheel_force(params, wheel_data)
 	var msg = "gear=" + str(params.gear) \
 			+ " thr=" + str(params.throttle) \

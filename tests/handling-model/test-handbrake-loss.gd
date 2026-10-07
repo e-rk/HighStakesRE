@@ -31,6 +31,7 @@ func body(data: Dictionary):
 	var wheel_data := HandlingModelRE.WheelData.new()
 	wheel_data.grip = self.wheel_lateral_grip(data)
 	wheel_data.downforce = self.wheel_downforce2(data)
+	wheel_data.handbrake_accumulator = params.handbrake_accumulator
 	var result = self.model.handbrake_loss_of_grip(params, wheel_data, planar_vector, wheel_traction)
 	var msg = "hba=" + str(params.handbrake_accumulator) + " trc=" + str(wheel_traction)
 	assert_almost_eq(result, expected, EPSILON * Vector3.ONE, msg)

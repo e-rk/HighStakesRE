@@ -19,7 +19,7 @@ func get_csv() -> FileAccess:
 
 
 func make_params(data: Dictionary) -> HandlingModelRE.CollisionParams:
-	var result = HandlingModelRE.CollisionParams.new()
+	var result := HandlingModelRE.CollisionParams.new()
 	result.basis = self.basis(data)
 	result.angular_velocity = self.global_angular_velocity(data)
 	result.linear_velocity = self.global_linear_velocity(data)
@@ -31,18 +31,17 @@ func make_params(data: Dictionary) -> HandlingModelRE.CollisionParams:
 
 
 func body(data: Dictionary):
-	if current_line == 3:
-		pass
-	var params = self.make_params(data)
-	var obj_position = self.vector3("obj_position", data)
-	var collision_point = self.vector3("collision_point", data)
-	var normal = self.vector3("normal", data)
-	var friction = float(data["maybe_friction"])
-	var expected_linear_velocity = self.result_global_linear_velocity(data)
-	var expected_angular_velocity = self.result_global_angular_velocity(data)
-	var expected_position = self.vector3("result_global_position", data)
-	var result = HandlingModelRE.CollisionOutput.new()
-	self.model.calculate_impact(params, obj_position, collision_point, normal, friction, result)
-	assert_almost_eq(result["linear_velocity"], expected_linear_velocity, EPSILON * Vector3.ONE, " ln=" + str(self.current_line))
-	assert_almost_eq(result["angular_velocity"], expected_angular_velocity, EPSILON * Vector3.ONE)
-	assert_almost_eq(result["position"], expected_position, EPSILON * Vector3.ONE)
+	var params := self.make_params(data)
+	var obj_position := self.vector3("obj_position", data)
+	var collision_point := self.vector3("collision_point", data)
+	var normal := self.vector3("normal", data)
+	var friction := float(data["maybe_friction"])
+	var expected_linear_velocity := self.result_global_linear_velocity(data)
+	var expected_angular_velocity := self.result_global_angular_velocity(data)
+	var expected_position := self.vector3("result_global_position", data)
+	var result := HandlingModelRE.CollisionOutput.new()
+	self.model.calculate_impact_impulse(params, obj_position, collision_point, normal, friction, result)
+	var msg := " ln=" + str(self.current_line)
+	assert_almost_eq(result.linear_velocity, expected_linear_velocity, EPSILON * Vector3.ONE, msg)
+	assert_almost_eq(result.angular_velocity, expected_angular_velocity, EPSILON * Vector3.ONE, msg)
+	assert_almost_eq(result.position, expected_position, EPSILON * Vector3.ONE, msg)

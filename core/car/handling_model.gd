@@ -39,7 +39,12 @@ class HandlingState:
 	var road_surface: int
 	var slip_angle: float
 	var speed_xz: float
-	var unknown_bool: bool
+	var drivetrain_overload: bool
+	var controls_locked: bool
+	var traction_suspended: bool
+	var wheel_linear_acceleration: Vector3
+	var wheel_angular_acceleration: Vector3
+	var stop_moving_sideways: bool
 
 class HandlingOutput:
 	const F_LINEAR_VELOCITY         = 1 << 0
@@ -60,6 +65,9 @@ class HandlingOutput:
 	const F_POSITION                = 1 << 15
 	const F_LINEAR_ACCELERATION     = 1 << 16
 	const F_ANGULAR_ACCELERATION    = 1 << 17
+	const F_DRIVETRAIN_OVERLOAD     = 1 << 18
+	const F_WHEEL_ACCELERATION      = 1 << 19
+	const F_STOP_MOVING_SIDEWAYS    = 1 << 20
 
 	var updated: int = 0
 
@@ -81,6 +89,10 @@ class HandlingOutput:
 	var position: Vector3
 	var linear_acceleration: Vector3
 	var angular_acceleration: Vector3
+	var drivetrain_overload: bool
+	var wheel_linear_acceleration: Vector3
+	var wheel_angular_acceleration: Vector3
+	var stop_moving_sideways: bool
 
 
 func extract(params: Dictionary) -> Dictionary:
@@ -137,6 +149,13 @@ func extend(f: Callable) -> Callable:
 			state.steering = output.steering
 		if output.updated & HandlingOutput.F_POSITION:
 			state.position = output.position
+		if output.updated & HandlingOutput.F_DRIVETRAIN_OVERLOAD:
+			state.drivetrain_overload = output.drivetrain_overload
+		if output.updated & HandlingOutput.F_WHEEL_ACCELERATION:
+			state.wheel_linear_acceleration = output.wheel_linear_acceleration
+			state.wheel_angular_acceleration = output.wheel_angular_acceleration
+		if output.updated & HandlingOutput.F_STOP_MOVING_SIDEWAYS:
+			state.stop_moving_sideways = output.stop_moving_sideways
 
 func integrate(f: Callable) -> Callable:
 	return func(state: HandlingState, output: HandlingOutput) -> void:

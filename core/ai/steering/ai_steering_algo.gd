@@ -112,15 +112,15 @@ func calculate_steering_input(error: float,
 
 func _grip_params(performance: Resource, linear_velocity: Vector3, g_transfer: float) -> HandlingModelRE.HandlingState:
 	var data = HandlingModelRE.HandlingState.new()
-	data.performance     = performance
-	data.basis_to_road   = Basis.IDENTITY
-	data.basis           = Basis.IDENTITY
-	data.linear_velocity = linear_velocity
-	data.gravity_vector  = Vector3(0.0, -9.8, 0.0)
-	data.g_transfer      = g_transfer
-	data.brake           = 0.0
-	data.weather         = CarTypes.Weather.DRY
-	data.unknown_bool    = false
+	data.performance         = performance
+	data.basis_to_road       = Basis.IDENTITY
+	data.basis               = Basis.IDENTITY
+	data.linear_velocity     = linear_velocity
+	data.gravity_vector      = Vector3(0.0, -9.8, 0.0)
+	data.g_transfer          = g_transfer
+	data.brake               = 0.0
+	data.weather             = CarTypes.Weather.DRY
+	data.drivetrain_overload = false
 	return data
 
 

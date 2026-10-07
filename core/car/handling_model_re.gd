@@ -21,6 +21,7 @@ class TractionState:
 	var force: float
 	var slip_angle: float
 	var weather: int
+	var drivetrain_overload: bool
 
 
 class TractionOutput:
@@ -31,6 +32,7 @@ class TractionOutput:
 	const F_TARGET_RPM          = 1 << 4
 	const F_FORCE               = 1 << 5
 	const F_LOST_GRIP           = 1 << 6
+	const F_DRIVETRAIN_OVERLOAD = 1 << 7
 
 	var updated: int = 0
 
@@ -41,6 +43,7 @@ class TractionOutput:
 	var target_rpm: int
 	var force: float
 	var lost_grip: bool
+	var drivetrain_overload: bool
 
 
 class WheelData:
@@ -49,6 +52,22 @@ class WheelData:
 	var grip: float
 	var traction: float
 	var downforce: float
+	var handbrake_accumulator: int
+
+
+const SURFACE_FACTORS: Array[float] = [
+	1.0, 1.0, 0.75, 0.8, 0.98, 0.8, 0.75, 0.95,
+	0.75, 0.75, 0.98, 0.95, 0.95, 0.8, 1.0, 0.75,
+	0.98, 0.98, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
+	1.0, 0.87, 0.75, 1.0, 0.87, 0.75, 0.75, 0.6525,
+]
+
+
+static func round_half_even(value: float) -> int:
+	var result := roundf(value)
+	if absf(value - result) == 0.5 and fmod(result, 2.0) != 0.0:
+		result -= signf(value)
+	return int(result)
 
 
 class CollisionParams:
@@ -69,9 +88,8 @@ class CollisionOutput:
 
 func torque_for_rpm(performance: CarPerformance, rpm: int) -> float:
 	var torque_curve := performance.torque_curve
-	var torque_div := rpm / 500.0
-	var torque_idx := floori(torque_div)
-	torque_idx = clampi(torque_idx, 0, 19)
+	var torque_div := clampf(rpm / 500.0, 0.0, 20.0)
+	var torque_idx := mini(floori(torque_div), 19)
 	var torque_next := torque_idx + 1
 	var torque_1 := torque_curve[torque_idx]
 	var torque_2 := torque_curve[torque_next]
@@ -109,7 +127,7 @@ func longitudal_drag_coefficient(params: HandlingState) -> float:
 	var max_velocity := performance.max_velocity()
 	var velocity_to_rpm := performance.gear_velocity_to_rpm(max_gear)
 	var rpm_for_max_speed := velocity_to_rpm * max_velocity
-	var rpm_idx := floori(rpm_for_max_speed / 500.0)
+	var rpm_idx := round_half_even(rpm_for_max_speed) / 500
 	var torque_curve := performance.torque_curve
 	var torque_for_max_speed := torque_curve[rpm_idx]
 	var mass := performance.mass
@@ -123,7 +141,7 @@ func drag(params: HandlingState) -> float:
 	var basis: Basis = params.basis_to_road
 	var linear_velocity: Vector3 = params.linear_velocity
 	var performance: CarPerformance = params.performance
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var result := DRAG_INIT * self.longitudal_drag_coefficient(params)
 	var velocity_max_diff := absf(velocity_local.z) - performance.max_velocity()
 	result = result * velocity_local.z ** 3
@@ -140,7 +158,7 @@ func get_lost_grip(state: HandlingState) -> bool:
 func prepare_traction_model_ctx(state: HandlingState) -> TractionState:
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var ts := TractionState.new()
 	ts.performance = state.performance
 	ts.rpm = state.rpm
@@ -160,6 +178,7 @@ func prepare_traction_model_ctx(state: HandlingState) -> TractionState:
 	ts.force = 0.0
 	ts.slip_angle = state.slip_angle
 	ts.weather = state.weather
+	ts.drivetrain_overload = false
 	return ts
 
 func traction_model_extend(f: Callable) -> Callable:
@@ -180,6 +199,8 @@ func traction_model_extend(f: Callable) -> Callable:
 			state.force = output.force
 		if output.updated & TractionOutput.F_LOST_GRIP:
 			state.lost_grip = output.lost_grip
+		if output.updated & TractionOutput.F_DRIVETRAIN_OVERLOAD:
+			state.drivetrain_overload = output.drivetrain_overload
 
 func make_traction_model_pipeline(func_array: Array) -> Callable:
 	return func(state: TractionState, output: TractionOutput) -> void:
@@ -219,12 +240,15 @@ func traction_model(state: HandlingState, output: HandlingOutput) -> void:
 		traction_model_postprocess,
 	])
 	pipeline.call(ts, to)
-	output.updated = HandlingOutput.F_RPM | HandlingOutput.F_FORCE | HandlingOutput.F_LOST_GRIP | HandlingOutput.F_HANDBRAKE_ACCUMULATOR | HandlingOutput.F_GEAR
+	output.updated = (HandlingOutput.F_RPM | HandlingOutput.F_FORCE | HandlingOutput.F_LOST_GRIP
+		| HandlingOutput.F_HANDBRAKE_ACCUMULATOR | HandlingOutput.F_GEAR
+		| HandlingOutput.F_DRIVETRAIN_OVERLOAD)
 	output.rpm = ts.rpm
 	output.force = ts.force
 	output.lost_grip = ts.lost_grip
 	output.handbrake_accumulator = ts.handbrake_accumulator
 	output.gear = ts.gear
+	output.drivetrain_overload = ts.drivetrain_overload
 
 func traction_model_rpm_above_redline(state: TractionState, output: TractionOutput) -> void:
 	var performance := state.performance
@@ -263,13 +287,15 @@ func traction_model_limit_gear_when_low_velocity(state: TractionState, output: T
 	output.updated = TractionOutput.F_GEAR
 	output.gear = gear
 
-func rpm_from_wheels(state: TractionState) -> float:
+func rpm_from_velocity(state: TractionState) -> float:
 	var performance := state.performance
 	var gear := state.gear
 	var velocity_local := state.linear_velocity
-	# Vector multiplication is done in 32-bit float, which is what the original uses.
 	var velocity_to_rpm := performance.gear_velocity_to_rpm(gear) * Vector3.ONE
 	return (velocity_local * velocity_to_rpm).z
+
+func rpm_from_velocity_rounded(state: TractionState) -> int:
+	return round_half_even(self.rpm_from_velocity(state))
 
 func traction_model_force(state: TractionState, output: TractionOutput) -> void:
 	var performance := state.performance
@@ -291,16 +317,17 @@ func traction_model_force(state: TractionState, output: TractionOutput) -> void:
 	rpm = mini(engine_redline_rpm, rpm)
 	var force := self.traction_powertrain(state, rpm)
 
-	var current_rpm_from_wheels := roundi(abs(self.rpm_from_wheels(state)))
-	var rpm_target_wheels_diff := target_rpm - current_rpm_from_wheels
+	var current_rpm_from_velocity := absi(self.rpm_from_velocity_rounded(state))
+	var rpm_target_wheels_diff := target_rpm - current_rpm_from_velocity
 	if abs(rpm_target_wheels_diff) < 500 and target_rpm < (engine_redline_rpm - 300):
 		rpm_target_wheels_diff = 0
-	var rpm_diff := rpm - current_rpm_from_wheels
+	var rpm_diff := rpm - current_rpm_from_velocity
 	var rpm_diff_to_big := (engine_redline_rpm / 6) < rpm_diff and gear_shift_counter == 0 and gear < CarTypes.Gear.GEAR_4
 	var going_in_reverse_dir := CarTypes.Gear.NEUTRAL < gear and speed_xz < -0.3 and (8 / 255.0) < throttle \
 							 or CarTypes.Gear.REVERSE == gear and speed_xz > 0.3 and (8 / 255.0) < throttle
+	var drivetrain_overload := false
 	if rpm_diff_to_big or going_in_reverse_dir:
-		# Missing engine damage
+		drivetrain_overload = true
 		var rpm_adjust := 125
 		const adjust_by_gear = [50, 50, 10, 15, 20, 22, 50, 50]
 		if target_rpm >= 2000:
@@ -308,7 +335,7 @@ func traction_model_force(state: TractionState, output: TractionOutput) -> void:
 		rpm -= min(rpm_adjust, rpm_diff)
 	elif rpm_target_wheels_diff < 0:
 		force = -force * performance.gas_off_factor
-		if gear < CarTypes.Gear.NEUTRAL or 0 < velocity_local.z:
+		if gear < CarTypes.Gear.NEUTRAL or 0 <= velocity_local.z:
 			if gear == CarTypes.Gear.REVERSE and 0 < velocity_local.z:
 				force = -abs(force)
 		else:
@@ -324,43 +351,48 @@ func traction_model_force(state: TractionState, output: TractionOutput) -> void:
 			if not lost_grip:
 				handbrake_accumulator = 0
 		else:
-			# Missing engine damage
+			drivetrain_overload = true
 			velocity_redline = engine_redline_rpm * self.gear_rpm_to_velocity(state.performance, gear)
 			force = (velocity_redline / abs(velocity_local.z)) * force
 			lost_grip = true
 			handbrake_accumulator = self.increment_handbrake_accumulator(state.handbrake_accumulator, state.weather)
 	elif rpm_target_wheels_diff == 0:
-		rpm = max(current_rpm_from_wheels, engine_min_rpm)
+		rpm = max(current_rpm_from_velocity, engine_min_rpm)
 		force = drag_factor
 	else:
 		if rpm_diff <= 200:
 			if rpm_diff < -300:
 				rpm += 40
 			else:
-				rpm = max(current_rpm_from_wheels, engine_min_rpm)
+				rpm = max(current_rpm_from_velocity, engine_min_rpm)
 		else:
 			rpm -= 40
 		rpm = max(min(target_rpm, rpm), engine_min_rpm)
 		var slip_factor := absf(slip_angle) * 0.6 + 1.0
 		slip_factor = min(slip_factor, 1.5)
 		force = force * throttle * slip_factor
-	output.updated = TractionOutput.F_FORCE | TractionOutput.F_HANDBRAKE_ACCUMULATOR | TractionOutput.F_RPM | TractionOutput.F_LOST_GRIP
+	output.updated = (TractionOutput.F_FORCE | TractionOutput.F_HANDBRAKE_ACCUMULATOR
+		| TractionOutput.F_RPM | TractionOutput.F_LOST_GRIP | TractionOutput.F_DRIVETRAIN_OVERLOAD)
 	output.force = force
 	output.handbrake_accumulator = handbrake_accumulator
 	output.rpm = rpm
 	output.lost_grip = lost_grip
+	output.drivetrain_overload = drivetrain_overload
 
 func traction_model_low_engine_rpm(state: TractionState, output: TractionOutput) -> void:
 	var performance := state.performance
 	var rpm := state.rpm
 	var force := state.force
+	var drivetrain_overload := state.drivetrain_overload
 	var engine_min_rpm := performance.engine_min_rpm()
 	if rpm < engine_min_rpm:
 		force = self.traction_powertrain(state, engine_min_rpm)
 		rpm = engine_min_rpm
-	output.updated = TractionOutput.F_RPM | TractionOutput.F_FORCE
+		drivetrain_overload = false
+	output.updated = TractionOutput.F_RPM | TractionOutput.F_FORCE | TractionOutput.F_DRIVETRAIN_OVERLOAD
 	output.rpm = rpm
 	output.force = force
+	output.drivetrain_overload = drivetrain_overload
 
 func traction_model_airborne_target_rpm(state: TractionState, output: TractionOutput) -> void:
 	var performance := state.performance
@@ -432,7 +464,7 @@ func traction_model_postprocess(state: TractionState, output: TractionOutput) ->
 func calculate_speed_xz(state: HandlingState) -> float:
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
-	var velocity_xz := basis.inverse() * linear_velocity
+	var velocity_xz := basis.transposed() * linear_velocity
 	velocity_xz.y = 0
 	var speed_xz := velocity_xz.length()
 	return speed_xz if velocity_xz.z > 0 else -speed_xz
@@ -462,7 +494,7 @@ func angular_velocity_factor(state: HandlingState) -> float:
 func wheel_planar_vector(state: HandlingState, wheel_data: WheelData) -> Vector3:
 	var basis: Basis = state.basis_to_road
 	var linear_velocity: Vector3 = state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var planar_vector := -0.5 * velocity_local * 32
 	var angular_velocity_fact := self.angular_velocity_factor(state)
 	match wheel_data.type:
@@ -475,10 +507,10 @@ func wheel_planar_vector(state: HandlingState, wheel_data: WheelData) -> Vector3
 
 
 func vehicle_slip_angle_tg(state: HandlingState) -> float:
-	const VELOCITY_LONGITUDAL_THRESHOLD = 0.5
+	const VELOCITY_LONGITUDAL_THRESHOLD = 5.0
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var result := 0.0
 	if VELOCITY_LONGITUDAL_THRESHOLD < abs(velocity_local.z):
 		result = velocity_local.x / velocity_local.z
@@ -497,7 +529,7 @@ func slip_angle_factor(state: HandlingState) -> float:
 	var steering := state.current_steering
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var slip_angle := self.vehicle_slip_angle(state)
 	var is_same_dir := (slip_angle * steering) >= 0
 	var result := 1.0
@@ -525,7 +557,7 @@ func steering_angle(state: HandlingState, output: HandlingOutput) -> void:
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
 	var performance := state.performance
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var slip_angle_fact := self.slip_angle_factor(state)
 	var steering_accel := performance.minimum_steering_acceleration
 	steering *= slip_angle_fact
@@ -556,8 +588,8 @@ func turning_circle(
 			result_angular_velocity.y *= 0.95
 	else:
 		result_angular_velocity.y = 0
-	if abs(velocity_local.z) < abs(velocity_local.x):
-		if velocity_local.length() < 2.0:
+	if absf(velocity_local.z) <= absf(velocity_local.x):
+		if absf(velocity_local.z) < absf(velocity_local.x) and velocity_local.length() < 2.0:
 			var factor := absf(result_angular_velocity.y) * TAU * turning_radius * 0.5
 			if factor <= abs(velocity_local.z) or factor <= abs(velocity_local.x):
 				if 0.2 <= abs(slip_angle):
@@ -632,18 +664,16 @@ func turned_steering_acceleration(state: HandlingState, wheel_data: WheelData, p
 func g_transfer_damp(state: HandlingState) -> float:
 	var factor := state.g_transfer
 	var weather := state.weather
-	var unknown_value := state.unknown_bool
+	var wet := weather == CarTypes.Weather.RAIN or weather == CarTypes.Weather.SNOW
 	if factor < 0.0:
 		factor *= 0.75
-		match weather:
-			[CarTypes.Weather.RAIN, CarTypes.Weather.SNOW]:
-				factor *= 1.1
-	else:
-		if unknown_value:
+		if wet:
+			factor *= 1.1
+	elif factor > 0.0:
+		if state.drivetrain_overload:
 			factor *= 0.5
-		match weather:
-			[CarTypes.Weather.RAIN, CarTypes.Weather.SNOW]:
-				factor *= 0.9
+		if wet:
+			factor *= 0.9
 	return factor
 
 
@@ -651,23 +681,22 @@ func wheel_downforce_factor(state: HandlingState, wheel_data: WheelData) -> floa
 	const DOWNFORCE_THRESHOLD_SPEED = 10.0
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var performance := state.performance
 	var brake := state.brake
 	var downforce := performance.downforce_mult()
 	if abs(velocity_local.z) <= DOWNFORCE_THRESHOLD_SPEED:
 		return downforce + 1.0
-	# Missing body damage influence on downforce
 	downforce = velocity_local.z * downforce
 	var rear_factor := 1.5
-	if 0.15 <= brake and performance.has_spoiler():
+	if 0.15 < brake and performance.has_spoiler():
 		rear_factor = 1.75
 	match wheel_data.type:
 		CarTypes.Wheel.FRONT_RIGHT, CarTypes.Wheel.FRONT_LEFT:
 			downforce += 1.0
 		CarTypes.Wheel.REAR_RIGHT, CarTypes.Wheel.REAR_LEFT:
 			downforce = downforce * rear_factor + 1.0
-	return max(downforce, 0)
+	return downforce
 
 
 func longitudal_acceleration(
@@ -682,11 +711,11 @@ func longitudal_acceleration(
 		if (
 			0.0 < traction
 			and 0.0 < wheel_vector.z
-			and (throttle < 0.25 or state.gear == CarTypes.Gear.REVERSE or state.gear == CarTypes.Gear.NEUTRAL)
+			and (throttle <= 0.25 or state.gear == CarTypes.Gear.REVERSE or state.gear == CarTypes.Gear.NEUTRAL)
 		):
 			traction = min(traction, wheel_vector.z)
 			traction_loss = true
-	elif throttle < 0.25 or not is_gear_reverse(state):
+	elif throttle <= 0.25 or not is_gear_reverse(state):
 		traction = max(traction, wheel_vector.z)
 		traction_loss = true
 	traction = traction * lateral_grip_mult
@@ -701,9 +730,12 @@ func orientation_to_ground(basis_to_road: Basis, basis: Basis) -> Vector3:
 	return Vector3(x, y, z)
 
 
+func road_normal_y(state: HandlingState) -> float:
+	return state.basis_to_road.y.y
+
+
 func wheel_slope_vector(state: HandlingState, vector: Vector3) -> Vector3:
-	var slope := orientation_to_ground(state.basis_to_road, state.basis).y
-	return vector * slope
+	return vector * self.road_normal_y(state)
 
 
 func wheel_forces_to_linear_acceleration(state: HandlingState, forces: Array) -> Vector3:
@@ -728,45 +760,16 @@ func wheel_forces_to_angular_acceleration(state: HandlingState, forces: Array) -
 	return Vector3(0, ang_accel_y, 0)
 
 
-func weather_factor() -> float:
-	const SUNNY = 1.0
-	const _RAIN = 0.9
-	const _SNOW = 0.8
-	return SUNNY
+func weather_factor(weather: int) -> float:
+	const FACTORS = [1.0, 0.9, 0.8]
+	return FACTORS[weather]
 
 
 func wheel_surface_grip_factor(state: HandlingState, wheel_data: WheelData) -> float:
-	const road_factors: Array[float] = [
-		1.0,
-		1.0,
-		0.75,
-		0.8,
-		0.98,
-		0.8,
-		0.75,
-		0.95,
-		0.75,
-		0.75,
-		0.98,
-		0.95,
-		0.95,
-		0.8,
-		1.0,
-		0.75,
-		0.98,
-		0.98,
-		0.8,
-		0.8,
-		0.8,
-		0.8,
-		0.8,
-		0.8
-	]
 	var road_surface := wheel_data.road_surface
-	var ort_to_grnd := orientation_to_ground(state.basis_to_road, state.basis)
-	var slope := clampf(ort_to_grnd.y, 0.75, 1.0)
-	var wheel_road_factor := (road_factors[road_surface] + 1.0) * 0.5
-	var wheel_weather_factor := self.weather_factor()
+	var slope := clampf(self.road_normal_y(state), 0.75, 1.0)
+	var wheel_road_factor := (SURFACE_FACTORS[road_surface] + 1.0) * 0.5
+	var wheel_weather_factor := self.weather_factor(state.weather)
 	var effective_weather_factor := slope * wheel_road_factor * wheel_weather_factor * 0.25
 	return (effective_weather_factor + slope) * wheel_road_factor
 
@@ -774,7 +777,7 @@ func wheel_surface_grip_factor(state: HandlingState, wheel_data: WheelData) -> f
 func wheel_base_road_grip(state: HandlingState, surface_grip: float) -> float:
 	var basis := state.basis_to_road
 	var performance := state.performance
-	var gravity := basis.inverse() * state.gravity_vector
+	var gravity := basis.transposed() * state.gravity_vector
 	var lateral_grip_mult := performance.lateral_grip_multiplier()
 	return -gravity.y * lateral_grip_mult * surface_grip
 
@@ -808,7 +811,6 @@ func model_wheel_grip(state: HandlingState, wheel_data: WheelData) -> float:
 	var surface_grip := self.wheel_surface_grip_factor(state, wheel_data)
 	var base_grip := self.wheel_base_road_grip(state, surface_grip)
 	var biased_grip := self.wheel_bias_grip(state, wheel_data, base_grip)
-	# Missing g transfer influence
 	var downforce_grip := self.wheel_downforce_grip(state, wheel_data, base_grip, biased_grip)
 	return downforce_grip
 
@@ -838,36 +840,7 @@ func calculate_wheel_data(state: HandlingState, wheel: Dictionary) -> WheelData:
 
 
 func road_factor(state: HandlingState) -> float:
-	const road_factors: Array[float] = [
-		1.0,
-		1.0,
-		0.75,
-		0.8,
-		0.98,
-		0.8,
-		0.75,
-		0.95,
-		0.75,
-		0.75,
-		0.98,
-		0.95,
-		0.95,
-		0.8,
-		1.0,
-		0.75,
-		0.98,
-		0.98,
-		0.8,
-		0.8,
-		0.8,
-		0.8,
-		0.8,
-		0.8
-	]
-	const weather_factors = [1.0, 0.87, 0.75]
-	var road_surface := state.road_surface
-	var weather := state.weather
-	return road_factors[road_surface] * weather_factors[weather]
+	return SURFACE_FACTORS[state.road_surface]
 
 
 func wheel_loss_of_grip(state: HandlingState, wheel_data: WheelData, forces: Vector3) -> Vector3:
@@ -885,7 +858,11 @@ func wheel_loss_of_grip(state: HandlingState, wheel_data: WheelData, forces: Vec
 	if grip_loss < force_magnitude:
 		var diff := force_magnitude - grip_loss
 		var val := minf(diff, grip_loss) * tire_grip_factor
-		# Missing other weather conditions
+		match state.weather:
+			CarTypes.Weather.RAIN:
+				val *= 1.5
+			CarTypes.Weather.SNOW:
+				val *= 2.0
 		var factor := (grip_loss - val) / force_magnitude
 		if force_magnitude <= (grip_loss - val):
 			factor = 1.0
@@ -895,10 +872,10 @@ func wheel_loss_of_grip(state: HandlingState, wheel_data: WheelData, forces: Vec
 		if (
 			not is_front
 			and gear == CarTypes.Gear.GEAR_1
-			and 0.85 < throttle
+			and 0.85 <= throttle
 			and engine_redline_rpm * 0.85 <= rpm
 			and 0.95 <= road_factor(state)
-		):  # Bug here, road factor effect only, no weather
+		):
 			result.z = 0.5 * factor * forces.z
 			result.x = factor * forces.x
 	return result
@@ -917,11 +894,10 @@ func increment_handbrake_accumulator(current: int, weather: int) -> int:
 	return min(next, 384)
 
 
-func update_handbrake_accumulator(state: HandlingState) -> int:
-	var handbrake := self.get_lost_grip(state)
-	if not handbrake:
+func step_handbrake_accumulator(state: HandlingState, current: int) -> int:
+	if not self.get_lost_grip(state):
 		return 0
-	return increment_handbrake_accumulator(state.handbrake_accumulator, state.weather)
+	return increment_handbrake_accumulator(current, state.weather)
 
 
 func handbrake_scaling_function(value: float) -> float:
@@ -938,7 +914,7 @@ func handbrake_loss_of_grip(state: HandlingState, wheel_data: WheelData, wheel_v
 	var grip := wheel_data.grip
 	var downforce := wheel_data.downforce
 	var xz_speed := (wheel_vector * Vector3(1, 0, 1)).length()
-	var handbrake_accumulator: int = state.handbrake_accumulator
+	var handbrake_accumulator := wheel_data.handbrake_accumulator
 	var grip_times_downforce := grip * downforce
 	var grip_loss := grip_times_downforce - grip_times_downforce * tire_factor(state)
 	var factor := 0.75
@@ -963,9 +939,9 @@ func wheel_force(state: HandlingState, wheel_data: WheelData) -> Vector3:
 	var throttle := state.throttle
 	var handbrake := self.get_lost_grip(state)
 	var grip := wheel_data.grip
-	var speed_xz := state.speed_xz
 	var linear_velocity := state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var speed_xz := Vector2(linear_velocity.x, linear_velocity.z).length()
+	var velocity_local := basis.transposed() * linear_velocity
 	var whl_planar_vector := self.wheel_planar_vector(state, wheel_data)
 	var is_front := false
 	var forces := Vector3.ZERO
@@ -1019,37 +995,54 @@ func wheel_longitudal_acceleration(state: HandlingState, acceleration: Vector3) 
 func calculate_g_transfer(state: HandlingState, linear_acceleration: Vector3) -> float:
 	var performance := state.performance
 	var basis := state.basis_to_road
-	var gravity := basis.inverse() * state.gravity_vector
+	var gravity := basis.transposed() * state.gravity_vector
 	var g_transfer := linear_acceleration.z * performance.g_transfer_factor - gravity.z * 0.1
 	return g_transfer
 
 
-func process_wheels_cm(state: HandlingState, output: HandlingOutput) -> void:
+func wheel_forces_cm(state: HandlingState, output: HandlingOutput) -> void:
 	var basis := state.basis_to_road
-	var g_transfer := state.g_transfer
-	var wheel_data: Array[WheelData] = []
+	var accumulator := state.handbrake_accumulator
+	var vectors: Array[Vector3] = []
 	for w in state.wheels:
-		wheel_data.append(self.calculate_wheel_data(state, w))
-	var linear_acceleration := Vector3.ZERO
-	var angular_acceleration := Vector3.ZERO
-	if wheel_data.any(func(x: WheelData): return 0 < x.grip):
-		var vectors: Array = wheel_data.map(func(x: WheelData): return wheel_force(state, x))
-		linear_acceleration = wheel_forces_to_linear_acceleration(state, vectors)
-		linear_acceleration = wheel_longitudal_acceleration(state, linear_acceleration)
-		angular_acceleration = self.wheel_forces_to_angular_acceleration(state, vectors)
-		g_transfer = calculate_g_transfer(state, linear_acceleration)
-	output.updated = HandlingOutput.F_LINEAR_ACCELERATION | HandlingOutput.F_ANGULAR_ACCELERATION | HandlingOutput.F_G_TRANSFER
-	output.linear_acceleration = basis * linear_acceleration
-	output.angular_acceleration = basis * angular_acceleration
-	output.g_transfer = g_transfer
+		var wheel_data := self.calculate_wheel_data(state, w)
+		accumulator = self.step_handbrake_accumulator(state, accumulator)
+		wheel_data.handbrake_accumulator = accumulator
+		vectors.append(self.wheel_force(state, wheel_data))
+	var linear_acceleration := wheel_forces_to_linear_acceleration(state, vectors)
+	linear_acceleration = wheel_longitudal_acceleration(state, linear_acceleration)
+	var angular_acceleration := self.wheel_forces_to_angular_acceleration(state, vectors)
+	output.updated = (HandlingOutput.F_WHEEL_ACCELERATION | HandlingOutput.F_G_TRANSFER
+		| HandlingOutput.F_HANDBRAKE_ACCUMULATOR | HandlingOutput.F_STOP_MOVING_SIDEWAYS)
+	output.wheel_linear_acceleration = basis * linear_acceleration
+	output.wheel_angular_acceleration = basis * angular_acceleration
+	output.g_transfer = calculate_g_transfer(state, linear_acceleration)
+	output.handbrake_accumulator = accumulator
+	output.stop_moving_sideways = self.is_moving_sideways_locked(state)
+
+
+func apply_wheel_linear_acceleration_cm(state: HandlingState, output: HandlingOutput) -> void:
+	output.updated = HandlingOutput.F_LINEAR_ACCELERATION
+	output.linear_acceleration = state.wheel_linear_acceleration
+
+
+func apply_wheel_angular_acceleration_cm(state: HandlingState, output: HandlingOutput) -> void:
+	output.updated = HandlingOutput.F_ANGULAR_ACCELERATION
+	output.angular_acceleration = state.wheel_angular_acceleration
+
+
+func has_traction(state: HandlingState) -> bool:
+	if not state.has_contact_with_ground or state.traction_suspended or self.road_normal_y(state) < 0.5:
+		return false
+	return 0.0 < self.wheel_base_road_grip(state, 1.0)
 
 
 func turning_circle_cm(state: HandlingState, output: HandlingOutput) -> void:
 	var basis := state.basis_to_road
 	var angular_velocity := state.angular_velocity
 	var linear_velocity := state.linear_velocity
-	var local_angular_velocity := basis.inverse() * angular_velocity
-	var local_linear_velocity := basis.inverse() * linear_velocity
+	var local_angular_velocity := basis.transposed() * angular_velocity
+	var local_linear_velocity := basis.transposed() * linear_velocity
 	var result := self.turning_circle(state, local_angular_velocity, local_linear_velocity)
 	var result_angular: Vector3 = result["angular_velocity"]
 	var result_linear: Vector3 = result["linear_velocity"]
@@ -1061,9 +1054,9 @@ func turning_circle_cm(state: HandlingState, output: HandlingOutput) -> void:
 
 
 func airborne_drag_cm(state: HandlingState, output: HandlingOutput) -> void:
-	const COEFFICIENTS = Vector3(0.006, 0.004, 0.002)
+	const COEFFICIENTS = Vector3(0.004, 0.006, 0.002)
 	var basis := state.basis
-	var basis_inv := basis.inverse()
+	var basis_inv := basis.transposed()
 	var basis_right := basis_inv.x.abs()
 	var basis_forward := basis_inv.z.abs()
 	var velocity := state.linear_velocity
@@ -1078,10 +1071,13 @@ func neutral_gear_deceleration_cm(state: HandlingState, output: HandlingOutput) 
 	var steering := state.current_steering
 	var linear_velocity := state.linear_velocity
 	var angular_velocity := state.angular_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
+	var gravity := basis.transposed() * state.gravity_vector
 	var factor := 0.998
 	if absf(velocity_local.z) < 20.0 or 32.0 < absf(steering):
 		factor = 0.99
+	if not is_gear_neutral(state) or absf(gravity.z) >= 0.5:
+		factor = 1.0
 	factor = (factor - 1)
 	output.updated = HandlingOutput.F_LINEAR_ACCELERATION | HandlingOutput.F_ANGULAR_ACCELERATION
 	output.linear_acceleration = factor * linear_velocity * 32
@@ -1096,7 +1092,7 @@ func damp_lateral_velocity_cm(state: HandlingState, output: HandlingOutput) -> v
 	const _HIGH_VELOCITY_DAMP = 0.99
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var lateral_velocity := absf(velocity_local.x)
 	var alpha := (lateral_velocity - 1) * 0.09 + 0.9
 	var beta := clampf(alpha, LOW_VELOCITY_DAMP, MEDIUM_VELOCITY_DAMP)
@@ -1112,22 +1108,36 @@ func damp_lateral_velocity_cm(state: HandlingState, output: HandlingOutput) -> v
 	output.linear_acceleration = basis * Vector3(accel_x, 0, 0)
 
 
+func damp_longitudinal_velocity_cm(state: HandlingState, output: HandlingOutput) -> void:
+	var basis := state.basis_to_road
+	var velocity_local := basis.transposed() * state.linear_velocity
+	var speed := absf(velocity_local.z)
+	var factor := 1.0
+	if self.get_lost_grip(state):
+		if 1.0 < speed:
+			var wet := state.weather == CarTypes.Weather.RAIN or state.weather == CarTypes.Weather.SNOW
+			factor = 0.9985 if wet else 0.9995
+		elif speed < 1.0 and is_gear_neutral(state):
+			factor = 0.5
+	output.updated = HandlingOutput.F_LINEAR_ACCELERATION
+	output.linear_acceleration = basis * Vector3(0, 0, (factor - 1) * velocity_local.z * 32)
+
+
 func process_steering_input_cm(state: HandlingState, output: HandlingOutput) -> void:
 	var steering := state.current_steering
 	var performance := state.performance
-	var turn_in_ramp := performance.turn_in_ramp
-	var turn_out_ramp := performance.turn_out_ramp
 	var turn_input := state.turn_input
 	var steering_target := 128.0 * turn_input
-	var steering_diff := steering_target - steering
-	var delta: float
-	if steering_diff < 0 and steering > 0:
-		delta = turn_out_ramp
-	elif steering_diff > 0 and steering < 0:
-		delta = turn_out_ramp
+	var ramp_scale := 32 * state.timestep
+	var turning_in := (
+		(steering_target < 0 or steering >= 0) and (steering_target > 0 or steering <= 0)
+	)
+	if turning_in:
+		var step := round_half_even(performance.turn_in_ramp) * ramp_scale
+		steering = move_toward(steering, steering_target, step)
 	else:
-		delta = turn_in_ramp
-	steering = move_toward(steering, steering_target, delta * 32 * state.timestep)
+		var step := round_half_even(performance.turn_out_ramp) * ramp_scale
+		steering = move_toward(steering, 0.0, step)
 	output.updated = HandlingOutput.F_CURRENT_STEERING
 	output.current_steering = steering
 
@@ -1146,10 +1156,13 @@ func process_brake_input_cm(state: HandlingState, output: HandlingOutput) -> voi
 	var brake := state.brake
 	var input := state.brake_input
 	var idx := roundi(brake * 255) >> 5
-	var delta := performance.brake_increasing_curve[idx] / 255.0
+	var curve := performance.brake_increasing_curve
 	if input < brake:
-		delta = performance.brake_decreasing_curve[idx] / 255.0
+		curve = performance.brake_decreasing_curve
+	var delta := round_half_even(curve[idx]) / 255.0
 	brake = move_toward(brake, input, delta * 32 * state.timestep)
+	if state.controls_locked:
+		brake = 1.0
 	output.updated = HandlingOutput.F_BRAKE
 	output.brake = brake
 
@@ -1160,7 +1173,7 @@ func process_gear_input_cm(state: HandlingState, output: HandlingOutput) -> void
 	var next_gear := state.next_gear
 	var gear_shift_counter := state.gear_shift_counter - 1
 	var shifted_down := state.shifted_down
-	if next_gear != gear:
+	if next_gear != gear and not state.controls_locked:
 		gear_shift_counter = performance.gear_shift_delay
 		shifted_down = next_gear < gear and CarTypes.Gear.NEUTRAL < next_gear
 		gear = next_gear
@@ -1176,15 +1189,33 @@ func gravity_cm(state: HandlingState, output: HandlingOutput) -> void:
 	output.updated = HandlingOutput.F_LINEAR_ACCELERATION
 
 
+func ground_gravity_cm(state: HandlingState, output: HandlingOutput) -> void:
+	var road := state.basis_to_road
+	var gravity := state.gravity_vector
+	var normal_part := road.y * road.y.dot(gravity)
+	var forward_part := road.z * road.z.dot(gravity)
+	var side_part := road.x * road.x.dot(gravity)
+	var result := normal_part
+	if 0.87 <= self.road_normal_y(state):
+		if 0.9 <= orientation_to_ground(road, state.basis).y:
+			result += forward_part
+	else:
+		result += side_part + forward_part
+	output.linear_acceleration = result
+	output.updated = HandlingOutput.F_LINEAR_ACCELERATION
+
+
+func is_moving_sideways_locked(state: HandlingState) -> bool:
+	var velocity_local := state.basis_to_road.transposed() * state.linear_velocity
+	return (
+		0.5 <= state.throttle and 0.75 <= state.brake
+		and 64.0 < absf(state.current_steering) and absf(velocity_local.z) <= 5.0
+	)
+
+
 func prevent_moving_sideways_cm(state: HandlingState, output: HandlingOutput) -> void:
-	var basis: Basis = state.basis_to_road
-	var throttle: float = state.throttle
-	var brake: float = state.brake
-	var steering: float = state.current_steering
-	var linear_velocity: Vector3 = state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
-	var result := linear_velocity
-	if 0.5 <= throttle and 0.75 <= brake and 64.0 < abs(steering) and abs(velocity_local.z) <= 5.0:
+	var result := state.linear_velocity
+	if state.stop_moving_sideways:
 		result *= 0
 	output.updated = HandlingOutput.F_LINEAR_VELOCITY
 	output.linear_velocity = result
@@ -1203,7 +1234,7 @@ func near_stop_deceleration(state: HandlingState, output: HandlingOutput) -> voi
 	var threshold := VELOCITY_THRESHOLD_FORWARD
 	if gear == CarTypes.Gear.REVERSE:
 		threshold = VELOCITY_THRESHOLD_REVERSE
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	if abs(velocity_local.z) < threshold:
 		var damp := DAMP_FACTOR - 1.0
 		linear_acceleration = damp * linear_velocity * 32
@@ -1235,13 +1266,13 @@ func brake_force(state: HandlingState, wheel_data: WheelData) -> float:
 	var front_brake_ratio := performance.front_brake_bias()
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
+	var velocity_local := basis.transposed() * linear_velocity
 	var brake_maximum := absf(32 * velocity_local.z)
 	var has_spoiler := performance.has_spoiler()
 	var downforce_mult := performance.downforce_mult()
-	brake_deceleration = minf(brake_maximum, brake_deceleration)
 	if 0.15 < brake and has_spoiler:
 		brake_deceleration += absf(velocity_local.z) * downforce_mult
+	brake_deceleration = minf(brake_maximum, brake_deceleration)
 	if self.get_lost_grip(state):
 		front_brake_ratio += 0.05
 	var rear_brake_ratio := 1.0 - front_brake_ratio
@@ -1273,7 +1304,7 @@ func height_above_surface(state: HandlingState) -> float:
 
 
 func limit_angular_velocity_cm(state: HandlingState, output: HandlingOutput) -> void:
-	const ANGULAR_VELOCITY_LIMIT = 2.4 / TAU
+	const ANGULAR_VELOCITY_LIMIT = 2.4
 	var result := self.limit_angular_velocity(state.angular_velocity, ANGULAR_VELOCITY_LIMIT)
 	output.updated = HandlingOutput.F_ANGULAR_VELOCITY
 	output.angular_velocity = result
@@ -1282,12 +1313,14 @@ func limit_angular_velocity_cm(state: HandlingState, output: HandlingOutput) -> 
 func downforce_cm(state: HandlingState, output: HandlingOutput) -> void:
 	var basis := state.basis
 	var linear_velocity := state.linear_velocity
-	var velocity_local := basis.inverse() * linear_velocity
-	var downforce_mult := state.performance.downforce_mult()
-	var downforce_accel := -downforce_mult * velocity_local.z * 32
-	var result := Vector3(0, downforce_accel, 0)
+	var velocity_local := basis.transposed() * linear_velocity
+	var downforce_accel := 0.0
+	var upright := 0.75 < orientation_to_ground(state.basis_to_road, basis).y
+	var speed_xz := Vector2(linear_velocity.x, linear_velocity.z).length()
+	if upright and 10.0 < speed_xz and 0.0 < velocity_local.z:
+		downforce_accel = -state.performance.downforce_mult() * velocity_local.z * 32
 	output.updated = HandlingOutput.F_LINEAR_ACCELERATION
-	output.linear_acceleration = basis * result
+	output.linear_acceleration = basis * Vector3(0, downforce_accel, 0)
 
 
 func adjust_to_road_cm(state: HandlingState, output: HandlingOutput) -> void:
@@ -1297,7 +1330,7 @@ func adjust_to_road_cm(state: HandlingState, output: HandlingOutput) -> void:
 	var basis_next: Basis = state.basis_to_road_next
 	var interpolated := basis_current.slerp(basis_next, 0.5)
 	var basis: Basis = state.basis
-	var basis_inv := basis.inverse()
+	var basis_inv := basis.transposed()
 	var normal := interpolated.y
 	var angular_velocity: Vector3 = state.angular_velocity
 	var orientation := self.orientation_to_ground(state.basis_to_road, state.basis)
@@ -1334,7 +1367,7 @@ func prevent_sinking_cm(state: HandlingState, output: HandlingOutput) -> void:
 	var interpolated := basis_current.slerp(basis_next, 0.5)
 	var height_adjust := self.height_above_surface(state)
 	var linear_velocity := state.linear_velocity
-	var velocity_local := interpolated.inverse() * linear_velocity
+	var velocity_local := interpolated.transposed() * linear_velocity
 	var normal := interpolated.y
 	if height_adjust < 0.0:
 		if velocity_local.y < 0.0:
@@ -1348,7 +1381,7 @@ func go_airborne(state: HandlingState, output: HandlingOutput) -> void:
 	var angular_velocity := state.angular_velocity
 	var linear_velocity := state.linear_velocity
 	var distance_above_ground: float = state.distance_above_ground
-	var result := basis.inverse() * angular_velocity
+	var result := basis.transposed() * angular_velocity
 	if 0.0 < basis.y.dot(linear_velocity) and self.went_airborne(state):
 		result *= Vector3(0.15, 1, 1)
 	output.updated = HandlingOutput.F_ANGULAR_VELOCITY | HandlingOutput.F_HAS_CONTACT_WITH_GROUND
@@ -1408,13 +1441,18 @@ func brake_in_range_uint8(lower: int, upper: int) -> Callable:
 func traction_pipeline(state: HandlingState, output: HandlingOutput) -> void:
 	state.slip_angle = self.vehicle_slip_angle_tg(state)
 	state.speed_xz = self.calculate_speed_xz(state)
-	state.unknown_bool = false
+	state.drivetrain_overload = false
 	state.force = 0.0
 	state.lost_grip = true
+	state.wheel_linear_acceleration = Vector3.ZERO
+	state.wheel_angular_acceleration = Vector3.ZERO
+	state.stop_moving_sideways = false
 	var traction := make_model_pipeline([
-		integrate(self.process_wheels_cm),
+		integrate(self.apply_wheel_linear_acceleration_cm),
 		prevent_moving_sideways_cm,
 		integrate(self.damp_lateral_velocity_cm),
+		integrate(self.damp_longitudinal_velocity_cm),
+		integrate(self.apply_wheel_angular_acceleration_cm),
 		integrate(turning_circle_cm),
 		enable_if(is_gear_neutral, integrate(self.neutral_gear_deceleration_cm)),
 	])
@@ -1424,9 +1462,10 @@ func traction_pipeline(state: HandlingState, output: HandlingOutput) -> void:
 		process_steering_input_cm,
 		process_gear_input_cm,
 		steering_angle,
-		near_stop_deceleration_cm,
 		traction_model,
-		enable_if(neg(is_airborne), traction),
+		enable_if(self.has_traction, self.wheel_forces_cm),
+		near_stop_deceleration_cm,
+		enable_if(self.has_traction, traction),
 	])
 	pipeline.call(state, output)
 
@@ -1480,6 +1519,18 @@ func kinetic_energy(params: CollisionParams) -> float:
 
 
 func calculate_impact(params: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float, result: CollisionOutput) -> void:
+	var energy_before := self.kinetic_energy(params)
+	if self.calculate_impact_impulse(params, body_point, impact_point, normal, friction, result):
+		params.linear_velocity = result.linear_velocity
+		params.angular_velocity = result.angular_velocity
+		var energy_after := self.kinetic_energy(params)
+		if energy_before < energy_after:
+			var energy_ratio := sqrt(energy_before / energy_after)
+			result.linear_velocity *= energy_ratio
+			result.angular_velocity *= energy_ratio
+
+
+func calculate_impact_impulse(params: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float, result: CollisionOutput) -> bool:
 	var current_position: Vector3 = params.position
 	var angular_velocity: Vector3 = params.angular_velocity
 	var linear_velocity: Vector3 = params.linear_velocity
@@ -1500,18 +1551,12 @@ func calculate_impact(params: CollisionParams, body_point: Vector3, impact_point
 	var momentum_dot := momentum_at_body_point.dot(normal)
 	result.linear_velocity = linear_velocity
 	result.angular_velocity = angular_velocity
-	if momentum_dot < 0.0:
-		var projected_momentum := -momentum_dot * normal
-		var energy_before := self.kinetic_energy(params)
-		var combined_friction := car_friction * friction
-		self.apply_collision_velocities(params, projected_momentum, body_point_to_origin, 1.0, combined_friction, result)
-		params.linear_velocity = result.linear_velocity
-		params.angular_velocity = result.angular_velocity
-		var energy_after := self.kinetic_energy(params)
-		if energy_before < energy_after:
-			var energy_ratio := sqrt(energy_before / energy_after)
-			result.linear_velocity *= energy_ratio
-			result.angular_velocity *= energy_ratio
+	if momentum_dot >= 0.0:
+		return false
+	var projected_momentum := -momentum_dot * normal
+	var combined_friction := car_friction * friction
+	self.apply_collision_velocities(params, projected_momentum, body_point_to_origin, 1.0, combined_friction, result)
+	return true
 
 
 func process_collision(params: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float, result: CollisionOutput) -> void:
@@ -1526,7 +1571,7 @@ func process(state: HandlingState, output: HandlingOutput) -> void:
 	state.speed_xz = self.calculate_speed_xz(state)
 	var airborne_processing := make_model_pipeline([
 		enable_if(is_airborne, integrate(airborne_drag_cm)),
-		enable_if(neg(is_airborne), integrate(self.gravity_cm)),
+		enable_if(neg(is_airborne), integrate(self.ground_gravity_cm)),
 		enable_if(neg(is_airborne), prevent_sinking_cm),
 		enable_if(neg(is_airborne), adjust_to_road_cm),
 	])
