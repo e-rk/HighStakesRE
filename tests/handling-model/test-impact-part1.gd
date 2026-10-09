@@ -18,15 +18,15 @@ func get_csv() -> FileAccess:
 	)
 
 
-func make_params(data: Dictionary) -> Dictionary:
-	var result = Dictionary()
-	result["basis"] = self.basis(data)
-	result["angular_velocity"] = self.global_angular_velocity(data)
-	result["linear_velocity"] = self.global_linear_velocity(data)
-	result["mass"] = self.mass(data)
-	result["inertia_inv"] = self.inertia_inv(data)
-	result["position"] = self.global_position(data)
-	result["friction"] = float(data["object_friction"])
+func make_params(data: Dictionary) -> HandlingModelRE.CollisionParams:
+	var result = HandlingModelRE.CollisionParams.new()
+	result.basis = self.basis(data)
+	result.angular_velocity = self.global_angular_velocity(data)
+	result.linear_velocity = self.global_linear_velocity(data)
+	result.mass = self.mass(data)
+	result.inertia_inv = self.inertia_inv(data)
+	result.position = self.global_position(data)
+	result.friction = float(data["object_friction"])
 	return result
 
 
@@ -41,7 +41,8 @@ func body(data: Dictionary):
 	var expected_linear_velocity = self.result_global_linear_velocity(data)
 	var expected_angular_velocity = self.result_global_angular_velocity(data)
 	var expected_position = self.vector3("result_global_position", data)
-	var result = self.model.calculate_impact(params, obj_position, collision_point, normal, friction)
+	var result = HandlingModelRE.CollisionOutput.new()
+	self.model.calculate_impact(params, obj_position, collision_point, normal, friction, result)
 	assert_almost_eq(result["linear_velocity"], expected_linear_velocity, EPSILON * Vector3.ONE, " ln=" + str(self.current_line))
 	assert_almost_eq(result["angular_velocity"], expected_angular_velocity, EPSILON * Vector3.ONE)
 	assert_almost_eq(result["position"], expected_position, EPSILON * Vector3.ONE)
