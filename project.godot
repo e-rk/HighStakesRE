@@ -16,7 +16,7 @@ warnings/check_invalid_track_paths=false
 
 config/name="HighStakesRE"
 run/main_scene="uid://drxrxxcoribky"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.7", "Forward Plus")
 
 [audio]
 
