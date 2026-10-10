@@ -54,7 +54,7 @@ func update_police_ui(police: PursuitPolice):
 		self.pursuit_map.update_state(police.player.car, target.player.car,
 				self._pursuit_map_others(police.player, target.player))
 	else:
-		self.pursuit_map.show()
+		self.pursuit_map.hide()
 
 func _update_ui(spectated_player: Player):
 	var player_data = spectated_player.get_meta(&"pursuit_info")
