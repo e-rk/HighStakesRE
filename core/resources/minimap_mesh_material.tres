@@ -1,0 +1,25 @@
+[gd_resource type="ShaderMaterial" script_class="MinimapMeshMaterial" format=3 uid="uid://dcif5p4xl4vsq"]
+
+[ext_resource type="Script" uid="uid://b6t0v3n4lkstd" path="res://core/resources/minimap_mesh_material.gd" id="1_auhfc"]
+
+[sub_resource type="Shader" id="Shader_auhfc"]
+code = "shader_type spatial;
+render_mode unshaded, specular_disabled, shadows_disabled, specular_occlusion_disabled;
+
+global uniform vec4 minimap_track_color : source_color;
+
+void vertex() {
+	COLOR = minimap_track_color;
+}
+
+void fragment() {
+	ALBEDO = COLOR.rgb;
+	ALPHA = COLOR.a;
+}
+"
+
+[resource]
+render_priority = 0
+shader = SubResource("Shader_auhfc")
+script = ExtResource("1_auhfc")
+metadata/_custom_type_script = "uid://b6t0v3n4lkstd"

@@ -1,0 +1,2 @@
+extends ShaderMaterial
+class_name MinimapMeshMaterial

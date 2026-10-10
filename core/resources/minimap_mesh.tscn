@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dr3sk13l77ecr"]
+
+[ext_resource type="Material" uid="uid://dcif5p4xl4vsq" path="res://core/resources/minimap_mesh_material.tres" id="1_c0jef"]
+[ext_resource type="Script" uid="uid://cnfqa2gw0l6rb" path="res://core/resources/minimap_mesh.gd" id="1_padb1"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_gnmtg"]
+resource_local_to_scene = true
+
+[node name="MinimapMesh" type="MeshInstance3D" unique_id=221202505]
+visible = false
+layers = 16
+sorting_offset = -100.0
+material_override = ExtResource("1_c0jef")
+mesh = SubResource("ArrayMesh_gnmtg")
+script = ExtResource("1_padb1")

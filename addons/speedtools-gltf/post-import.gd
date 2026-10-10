@@ -74,6 +74,32 @@ func make_rigid_bodies(scene: Node):
 	for object in objects:
 		self.make_rigid_body(scene, object)
 
+func build_road_mesh(shape: ConcavePolygonShape3D) -> MeshInstance3D:
+	var faces := shape.get_faces()
+	if faces.is_empty():
+		return null
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = faces
+	var mesh = preload("res://core/resources/minimap_mesh.tscn").instantiate()
+	mesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	return mesh
+
+func make_minimap_mesh(scene: Node):
+	var track_collision = Constants.collision_layer_to_mask([Constants.CollisionLayer.TRACK_ROAD])
+	var objects: Array[StaticBody3D]
+	objects.assign(scene.get_children().filter(func(x): return x.name.contains("Collision") and x is StaticBody3D and x.collision_layer == track_collision))
+	var mesh_container := Node3D.new()
+	mesh_container.name = "MinimapMeshes"
+	scene.add_child(mesh_container)
+	mesh_container.owner = scene
+	mesh_container.set_display_folded(true)
+	for object in objects:
+		var shape: CollisionShape3D = object.find_child("CollisionShape3D")
+		var mesh = self.build_road_mesh(shape.shape)
+		mesh_container.add_child(mesh, true)
+		mesh.owner = scene
+
 func double_sided_shadows(scene: Node):
 	for child in scene.get_children():
 		if child is MeshInstance3D:
@@ -227,6 +253,7 @@ func _post_import(scene):
 				new_scene.add_child(player)
 				player.owner = new_scene
 			animation_player.free()
+		make_minimap_mesh(new_scene)
 		return new_scene
 	elif scene.get_meta("type") == "car":
 		var dimensions = scene.get_meta("dimensions")
