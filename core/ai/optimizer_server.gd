@@ -211,7 +211,7 @@ func _submit(compute_list: int, params: OptimizerParams) -> void:
 		self.device.compute_list_add_barrier(compute_list)
 
 	var curvature_pc := PackedByteArray()
-	curvature_pc.resize(16)
+	curvature_pc.resize(4)
 	curvature_pc.encode_u32(0, self.num_points)
 
 	self.device.compute_list_bind_compute_pipeline(compute_list, self.curvature_pipeline)
