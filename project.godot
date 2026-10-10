@@ -28,6 +28,7 @@ CarDB="*res://core/db/car_db.tscn"
 TrackDB="*res://core/db/track_db.tscn"
 GameModeDB="*res://core/db/mode_db.gd"
 OptimizerServer="*uid://by6ile3p5mh5y"
+GlobalConfig="*uid://bo0ksr1l7lk40"
 
 [editor_plugins]
 
@@ -168,3 +169,10 @@ common/physics_interpolation=true
 [rendering]
 
 textures/default_filters/texture_mipmap_bias=-1.0
+
+[shader_globals]
+
+minimap_track_color={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
