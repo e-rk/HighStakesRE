@@ -69,6 +69,9 @@ extends RigidBody3D
 			self._set_spectated(value)
 		spectated = value
 
+@export var minimap_color: Color = Color.SILVER:
+	set(value):
+		self.minimap_material.albedo_color = value
 
 var current_rpm := 0.0
 var current_steering := 0.0
@@ -110,6 +113,8 @@ var collision_output := HandlingModelRE.CollisionOutput.new()
 @onready var road_raycast_up: RayCast3D = $RoadRaycasts/Up
 @onready var synchronizer: CarSynchronizer = $CarSynchronizer
 @onready var wall_prober: RayCast3D = $WallProber
+@onready var minimap_mesh: MeshInstance3D = $MinimapMesh
+@onready var minimap_material: StandardMaterial3D = minimap_mesh.get_active_material(0) as StandardMaterial3D
 
 
 func _ready() -> void:
@@ -135,6 +140,7 @@ func _ready() -> void:
 		self.brake_light_energy = 2 * tail_light_energy
 	if not self.interior_wheel:
 		self.interior_wheel = self.find_child("*Steering*")
+	self.minimap_mesh.show()
 
 
 func _enable_lights(lights: Array, show_lights: bool) -> void:
@@ -223,12 +229,15 @@ func is_siren_active() -> bool:
 
 
 func _set_spectated(value: bool) -> void:
-	var interior_mask = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR])
-	var exterior_mask = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
+	var interior_mask: int = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR])
+	var exterior_mask: int = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
+	var minimap_mask: int = Constants.visual_layer_to_mask([Constants.VisualLayer.MINIMAP])
 	if not value:
 		interior_mask = 0
 		exterior_mask = Constants.visual_layer_to_mask([Constants.VisualLayer.OPPONENTS])
 	for child in self.get_children():
+		if child is MeshInstance3D and child.layers & minimap_mask:
+			continue
 		var extras = child.get_meta("extras", {})
 		if extras and extras.get("SPT_interior", false):
 			child.layers = interior_mask

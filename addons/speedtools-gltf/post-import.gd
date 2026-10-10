@@ -156,6 +156,8 @@ func _process_car_texture(car: Car):
 	var image_to_parts = {}
 	for child in car.get_children():
 		if child is MeshInstance3D:
+			if child.layers & Constants.visual_layer_to_mask([Constants.VisualLayer.MINIMAP]):
+				continue
 			for i in range(child.mesh.get_surface_count()):
 				var surface = child.mesh.surface_get_material(i) as StandardMaterial3D
 				if surface.refraction_enabled:
@@ -261,8 +263,10 @@ func _post_import(scene):
 		var new_scene: Node = load("res://core/car/car.tscn").instantiate()
 		var shadow = new_scene.get_child(0)
 		var collider = new_scene.get_child(2)
+		var minimap_mesh = new_scene.find_child("MinimapMesh") as MeshInstance3D
 		shadow.size = Vector3(dimensions.x, 1.5, dimensions.z) * 1.15
 		collider.shape.size = dimensions
+		minimap_mesh.mesh.size = dimensions * 1.3
 		new_scene.palette = colors
 		new_scene.name = scene.name
 		scene.replace_by(new_scene)
@@ -275,7 +279,7 @@ func _post_import(scene):
 				var extras = node.get_meta("extras", {})
 				if extras.get("SPT_interior", false):
 					node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR])
-				else:
+				elif not node.layers & Constants.visual_layer_to_mask([Constants.VisualLayer.MINIMAP]):
 					node.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
 			if node is Camera3D:
 				node.cull_mask = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR, Constants.VisualLayer.TRACK, Constants.VisualLayer.OPPONENTS])
