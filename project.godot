@@ -147,6 +147,7 @@ show_next_player={
 3d_render/layer_2="OPPONENTS"
 3d_render/layer_3="PLAYER"
 3d_render/layer_4="PLAYER_INTERIOR"
+3d_render/layer_5="MINIMAP"
 3d_physics/layer_1="TRACK_ROAD"
 3d_physics/layer_2="TRACK_WALLS"
 3d_physics/layer_3="TRACK_CEILING"

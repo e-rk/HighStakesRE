@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://col5koqu2pcb6"]
+
+[ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_theme"]
+[ext_resource type="Script" uid="uid://cte26x4o6v7ou" path="res://core/ui/game/pursuit_minimap_window.gd" id="2_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2xo6y"]
+bg_color = Color(0, 0.30980393, 0, 0.56078434)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="Environment" id="Environment_pmap"]
+background_mode = 1
+background_color = Color(0.05, 0.06, 0.08, 1)
+
+[node name="PursuitMinimapWindow" type="PanelContainer" unique_id=1461768611]
+custom_minimum_size = Vector2(250, 300)
+clip_contents = true
+theme = ExtResource("1_theme")
+script = ExtResource("2_script")
+
+[node name="Panel" type="Panel" parent="." unique_id=1669322446]
+z_index = -2
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2xo6y")
+
+[node name="ViewportFrame" type="SubViewportContainer" parent="." unique_id=56219178]
+layout_mode = 2
+size_flags_vertical = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="ViewportFrame" unique_id=317911565]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(242, 292)
+render_target_update_mode = 4
+
+[node name="PursuitCamera" type="Camera3D" parent="ViewportFrame/SubViewport" unique_id=1889343845]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 120, 0)
+cull_mask = 16
+environment = SubResource("Environment_pmap")
+projection = 1
+size = 120.0
+far = 400.0
