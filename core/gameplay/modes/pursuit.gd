@@ -56,6 +56,7 @@ func _ready():
 	var waypoints = self.track.get_waypoints()
 	self.spectator.set_waypoints(waypoints)
 	self.spectator.race_laps = self.rules.num_laps
+	self.spectator.num_tickets = self.rules.num_tickets
 	if self.get_multiplayer_authority() != multiplayer.get_unique_id():
 		self.process_mode = Node.PROCESS_MODE_DISABLED
 
