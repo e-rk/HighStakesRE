@@ -100,6 +100,8 @@ var handling_model_params := HandlingModel.HandlingState.new()
 var handling_model_output := HandlingModel.HandlingOutput.new()
 var collision_params := HandlingModelRE.CollisionParams.new()
 var collision_output := HandlingModelRE.CollisionOutput.new()
+var steering_bone := -1
+var steering_bone_rest := Quaternion.IDENTITY
 
 @onready var collider: CollisionShape3D = $Collider
 @onready var interior_camera: Camera3D = get_node_or_null("Interior camera")
@@ -115,6 +117,8 @@ var collision_output := HandlingModelRE.CollisionOutput.new()
 @onready var wall_prober: RayCast3D = $WallProber
 @onready var minimap_mesh: MeshInstance3D = $MinimapMesh
 @onready var minimap_material: StandardMaterial3D = minimap_mesh.get_active_material(0) as StandardMaterial3D
+@onready var steering_skeleton: Skeleton3D = $driver_rig/Skeleton3D
+@onready var driver: MeshInstance3D = $driver_rig/Skeleton3D/driver
 
 
 func _ready() -> void:
@@ -141,6 +145,14 @@ func _ready() -> void:
 	if not self.interior_wheel:
 		self.interior_wheel = self.find_child("*Steering*")
 	self.minimap_mesh.show()
+	if self.steering_skeleton:
+		self._find_steering_bone()
+
+
+func _find_steering_bone() -> void:
+	var bone := self.steering_skeleton.find_bone("rotation")
+	self.steering_bone = bone
+	self.steering_bone_rest = steering_skeleton.get_bone_rest(bone).basis.get_rotation_quaternion()
 
 
 func _enable_lights(lights: Array, show_lights: bool) -> void:
@@ -235,9 +247,11 @@ func _set_spectated(value: bool) -> void:
 	if not value:
 		interior_mask = 0
 		exterior_mask = Constants.visual_layer_to_mask([Constants.VisualLayer.OPPONENTS])
-	for child in self.get_children():
-		if child is MeshInstance3D and child.layers & minimap_mask:
-			continue
+	var visual_nodes: Array[MeshInstance3D]
+	visual_nodes.assign(self.get_children().filter(func(x): return x is MeshInstance3D and x.layers & minimap_mask == 0))
+	if driver:
+		visual_nodes.append(driver)
+	for child in visual_nodes:
 		var extras = child.get_meta("extras", {})
 		if extras and extras.get("SPT_interior", false):
 			child.layers = interior_mask
@@ -253,6 +267,9 @@ func _process(delta: float) -> void:
 		child.turn = wheel_turn
 	if self.interior_wheel:
 		self.interior_wheel.rotation = remap(self.current_steering, -128.0, 128.0, deg_to_rad(90), deg_to_rad(-90)) * Vector3.MODEL_FRONT
+	if self.steering_skeleton:
+		var hands_turn := remap(self.current_steering, -128.0, 128.0, deg_to_rad(90), deg_to_rad(-90))
+		self.steering_skeleton.set_bone_pose_rotation(self.steering_bone, self.steering_bone_rest * Quaternion(Vector3.UP, hands_turn))
 	if self.rpm_meter:
 		self.rpm_meter.value = remap(self.current_rpm, self.performance.engine_min_rpm(), self.performance.engine_redline_rpm, 0.0, 1.0)
 	if self.mph_meter:
