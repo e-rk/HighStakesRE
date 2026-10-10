@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://lx3rgl8vtscd"]
+
+[ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_theme"]
+[ext_resource type="Script" uid="uid://8p2808t80kex" path="res://core/ui/game/pursuit_ticket_status.gd" id="2_script"]
+
+[node name="PursuitTicketStatus" type="PanelContainer" unique_id=1922329577]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -85.0
+offset_right = 230.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("1_theme")
+script = ExtResource("2_script")
+
+[node name="Background" type="Panel" parent="." unique_id=1589892576]
+z_index = -1
+layout_mode = 2
+
+[node name="Container" type="VBoxContainer" parent="." unique_id=1049267314]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Container" unique_id=1910777364]
+layout_mode = 2
+theme_type_variation = &"HeaderBackground"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Container/PanelContainer" unique_id=1992263119]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Container/PanelContainer/HBoxContainer" unique_id=956272023]
+layout_mode = 2
+theme_type_variation = &"PanelHeader"
+text = "Tickets"
+
+[node name="MarginContainer" type="MarginContainer" parent="Container" unique_id=1606800989]
+layout_mode = 2
+
+[node name="TicketContainer" type="GridContainer" parent="Container/MarginContainer" unique_id=348983553]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_theme")
+columns = 4
+
+[node name="Label" type="Label" parent="Container/MarginContainer/TicketContainer" unique_id=1799671325]
+layout_mode = 2
+text = "Name"
+
+[node name="Label2" type="Label" parent="Container/MarginContainer/TicketContainer" unique_id=1455385397]
+layout_mode = 2
+text = "Tickets"
+
+[node name="Label3" type="Label" parent="Container/MarginContainer/TicketContainer" unique_id=806601507]
+layout_mode = 2
+text = "Speed"
+
+[node name="Label4" type="Label" parent="Container/MarginContainer/TicketContainer" unique_id=1922319955]
+layout_mode = 2
+text = "Laps"
