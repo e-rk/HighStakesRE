@@ -117,8 +117,8 @@ var steering_bone_rest := Quaternion.IDENTITY
 @onready var wall_prober: RayCast3D = $WallProber
 @onready var minimap_mesh: MeshInstance3D = $MinimapMesh
 @onready var minimap_material: StandardMaterial3D = minimap_mesh.get_active_material(0) as StandardMaterial3D
-@onready var steering_skeleton: Skeleton3D = $driver_rig/Skeleton3D
-@onready var driver: MeshInstance3D = $driver_rig/Skeleton3D/driver
+@onready var steering_skeleton: Skeleton3D = get_node_or_null("driver_rig/Skeleton3D")
+@onready var driver: MeshInstance3D = get_node_or_null("driver_rig/Skeleton3D/driver")
 
 
 func _ready() -> void:
