@@ -63,12 +63,6 @@ extends RigidBody3D
 
 @export var car_textures: Array[CarTexture] = []
 
-@export var spectated: bool = true:
-	set(value):
-		if value != spectated:
-			self._set_spectated(value)
-		spectated = value
-
 @export var minimap_color: Color = Color.SILVER:
 	set(value):
 		self.minimap_material.albedo_color = value
@@ -95,6 +89,9 @@ var reverse_lights: Array[Light3D] = []
 var siren_lights: Array[Light3D] = []
 var tail_light_energy : float = 0.0
 var brake_light_energy : float = 0.0
+
+var body_meshes: Array[MeshInstance3D] = []
+var interior_meshes: Array[MeshInstance3D] = []
 
 var handling_model_params := HandlingModel.HandlingState.new()
 var handling_model_output := HandlingModel.HandlingOutput.new()
@@ -147,6 +144,19 @@ func _ready() -> void:
 	self.minimap_mesh.show()
 	if self.steering_skeleton:
 		self._find_steering_bone()
+
+	var minimap_mask: int = Constants.visual_layer_to_mask([Constants.VisualLayer.MINIMAP])
+	var visual_nodes: Array[MeshInstance3D]
+	visual_nodes.assign(self.get_children().filter(func(x): return x is MeshInstance3D and x.layers & minimap_mask == 0))
+	if driver:
+		visual_nodes.append(driver)
+
+	for child in visual_nodes:
+		if child is MeshInstance3D:
+			if child.get_meta("extras", {}).get("SPT_interior", false):
+				self.interior_meshes.append(child)
+			else:
+				self.body_meshes.append(child)
 
 
 func _find_steering_bone() -> void:
@@ -238,25 +248,6 @@ func is_siren_active() -> bool:
 	if self.siren_lights:
 		return self.siren_lights[0].visible
 	return false
-
-
-func _set_spectated(value: bool) -> void:
-	var interior_mask: int = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR])
-	var exterior_mask: int = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
-	var minimap_mask: int = Constants.visual_layer_to_mask([Constants.VisualLayer.MINIMAP])
-	if not value:
-		interior_mask = 0
-		exterior_mask = Constants.visual_layer_to_mask([Constants.VisualLayer.OPPONENTS])
-	var visual_nodes: Array[MeshInstance3D]
-	visual_nodes.assign(self.get_children().filter(func(x): return x is MeshInstance3D and x.layers & minimap_mask == 0))
-	if driver:
-		visual_nodes.append(driver)
-	for child in visual_nodes:
-		var extras = child.get_meta("extras", {})
-		if extras and extras.get("SPT_interior", false):
-			child.layers = interior_mask
-		elif child is MeshInstance3D:
-			child.layers = exterior_mask
 
 
 func _process(delta: float) -> void:

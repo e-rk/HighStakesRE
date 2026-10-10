@@ -126,24 +126,49 @@ func update_camera(immediate: bool = false):
 		self.main_camera.look_at(spectated_player.car.position + Vector3(0, 1, 0))
 
 
+static func apply_car_render_mode(car: Car, is_spectated: bool) -> void:
+	var interior_mask := Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER_INTERIOR]) if is_spectated else 0
+	var body_mask := Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER]) if is_spectated \
+			else Constants.visual_layer_to_mask([Constants.VisualLayer.OPPONENTS])
+	for mesh in car.interior_meshes:
+		mesh.layers = interior_mask
+	for mesh in car.body_meshes:
+		mesh.layers = body_mask
+
+
+func _focus_player(player: Player) -> void:
+	spectated_player = player
+	for other in self._get_players():
+		apply_car_render_mode(other.car, other == player)
+	self._sync_active_camera()
+	self.update_camera()
+
+
+func _sync_active_camera() -> void:
+	if camera_mode != CameraMode.INTERIOR:
+		return
+	var interior_camera := spectated_player.car.get_interior_camera()
+	if interior_camera:
+		interior_camera.make_current()
+		self.pitch = 0.0
+	else:
+		self.main_camera.make_current()
+		self.camera_mode = CameraMode.HELI
+
+
 func _show_next_player():
 	var players := self._get_players()
+	var next_player: Player
 	if not spectated_player:
-		var local = players.find_custom(func(x): return x.is_local())
+		var local := players.find_custom(func(x): return x.is_local())
 		if local == -1:
 			self.change_player_timer.start()
 			return
-		spectated_player = players[local]
+		next_player = players[local]
 	else:
-		var index = players.find(spectated_player)
-		var next = 0
-		if index >= 0:
-			next = (index + 1) % players.size()
-		spectated_player = players[next]
-	for player in players:
-		player.car.spectated = false
-	spectated_player.car.spectated = true
-	self.update_camera()
+		var index := players.find(spectated_player)
+		next_player = players[(index + 1) % players.size()] if index >= 0 else players[0]
+	self._focus_player(next_player)
 
 
 func _update_ui(_player: Player):
@@ -168,7 +193,7 @@ func _process(_delta):
 
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("change_camera"):
+	if event.is_action_pressed("change_camera") and spectated_player:
 		var interior_camera = spectated_player.car.get_interior_camera()
 		match camera_mode:
 			CameraMode.HELI when interior_camera:
