@@ -210,6 +210,7 @@ func _make_performance(data: Dictionary) -> CarPerformance:
 	performance.g_transfer_factor = data["g_transfer_factor"]
 	performance.brake_decreasing_curve.assign(data["brake_decreasing_curve"])
 	performance.brake_increasing_curve.assign(data["brake_increasing_curve"])
+	performance.suspension_stiffness = data["suspension_stiffness"]
 	return performance
 
 

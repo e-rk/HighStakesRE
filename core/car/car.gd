@@ -186,54 +186,16 @@ func max_gear() -> CarTypes.Gear:
 	return self.performance.max_gear()
 
 
-func _do_road_raycasts(raycast_position: Vector3) -> Dictionary:
-	self.road_raycasts.global_position = raycast_position
+func _probe_road(point: Vector3) -> Plane:
+	self.road_raycasts.global_transform = Transform3D(Basis.IDENTITY, point)
 	self.road_raycasts.force_update_transform()
 	self.road_raycast_down.force_raycast_update()
-	self.road_raycast_up.force_raycast_update()
-	var collision_position = Vector3(raycast_position.x, -INF, raycast_position.z)
-	var normal = Vector3.UP
 	if self.road_raycast_down.is_colliding():
-		collision_position = self.road_raycast_down.get_collision_point()
-		normal = self.road_raycast_down.get_collision_normal()
-	elif self.road_raycast_up.is_colliding():
-		collision_position = self.road_raycast_up.get_collision_point()
-		normal = -self.road_raycast_up.get_collision_normal()
-	var result = {
-		"distance": (position.y - collision_position.y),
-		"normal": normal,
-	}
-	return result
-
-
-func basis_from_normal(normal: Vector3) -> Basis:
-	var x = self.basis.z.cross(normal).normalized()
-	var z = normal.cross(x)
-	return Basis(-x, normal, z)
-
-
-func get_positional_attributes(position: Vector3) -> Dictionary:
-	var result = self._do_road_raycasts(position)
-	return {
-		"distance_above_ground": result["distance"],
-		"basis_to_road": self.basis_from_normal(result["normal"]),
-	}
-
-
-func get_current_positional_attributes(state: PhysicsDirectBodyState3D) -> Dictionary:
-	return self.get_positional_attributes(state.transform.origin)
-
-
-func get_next_positional_attributes(state: PhysicsDirectBodyState3D, timestep: float) -> Dictionary:
-	var next_position = state.transform.origin + timestep * state.linear_velocity
-	return self.get_positional_attributes(next_position)
-
-
-func keep_height_above_ground(state: PhysicsDirectBodyState3D, height_adjust: float) -> void:
-	if height_adjust <= 0.0:
-		var pos = state.transform.origin
-		pos.y = pos.y - height_adjust
-		state.transform.origin = pos
+		return Plane(self.road_raycast_down.get_collision_normal(), self.road_raycast_down.get_collision_point())
+	self.road_raycast_up.force_raycast_update()
+	if self.road_raycast_up.is_colliding():
+		return Plane(-self.road_raycast_up.get_collision_normal(), self.road_raycast_up.get_collision_point())
+	return Plane(INF, INF, INF ,INF)
 
 
 func enable_sync(enable: bool) -> void:
@@ -298,6 +260,7 @@ func _collision(state: PhysicsDirectBodyState3D) -> HandlingModelRE.CollisionOut
 	var current_linear_velocity = state.linear_velocity
 	var current_angular_velocity = state.angular_velocity
 	var current_position = state.transform.origin
+	var collided = false
 
 	for point in points_next:
 		self.wall_prober.target_position = next_transform.inverse() * point
@@ -323,13 +286,31 @@ func _collision(state: PhysicsDirectBodyState3D) -> HandlingModelRE.CollisionOut
 				1.0,
 				self.collision_output
 			)
+			collided = self.collision_output.collided
 			current_position = self.collision_output.position
 			current_linear_velocity = self.collision_output.linear_velocity
 			current_angular_velocity = self.collision_output.angular_velocity
 	self.collision_output.position = current_position
 	self.collision_output.linear_velocity = current_linear_velocity
 	self.collision_output.angular_velocity = current_angular_velocity
+	self.collision_output.collided = collided
 	return self.collision_output
+
+
+func _probe_road_under_body(point: Vector3) -> Variant:
+	var origin := self.handling_model_params.position
+	return self._probe_road(Vector3(point.x, maxf(point.y, origin.y), point.z))
+
+
+func _road_collision() -> void:
+	var params := self.handling_model_params
+	if not self.handling_model.is_landing(params):
+		return
+	for corner: Vector3 in self.handling_model.road_collision_points(params):
+		var point := params.basis * corner + params.position
+		var road = self._probe_road_under_body(point)
+		if road.is_finite():
+			self.handling_model.process_road_collision(params, point, road)
 
 
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
@@ -348,10 +329,10 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	state.angular_velocity = collision_result.angular_velocity
 	state.transform.origin = collision_result.position
 
-	var positional_attributes = self.get_current_positional_attributes(state)
-	var next_positional_attributes = self.get_next_positional_attributes(state, state.step * 2)
+	var road = self._probe_road(state.transform.origin)
+	var road_normal: Vector3 = road.normal if road != null else Vector3.UP
 
-	handling_model_params
+	handling_model_params.position = state.transform.origin
 	handling_model_params.linear_velocity = state.linear_velocity
 	handling_model_params.angular_velocity = state.angular_velocity
 	handling_model_params.gravity_vector = state.total_gravity
@@ -363,7 +344,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	handling_model_params.rpm = self.current_rpm
 	handling_model_params.mass = self.mass
 	handling_model_params.basis = state.transform.basis
-	handling_model_params.basis_to_road = positional_attributes["basis_to_road"]
+	handling_model_params.basis_to_road = handling_model.road_aligned_basis(state.transform.basis, road_normal)
 	handling_model_params.current_steering = self.current_steering
 	handling_model_params.throttle_input = self.throttle
 	handling_model_params.throttle = self.current_throttle
@@ -376,8 +357,9 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	handling_model_params.road_surface = 0
 	handling_model_params.weather = 0
 	handling_model_params.lost_grip = true
-	handling_model_params.basis_to_road_next = next_positional_attributes["basis_to_road"]
-	handling_model_params.distance_above_ground = positional_attributes["distance_above_ground"]
+	handling_model_params.distance_above_ground = road.distance_to(state.transform.origin) if road != null else INF
+	handling_model_params.friction = self.physics_material_override.friction
+	handling_model_params.collided = self.collision_output.collided
 	handling_model_params.wheels = wheels
 	handling_model_params.handbrake_accumulator = self.handbrake_accumulator
 	handling_model_params.force = 0.0
@@ -386,8 +368,13 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	handling_model_params.g_transfer = self.g_transfer
 	handling_model_params.dimensions = self.dimensions()
 
+	handling_model.process_external_forces(handling_model_params, handling_model_output)
+	self._road_collision()
+	var road_ahead = self._probe_road_under_body(handling_model.road_lookahead_point(handling_model_params))
+	handling_model_params.road_normal_ahead = road_ahead.normal if road_ahead != null else road_normal
 	handling_model.process(handling_model_params, handling_model_output)
 
+	state.transform.origin = handling_model_output.position
 	state.linear_velocity = handling_model_output.linear_velocity
 	state.angular_velocity = handling_model_output.angular_velocity
 	self.current_steering = handling_model_output.current_steering
@@ -404,9 +391,6 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	self.linear_acceleration = (state.linear_velocity - prev_linear_velocity) / (state.step * 2)
 	prev_linear_velocity = state.linear_velocity
 	prev_angular_velocity = state.angular_velocity
-	var height_adjust = self.handling_model.height_above_surface(handling_model_params)
-	if self.has_contact_with_ground:
-		self.keep_height_above_ground(state, height_adjust)
 	self._enable_lights(self.brake_lights, self.current_brake > 0)
 	self._enable_lights(self.tail_lights, self.current_brake > 0 || self.lights_on)
 	self._enable_lights(self.reverse_lights,self.current_gear == CarTypes.Gear.REVERSE)

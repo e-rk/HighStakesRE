@@ -29,6 +29,7 @@ class_name CarPerformance
 @export var g_transfer_factor: float
 @export var brake_decreasing_curve: Array[float]
 @export var brake_increasing_curve: Array[float]
+@export var suspension_stiffness: float = 1.0
 
 
 func gear_efficiency(gear) -> float:

@@ -21,7 +21,6 @@ class HandlingState:
 	var handbrake: bool
 	var basis_to_road: Basis
 	var basis: Basis
-	var basis_to_road_next: Basis
 	var gravity_vector: Vector3
 	var mass: float
 	var inertia_inv: Vector3
@@ -32,6 +31,11 @@ class HandlingState:
 	var brake_input: float
 	var next_gear: CarTypes.Gear
 	var distance_above_ground: float
+	var height_above_road: float
+	var road_normal_ahead: Vector3
+	var just_left_ground: bool
+	var collided: bool
+	var road_collided: bool
 	var dimensions: Vector3
 	var weather: int
 	var position: Vector3
@@ -177,10 +181,11 @@ func enable_if(predicate: Callable, f: Callable) -> Callable:
 			extend(f).call(state, output)
 
 func either(predicate: Callable, true_f: Callable, false_f: Callable) -> Callable:
-	return func(params: Dictionary) -> Dictionary:
-		if predicate.call(params):
-			return true_f.call(params)
-		return false_f.call(params)
+	return func(state: HandlingState, output: HandlingOutput) -> void:
+		if predicate.call(state):
+			extend(true_f).call(state, output)
+		else:
+			extend(false_f).call(state, output)
 
 func neg(predicate: Callable) -> Callable:
 	return func(state: HandlingState) -> bool:
@@ -212,6 +217,7 @@ func run_pipeline(state: HandlingState, output: HandlingOutput, func_array: Arra
 		updated_mask |= output.updated
 
 func process(state: HandlingState, output: HandlingOutput) -> void:
+	output.position = state.position
 	output.linear_velocity = state.linear_velocity
 	output.angular_velocity = state.angular_velocity
 	output.gear = state.gear
@@ -232,4 +238,4 @@ func process(state: HandlingState, output: HandlingOutput) -> void:
 		HandlingOutput.F_FORCE | HandlingOutput.F_GEAR_SHIFT_COUNTER |
 		HandlingOutput.F_SHIFTED_DOWN | HandlingOutput.F_G_TRANSFER |
 		HandlingOutput.F_THROTTLE | HandlingOutput.F_BRAKE |
-		HandlingOutput.F_HAS_CONTACT_WITH_GROUND)
+		HandlingOutput.F_HAS_CONTACT_WITH_GROUND | HandlingOutput.F_POSITION)

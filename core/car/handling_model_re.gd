@@ -62,6 +62,13 @@ const SURFACE_FACTORS: Array[float] = [
 	1.0, 0.87, 0.75, 1.0, 0.87, 0.75, 0.75, 0.6525,
 ]
 
+const SURFACE_FRICTION: Array[float] = [
+	1.0, 0.98, 0.93, 0.9, 0.98, 0.9, 0.51, 0.95,
+	0.95, 0.87, 0.98, 0.98, 0.95, 0.9, 1.0, 0.87,
+	0.98, 0.98, 0.98, 0.98, 0.98, 0.98, 0.98, 0.98,
+	1.0, 0.87, 0.75, 1.0, 0.87, 0.75, 1.0, 0.87,
+]
+
 
 static func round_half_even(value: float) -> int:
 	var result := roundf(value)
@@ -84,6 +91,7 @@ class CollisionOutput:
 	var position: Vector3
 	var linear_velocity: Vector3
 	var angular_velocity: Vector3
+	var collided: bool
 
 
 func torque_for_rpm(performance: CarPerformance, rpm: int) -> float:
@@ -1323,76 +1331,288 @@ func downforce_cm(state: HandlingState, output: HandlingOutput) -> void:
 	output.linear_acceleration = basis * Vector3(0, downforce_accel, 0)
 
 
+func is_flipped(state: HandlingState) -> bool:
+	return self.orientation_to_ground(state.basis_to_road, state.basis).y < 0.9
+
+
+func is_near_road(state: HandlingState) -> bool:
+	return state.height_above_road < 0.6
+
+
+func road_aligned_basis(basis: Basis, normal: Vector3) -> Basis:
+	var x: Vector3
+	var z: Vector3
+	if 0.5 <= basis.y.dot(normal) or absf(basis.x.dot(normal)) <= 0.5:
+		z = basis.x.cross(normal).normalized()
+		x = normal.cross(z).normalized()
+	else:
+		x = normal.cross(basis.z).normalized()
+		z = x.cross(normal).normalized()
+	return Basis(x, normal, z)
+
+
+func is_resting_flat_on_ground(state: HandlingState) -> bool:
+	const LIMIT = 1.0 / 72.0
+	var lean := self.orientation_to_ground(state.basis_to_road, state.basis).abs()
+	var size := state.dimensions
+	var on_wheels_or_roof := (
+		atan2(lean.z * size.y, lean.y * size.z) / TAU < LIMIT
+		and atan2(lean.x * size.y, lean.y * size.x) / TAU < LIMIT
+	)
+	var on_side := (
+		atan2(lean.y * size.x, lean.x * size.y) / TAU < LIMIT
+		and atan2(lean.z * size.x, lean.x * size.z) / TAU < LIMIT
+	)
+	return on_wheels_or_roof or on_side
+
+
+func lift_off_cm(state: HandlingState, output: HandlingOutput) -> void:
+	var has_contact_with_ground := state.has_contact_with_ground
+	if not self.is_resting_flat_on_ground(state) or self.road_normal_y(state) < 0.6:
+		has_contact_with_ground = false
+	output.updated = HandlingOutput.F_HAS_CONTACT_WITH_GROUND
+	output.has_contact_with_ground = has_contact_with_ground
+
+
+func collision_shape_points(state: HandlingState) -> Array[Vector3]:
+	var half_size := state.dimensions / 2.0
+	var points: Array[Vector3] = [
+		Vector3(-1, -1, 1) * half_size,
+		Vector3(1, -1, 1) * half_size,
+		Vector3(1, -1, -1) * half_size,
+		Vector3(-1, -1, -1) * half_size,
+		Vector3(-0.75, 0.5, 0.8) * half_size,
+		Vector3(0.75, 0.5, 0.8) * half_size,
+		Vector3(1, 1, -0.8) * half_size,
+		Vector3(-1, 1, -0.8) * half_size,
+	]
+	for face: Array in [[0, 1, 4, 5], [2, 3, 6, 7], [0, 3, 4, 7], [1, 2, 5, 6], [4, 5, 6, 7], [0, 1, 2, 3]]:
+		points.append((points[face[0]] + points[face[1]] + points[face[2]] + points[face[3]]) * 0.25)
+	return points
+
+
+func collision_outline_points(state: HandlingState) -> Array[Vector3]:
+	var half_size := state.dimensions / 2.0
+	return [
+		Vector3(-1, 0, 1) * half_size,
+		Vector3(1, 0, 1) * half_size,
+		Vector3(1, 0, -1) * half_size,
+		Vector3(-1, 0, -1) * half_size,
+		Vector3(0, 0, 1) * half_size,
+		Vector3(0, 0, -1) * half_size,
+		Vector3(-1, 0, 0) * half_size,
+		Vector3(1, 0, 0) * half_size,
+	]
+
+
+func collision_body(state: HandlingState) -> CollisionParams:
+	var body := CollisionParams.new()
+	body.basis = state.basis
+	body.position = state.position
+	body.linear_velocity = state.linear_velocity
+	body.angular_velocity = state.angular_velocity
+	body.inertia_inv = state.inertia_inv
+	body.mass = state.mass
+	body.friction = state.friction
+	return body
+
+
+func collide(body: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float) -> bool:
+	var result := CollisionOutput.new()
+	var collided := self.calculate_impact(body, body_point, impact_point, normal, friction, result)
+	body.position = result.position
+	body.linear_velocity = result.linear_velocity
+	body.angular_velocity = result.angular_velocity
+	return collided
+
+
+func collide_shape_with_plane(state: HandlingState, body: CollisionParams, normal: Vector3, plane_point: Vector3, reach: float, friction: float) -> bool:
+	var upright := 0.5 < absf(self.orientation_to_ground(state.basis_to_road, state.basis).y)
+	var shape: Array[Vector3]
+	if state.has_contact_with_ground and upright:
+		shape = self.collision_outline_points(state)
+	else:
+		shape = self.collision_shape_points(state)
+	var nearest := reach
+	var nearest_point := Vector3.ZERO
+	for shape_point in shape:
+		var point := body.basis * shape_point + body.position
+		var distance := (point - plane_point).dot(normal)
+		if distance < nearest:
+			nearest = distance
+			nearest_point = point
+	var collided := false
+	if nearest < reach:
+		collided = self.collide(body, nearest_point, plane_point, normal, friction)
+	body.angular_velocity = self.limit_angular_velocity(body.angular_velocity, 1.8)
+	return collided
+
+
+func road_collision_points(state: HandlingState) -> Array[Vector3]:
+	return self.collision_shape_points(state).slice(0, 8)
+
+
+func is_landing(state: HandlingState) -> bool:
+	var falling := state.linear_velocity.dot(state.basis_to_road.y) < 0.0
+	return not state.has_contact_with_ground and self.is_near_road(state) and falling
+
+
+func road_lookahead_point(state: HandlingState) -> Vector3:
+	var basis := state.basis
+	var half_size := state.dimensions / 2.0
+	var direction := state.linear_velocity.normalized()
+	var leading_edge := Vector3(direction.dot(basis.x), -1.0, direction.dot(basis.z)) * half_size
+	return state.position + state.linear_velocity * state.timestep + basis * leading_edge
+
+
 func adjust_to_road_cm(state: HandlingState, output: HandlingOutput) -> void:
-	#const LIMIT = 0.97222
-	const LIMIT = 0.6
-	var basis_current: Basis = state.basis_to_road
-	var basis_next: Basis = state.basis_to_road_next
-	var interpolated := basis_current.slerp(basis_next, 0.5)
-	var basis: Basis = state.basis
-	var basis_inv := basis.transposed()
-	var normal := interpolated.y
-	var angular_velocity: Vector3 = state.angular_velocity
-	var orientation := self.orientation_to_ground(state.basis_to_road, state.basis)
-	var signs := normal.sign()
-	var vec1 := signs * basis_inv.x - normal.x * Vector3.ONE
-	var vec2 := normal.z * Vector3.ONE - signs * basis_inv.z
-	var idx := 0
-	var should_adjust := false
-	var absv := orientation.abs()
-	if LIMIT < absv.x or LIMIT < absv.y or LIMIT < absv.z:
-		if LIMIT < abs(orientation.y):
-			idx = 1
-		elif LIMIT < abs(orientation.x):
-			idx = 0
-		elif LIMIT < abs(orientation.z):
-			idx = 2
-		if 0.02 < abs(vec1[idx]) or 0.02 < abs(vec2[idx]):
-			should_adjust = true
-		if should_adjust:
-			var v1 := clampf(vec1[idx], -0.5, 0.5)
-			var v2 := clampf(vec2[idx], -0.5, 0.5)
-			angular_velocity.z = v1
-			angular_velocity.x = v2
+	const LIMIT = 0.97222
+	const DEAD_ZONE = 0.02
+	const MAX_RATE = 0.5
+	var road := state.basis_to_road
+	var basis := state.basis
+	var body := self.collision_body(state)
+	var road_normal := road.y
+	var surface_normal := road_normal
+	var height := state.height_above_road
+	var collided := state.collided
+	var ahead_normal := state.road_normal_ahead
+	var similar := 0.87 <= 1.0 - absf(road_normal.y - ahead_normal.y)
+	if similar or 0.0 <= body.linear_velocity.dot(ahead_normal) or road_normal.y <= ahead_normal.y:
+		surface_normal = road_normal.slerp(ahead_normal, 0.5)
+	else:
+		var wall_normal := Vector3(ahead_normal.x, 0.0, ahead_normal.z).normalized()
+		var reach := Vector2(body.linear_velocity.x, body.linear_velocity.z).length() * state.timestep
+		var friction := SURFACE_FRICTION[state.road_surface]
+		if self.collide_shape_with_plane(state, body, wall_normal, self.road_lookahead_point(state), reach, friction):
+			collided = true
+	if height <= 0.0:
+		road_normal = surface_normal
+		body.position -= road_normal * height
+		height = 0.0
+		var normal_velocity := body.linear_velocity.dot(road_normal)
+		if normal_velocity < 0.5:
+			body.linear_velocity -= road_normal * normal_velocity
+	var orientation := self.orientation_to_ground(road, basis)
+	var lean := orientation.abs()
+	if LIMIT < lean.x or LIMIT < lean.y or LIMIT < lean.z:
+		var axis := Vector3.AXIS_Y
+		if lean.y <= LIMIT:
+			axis = Vector3.AXIS_X if LIMIT < lean.x else Vector3.AXIS_Z
+		var resting_axis: Vector3 = basis[axis] * (1.0 if 0.0 < orientation[axis] else -1.0)
+		var roll := resting_axis.x - road_normal.x
+		var pitch := road_normal.z - resting_axis.z
+		if DEAD_ZONE < absf(roll) or DEAD_ZONE < absf(pitch):
+			body.angular_velocity.z = clampf(roll, -MAX_RATE, MAX_RATE)
+			body.angular_velocity.x = clampf(pitch, -MAX_RATE, MAX_RATE)
 		else:
-			angular_velocity.z = 0.0
-			angular_velocity.x = 0.0
+			body.angular_velocity.z = 0.0
+			body.angular_velocity.x = 0.0
+	state.height_above_road = height
+	state.collided = collided
+	output.updated = (HandlingOutput.F_POSITION | HandlingOutput.F_LINEAR_VELOCITY
+		| HandlingOutput.F_ANGULAR_VELOCITY)
+	output.position = body.position
+	output.linear_velocity = body.linear_velocity
+	output.angular_velocity = body.angular_velocity
+
+
+func landing_damp(state: HandlingState) -> float:
+	return clampf(state.performance.suspension_stiffness * 0.1, 0.0, 0.2) + 0.5
+
+
+func landing_cm(state: HandlingState, output: HandlingOutput) -> void:
+	const UPRIGHT = 0.97222
+	var road := state.basis_to_road
+	var normal := road.y
+	var linear_velocity := state.linear_velocity
+	var angular_velocity := state.angular_velocity
+	var height := state.height_above_road
+	if state.road_collided:
+		height = 0.0
+		if UPRIGHT < self.orientation_to_ground(road, state.basis).y:
+			var damp := self.landing_damp(state)
+			var velocity_local := road.transposed() * linear_velocity
+			velocity_local.y *= damp
+			linear_velocity = road * velocity_local
+			angular_velocity *= damp
+	var settled := (
+		linear_velocity.dot(normal) < 0.5
+		and absf(angular_velocity.x) < 0.5 and absf(angular_velocity.z) < 0.5
+		and self.is_resting_flat_on_ground(state) and height <= 0.0
+	)
+	state.height_above_road = height
+	output.updated = (HandlingOutput.F_LINEAR_VELOCITY | HandlingOutput.F_ANGULAR_VELOCITY
+		| HandlingOutput.F_HAS_CONTACT_WITH_GROUND)
+	output.linear_velocity = linear_velocity
+	output.angular_velocity = angular_velocity
+	output.has_contact_with_ground = settled
+
+
+func leave_road_cm(state: HandlingState, output: HandlingOutput) -> void:
+	state.just_left_ground = state.has_contact_with_ground
+	self.limit_angular_velocity_cm(state, output)
+	output.updated |= HandlingOutput.F_HAS_CONTACT_WITH_GROUND
+	output.has_contact_with_ground = false
+
+
+func flipped_engine_cm(state: HandlingState, output: HandlingOutput) -> void:
+	const RPM_DROP = 500
+	var engine_min_rpm := state.performance.engine_min_rpm()
+	var rpm := state.rpm
+	if engine_min_rpm + RPM_DROP < rpm:
+		rpm -= RPM_DROP
+	else:
+		rpm = engine_min_rpm
+	state.slip_angle = 0.0
+	output.updated = HandlingOutput.F_RPM | HandlingOutput.F_FORCE | HandlingOutput.F_DRIVETRAIN_OVERLOAD
+	output.rpm = rpm
+	output.force = 0.0
+	output.drivetrain_overload = false
+
+
+func flipped_friction_cm(state: HandlingState, output: HandlingOutput) -> void:
+	const GROUND_FRICTION = 0.98
+	const SLIDE_FRICTION = 0.95
+	var road := state.basis_to_road
+	var linear_velocity := state.linear_velocity
+	var angular_velocity := state.angular_velocity
+	if state.has_contact_with_ground and state.height_above_road <= 0.2 and 0.5 <= self.road_normal_y(state):
+		var velocity_local := road.transposed() * linear_velocity
+		var angular_local := road.transposed() * angular_velocity
+		velocity_local.x *= GROUND_FRICTION * SLIDE_FRICTION
+		velocity_local.z *= GROUND_FRICTION * SLIDE_FRICTION
+		angular_local.y *= GROUND_FRICTION
+		linear_velocity = road * velocity_local
+		angular_velocity = road * angular_local
+	output.updated = HandlingOutput.F_LINEAR_VELOCITY | HandlingOutput.F_ANGULAR_VELOCITY
+	output.linear_velocity = linear_velocity
+	output.angular_velocity = angular_velocity
+
+
+var flipped_pipeline: Callable = make_model_pipeline([flipped_engine_cm, flipped_friction_cm])
+
+
+func takeoff_cm(state: HandlingState, output: HandlingOutput) -> void:
+	const PITCH_DAMP = 0.15
+	var basis := state.basis
+	var angular_velocity := state.angular_velocity
+	var rising := 0.0 < state.linear_velocity.dot(state.basis_to_road.y)
+	if state.just_left_ground and not state.collided and rising:
+		var angular_local := basis.transposed() * angular_velocity
+		angular_local.x *= PITCH_DAMP
+		angular_velocity = basis * angular_local
 	output.updated = HandlingOutput.F_ANGULAR_VELOCITY
 	output.angular_velocity = angular_velocity
 
 
-func prevent_sinking_cm(state: HandlingState, output: HandlingOutput) -> void:
-	var basis_current := state.basis_to_road
-	var basis_next := state.basis_to_road_next
-	var interpolated := basis_current.slerp(basis_next, 0.5)
-	var height_adjust := self.height_above_surface(state)
-	var linear_velocity := state.linear_velocity
-	var velocity_local := interpolated.transposed() * linear_velocity
-	var normal := interpolated.y
-	if height_adjust < 0.0:
-		if velocity_local.y < 0.0:
-			velocity_local.y = 0
-	output.updated = HandlingOutput.F_LINEAR_VELOCITY
-	output.linear_velocity = interpolated * velocity_local
-
-
-func go_airborne(state: HandlingState, output: HandlingOutput) -> void:
-	var basis := state.basis_to_road
+func upset_spin_damp_cm(state: HandlingState, output: HandlingOutput) -> void:
 	var angular_velocity := state.angular_velocity
-	var linear_velocity := state.linear_velocity
-	var distance_above_ground: float = state.distance_above_ground
-	var result := basis.transposed() * angular_velocity
-	if 0.0 < basis.y.dot(linear_velocity) and self.went_airborne(state):
-		result *= Vector3(0.15, 1, 1)
-	output.updated = HandlingOutput.F_ANGULAR_VELOCITY | HandlingOutput.F_HAS_CONTACT_WITH_GROUND
-	output.angular_velocity = basis * result
-	output.has_contact_with_ground = self.height_above_surface(state) < 0.6
-
-
-func went_airborne(state: HandlingState) -> bool:
-	var has_contact_with_ground: bool = state.has_contact_with_ground
-	var distance_above_ground: float = state.distance_above_ground
-	return has_contact_with_ground and 0.6 <= distance_above_ground
+	var upset := self.orientation_to_ground(state.basis_to_road, state.basis).y < 0.5
+	if state.has_contact_with_ground and state.height_above_road < 5.0 and upset:
+		angular_velocity -= angular_velocity / 64.0
+	output.updated = HandlingOutput.F_ANGULAR_VELOCITY
+	output.angular_velocity = angular_velocity
 
 # Predicates
 
@@ -1518,16 +1738,42 @@ func kinetic_energy(params: CollisionParams) -> float:
 	return rotational + linear
 
 
-func calculate_impact(params: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float, result: CollisionOutput) -> void:
+func damp_contact_sliding(basis: Basis, normal: Vector3, result: CollisionOutput) -> void:
+	const SPEED_THRESHOLD = 22.0
+	const DAMP = 0.958
+	const FORWARD_DAMP = 0.975
+	var basis_inv := basis.transposed()
+	var velocity_local := basis_inv * result.linear_velocity
+	var angular_local := basis_inv * result.angular_velocity
+	var normal_local := basis_inv * normal
+	var normal_velocity := normal_local * velocity_local.dot(normal_local)
+	var normal_spin := normal_local * angular_local.dot(normal_local)
+	var sliding := velocity_local - normal_velocity
+	var damp := Vector3(DAMP, DAMP, DAMP)
+	if 0.9 < basis.y.dot(normal):
+		damp.z = FORWARD_DAMP
+	for axis in 3:
+		if SPEED_THRESHOLD < absf(sliding[axis]):
+			sliding[axis] *= damp[axis]
+	result.linear_velocity = basis * (sliding + normal_velocity)
+	result.angular_velocity = basis * (angular_local - normal_spin + normal_spin * DAMP)
+
+
+func calculate_impact(params: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float, result: CollisionOutput) -> bool:
 	var energy_before := self.kinetic_energy(params)
-	if self.calculate_impact_impulse(params, body_point, impact_point, normal, friction, result):
-		params.linear_velocity = result.linear_velocity
-		params.angular_velocity = result.angular_velocity
-		var energy_after := self.kinetic_energy(params)
-		if energy_before < energy_after:
-			var energy_ratio := sqrt(energy_before / energy_after)
-			result.linear_velocity *= energy_ratio
-			result.angular_velocity *= energy_ratio
+	if not self.calculate_impact_impulse(params, body_point, impact_point, normal, friction, result):
+		result.collided = false
+		return false
+	params.linear_velocity = result.linear_velocity
+	params.angular_velocity = result.angular_velocity
+	var energy_after := self.kinetic_energy(params)
+	if energy_before < energy_after:
+		var energy_ratio := sqrt(energy_before / energy_after)
+		result.linear_velocity *= energy_ratio
+		result.angular_velocity *= energy_ratio
+	self.damp_contact_sliding(params.basis, normal, result)
+	result.collided = true
+	return true
 
 
 func calculate_impact_impulse(params: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float, result: CollisionOutput) -> bool:
@@ -1559,32 +1805,60 @@ func calculate_impact_impulse(params: CollisionParams, body_point: Vector3, impa
 	return true
 
 
-func process_collision(params: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float, result: CollisionOutput) -> void:
+func process_collision(params: CollisionParams, body_point: Vector3, impact_point: Vector3, normal: Vector3, friction: float, result: CollisionOutput) -> bool:
 	params.angular_velocity /= TAU
-	calculate_impact(params, body_point, impact_point, normal, friction, result)
+	var collided := calculate_impact(params, body_point, impact_point, normal, friction, result)
 	result.angular_velocity *= TAU
+	return collided
+
+
+func process_external_forces(state: HandlingState, output: HandlingOutput) -> void:
+	state.angular_velocity /= TAU
+	state.height_above_road = self.height_above_surface(state)
+	state.just_left_ground = false
+	state.road_collided = false
+	var external_forces := make_model_pipeline([
+		integrate(self.downforce_cm),
+		enable_if(is_airborne, integrate(airborne_drag_cm)),
+		lift_off_cm,
+		either(is_airborne, integrate(self.gravity_cm), integrate(self.ground_gravity_cm)),
+	])
+	external_forces.call(state, output)
+	state.angular_velocity *= TAU
+
+
+func process_road_collision(state: HandlingState, body_point: Vector3, road: Plane) -> bool:
+	if 0.0 <= road.distance_to(body_point):
+		return false
+	state.angular_velocity /= TAU
+	var body := self.collision_body(state)
+	var friction := SURFACE_FRICTION[state.road_surface]
+	var collided := self.collide(body, body_point, road.project(body_point), road.normal, friction)
+	state.position = body.position
+	state.linear_velocity = body.linear_velocity
+	state.angular_velocity = body.angular_velocity * TAU
+	if collided:
+		state.road_collided = true
+		state.collided = true
+	return collided
 
 
 func process(state: HandlingState, output: HandlingOutput) -> void:
 	state.angular_velocity /= TAU
-	state.slip_angle = self.vehicle_slip_angle_tg(state)
-	state.speed_xz = self.calculate_speed_xz(state)
-	var airborne_processing := make_model_pipeline([
-		enable_if(is_airborne, integrate(airborne_drag_cm)),
-		enable_if(neg(is_airborne), integrate(self.ground_gravity_cm)),
-		enable_if(neg(is_airborne), prevent_sinking_cm),
-		enable_if(neg(is_airborne), adjust_to_road_cm),
-	])
+	var road_contact := either(
+		self.is_near_road,
+		either(is_airborne, landing_cm, adjust_to_road_cm),
+		leave_road_cm,
+	)
 	var model := make_model_pipeline([
-		traction_pipeline,
-		airborne_processing,
-		integrate(self.downforce_cm),
-		enable_if(is_airborne, limit_angular_velocity_cm),
-		enable_if(is_airborne, integrate(self.gravity_cm)),
-		go_airborne,
+		road_contact,
+		either(self.is_flipped, flipped_pipeline, traction_pipeline),
+		takeoff_cm,
+		upset_spin_damp_cm,
 	])
 	model.call(state, output)
 	state.angular_velocity *= TAU
+	output.position = state.position
 	output.angular_velocity = state.angular_velocity
 	output.linear_velocity = state.linear_velocity
 	output.gear = state.gear
@@ -1605,4 +1879,4 @@ func process(state: HandlingState, output: HandlingOutput) -> void:
 		HandlingOutput.F_FORCE | HandlingOutput.F_GEAR_SHIFT_COUNTER |
 		HandlingOutput.F_SHIFTED_DOWN | HandlingOutput.F_G_TRANSFER |
 		HandlingOutput.F_THROTTLE | HandlingOutput.F_BRAKE |
-		HandlingOutput.F_HAS_CONTACT_WITH_GROUND)
+		HandlingOutput.F_HAS_CONTACT_WITH_GROUND | HandlingOutput.F_POSITION)
