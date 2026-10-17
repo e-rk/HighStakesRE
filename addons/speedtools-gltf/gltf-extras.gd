@@ -1,6 +1,26 @@
 @tool
 extends GLTFDocumentExtension
 
+const HORIZON_PARAMETERS = {
+	"mirror": "hrz_mirror",
+	"radius": "hrz_radius",
+	"angle": "hrz_angle",
+	"bottom_y": "hrz_bottom_y_off",
+	"gouraud_middle": "hrz_gouraud_middle",
+	"gouraud_height": "hrz_gouraud_height",
+	"panorama_bottom": "hrz_pmx_bottom",
+	"panorama_top": "hrz_pmx_top",
+}
+const CLOUD_PARAMETERS = {
+	"nimbus": "cloud_nimbus",
+	"fog": "cloud_fog",
+	"visual_height": "cloud_visual_height",
+	"wind_speed": "cloud_wind_speed",
+	"wind_direction": "cloud_wind_direction",
+	"y_offset": "cloud_y_offset",
+	"height": "cloud_height",
+}
+
 func make_vector(data: Array) -> Vector3:
 	return Vector3(data[0], data[1], data[2])
 
@@ -69,18 +89,6 @@ func dict_to_palette(value: Dictionary) -> CarColorSet:
 	)
 	return color_set
 
-func _make_skybox(state: GLTFState) -> Cubemap:
-	var images = state.get_images()
-	var json_images = state.json["images"]
-	for i in len(json_images):
-		if json_images[i].name == "horizon":
-			var image = images[i].get_image()
-			var cubemap = Cubemap.new()
-			var empty = Image.create_empty(image.get_width(), image.get_height(), true, image.get_format())
-			cubemap.create_from_images([image, image, empty, empty, image, image])
-			return cubemap
-	return null
-
 func find_gltf_node(state: GLTFState, name: String) -> Dictionary:
 	var json = state.json
 	var nodes = json["nodes"]
@@ -89,26 +97,85 @@ func find_gltf_node(state: GLTFState, name: String) -> Dictionary:
 			return node
 	return {}
 
+func set_sky_parameters(sky: ShaderMaterial, values: Dictionary, names: Dictionary):
+	for key in names:
+		sky.set_shader_parameter(names[key], values[key])
+
+func set_panorama(sky: ShaderMaterial, horizon: Dictionary, panorama: Texture2D):
+	sky.set_shader_parameter("hrz_has_pmx", panorama != null and horizon.get("has_panorama", true))
+	if panorama == null:
+		return
+	sky.set_shader_parameter("panorama_texture", panorama)
+	var size = panorama.get_size()
+	if size.x == size.y:
+		sky.set_shader_parameter("pmx_atlas_v", Vector2(0.5 - 0.5 / 8.0, 1.0 / 8.0))
+
+func make_cloud_field(bright: int, variance: int, seed_value: int) -> ImageTexture:
+	const SIZE = 13
+	var random = RandomNumberGenerator.new()
+	random.seed = seed_value
+	var field = PackedFloat32Array()
+	field.resize(SIZE * SIZE)
+	for i in len(field):
+		var value = bright - (random.randi() % variance if variance > 0 else 0)
+		var centered = (value - 128.0) / 128.0
+		field[i] = (signf(centered) * sqrt(absf(centered)) + 1.0) * 127.5
+	for _pass in 20:
+		for z in SIZE:
+			for x in SIZE:
+				var pull = 0.0
+				var count = 0
+				for nz in range(max(z - 2, 0), min(z + 3, SIZE)):
+					for nx in range(max(x - 2, 0), min(x + 3, SIZE)):
+						if nx == x and nz == z:
+							continue
+						var neighbour = field[nz * SIZE + nx]
+						pull += (neighbour - field[z * SIZE + x]) * pow((neighbour - 128.0) / 128.0, 2.0)
+						count += 1
+				field[z * SIZE + x] = clampf(field[z * SIZE + x] + pull / count * 0.5, 0.0, bright)
+	var image = Image.create_empty(SIZE, SIZE, false, Image.FORMAT_R8)
+	for z in SIZE:
+		for x in SIZE:
+			image.set_pixel(x, z, Color(field[z * SIZE + x] / 255.0, 0.0, 0.0))
+	return ImageTexture.create_from_image(image)
+
 func create_environment(state: GLTFState, environment: Dictionary):
 	var worldenv = load("res://core/resources/environment/environment.tscn").instantiate()
 	var ambient = environment["ambient"]
 	var horizon = environment["horizon"]
-	var color = dict_to_color(ambient)
 	var sun = self.find_gltf_node(state, "sun")
-	worldenv.environment.ambient_light_color = color
-	worldenv.environment.sky.sky_material.set_shader_parameter("ambient_color", color)
-	worldenv.environment.sky.sky_material.set_shader_parameter("sun_side_color", dict_to_color(horizon["sun_side"]))
-	worldenv.environment.sky.sky_material.set_shader_parameter("top_side_color", dict_to_color(horizon["sun_top"]))
-	worldenv.environment.sky.sky_material.set_shader_parameter("opposite_side_color", dict_to_color(horizon["sun_opposite"]))
-	worldenv.environment.sky.sky_material.set_shader_parameter("earth_bottom", dict_to_color(horizon["earth_bottom"]))
-	worldenv.environment.sky.sky_material.set_shader_parameter("earth_top", dict_to_color(horizon["earth_top"]))
-	worldenv.environment.sky.sky_material.set_shader_parameter("background_texture", self._make_skybox(state))
-	worldenv.environment.sky.sky_material.set_shader_parameter("sun_texture", self.get_image_by_name(state, "sun"))
-	worldenv.environment.sky.sky_material.set_shader_parameter("sky_texture", self.get_image_by_name(state, "clouds"))
+	var sky: ShaderMaterial = worldenv.environment.sky.sky_material
+	worldenv.environment.ambient_light_color = dict_to_color(ambient)
+	sky.set_shader_parameter("sun_side_color", dict_to_color(horizon["sun_side"]))
+	sky.set_shader_parameter("top_side_color", dict_to_color(horizon["sun_top"]))
+	sky.set_shader_parameter("opposite_side_color", dict_to_color(horizon["sun_opposite"]))
+	sky.set_shader_parameter("earth_bottom", dict_to_color(horizon["earth_bottom"]))
+	sky.set_shader_parameter("earth_top", dict_to_color(horizon["earth_top"]))
+	set_sky_parameters(sky, horizon, HORIZON_PARAMETERS)
+	set_panorama(sky, horizon, self.get_image_by_name(state, "horizon"))
+	sky.set_shader_parameter("sun_texture", self.get_image_by_name(state, "sun"))
+	sky.set_shader_parameter("sky_texture", self.get_image_by_name(state, "clouds"))
+	var clouds: Dictionary = environment.get("clouds", {})
+	set_sky_parameters(sky, clouds, CLOUD_PARAMETERS)
+	if clouds.has("type"):
+		sky.set_shader_parameter("cloud_type", int(clouds["type"]))
+		sky.set_shader_parameter("cloud_uv_scale", Vector2(clouds["u_scale"], clouds["v_scale"]))
+	var cloud_field = make_cloud_field(int(clouds.get("bright", 235)), int(clouds.get("variance", 208)), hash(state.filename))
+	sky.set_shader_parameter("cloud_field_texture", cloud_field)
+	if environment.has("lightning"):
+		var lightning: Dictionary = environment["lightning"]
+		sky.set_shader_parameter("lightning_chance", int(lightning["chance"]))
+		sky.set_shader_parameter("lightning_off_ticks", int(lightning["off_ticks"]))
+	if environment.has("fog"):
+		var fog: Dictionary = environment["fog"]
+		sky.set_shader_parameter("fog_color", dict_to_color(fog["color"]))
+		var clear = (100.0 - clampf(fog["density"], 0.0, 99.0)) * (1.0 - fog["horizon"])
+		sky.set_shader_parameter("horizon_haze", clampf(20.0 / maxf(clear, 0.001), 0.0, 1.0))
 	if sun.has("extras") and sun["extras"].has("SPT_sun"):
 		var spt_sun = sun["extras"]["SPT_sun"]
-		worldenv.environment.sky.sky_material.set_shader_parameter("sun_additive", spt_sun["additive"])
-		worldenv.environment.sky.sky_material.set_shader_parameter("sun_radius", spt_sun["radius"] / 4000.0)
+		sky.set_shader_parameter("sun_additive", spt_sun["additive"])
+		sky.set_shader_parameter("sun_in_front", spt_sun["is_front"])
+		sky.set_shader_parameter("sun_world_radius", spt_sun["radius"])
 	return worldenv
 
 func finalize_materials(json: Dictionary, materials: Array[Material]):
