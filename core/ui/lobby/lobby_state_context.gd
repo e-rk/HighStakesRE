@@ -143,8 +143,7 @@ func _on_player_config_player_car_changed() -> void:
 	if car_data:
 		var car = load(car_data.path)
 		self.car_viewer.car = car
-		var color_list = load(car_data.color_list) as CarColorList
-		self.player_config.color_picker.colors = color_list.colors
+		self.player_config.color_picker.colors = car_data.colors
 
 
 func _on_player_config_player_color_changed() -> void:
@@ -187,15 +186,15 @@ func _rand_elem(arr: Array, default: Variant = null) -> Variant:
 	var idx = rng.randi_range(0, arr.size() - 1)
 	return arr[idx]
 
-func _make_ai_player(personality: AiPersonality) -> PlayerConfig:
+func _make_ai_player(cars: Array[CarDatabase.CarData], personality: AiPersonality) -> PlayerConfig:
 	var ai_config = PlayerConfig.new()
-	var car_data: CarDatabase.CarData = _rand_elem(CarDB.cars.values())
-	var color_list = load(car_data.color_list) as CarColorList
-	ai_config.car_uuid = car_data.uuid
+	var car: CarDatabase.CarData = _rand_elem(cars)
+	ai_config.car_uuid = car.uuid
 	ai_config.player_name = personality.name
 	var preferred_color := rng.randf() <= personality.preferred_color_probability
-	var color_set: CarColorSet = _rand_elem(color_list.colors)
+	var color_set: CarColorSet = _rand_elem(car.colors)
 	if color_set:
+		color_set = color_set.duplicate()
 		if preferred_color:
 			color_set.primary = _rand_elem(personality.preferred_primary_colors)
 		ai_config.set_color_set(color_set)
@@ -205,12 +204,36 @@ func _make_ai_player(personality: AiPersonality) -> PlayerConfig:
 	return ai_config
 
 
+func _opponent_car_class() -> CarDatabase.CarClass:
+	match game_config.config.opponent_class:
+		GameConfig.OpponentClass.AAA:
+			return CarDatabase.CarClass.AAA
+		GameConfig.OpponentClass.AA:
+			return CarDatabase.CarClass.AA
+		GameConfig.OpponentClass.A:
+			return CarDatabase.CarClass.A
+		GameConfig.OpponentClass.B:
+			return CarDatabase.CarClass.B
+	return CarDatabase.CarClass.NONE
+
+
+func _opponent_pool(car_class: CarDatabase.CarClass) -> Array[CarDatabase.CarData]:
+	var result: Array[CarDatabase.CarData] = []
+	var cars := CarDB.cars.values()
+	result.assign(cars.filter(func(car: CarDatabase.CarData): return car.car_class == car_class and not car.police))
+	if result.is_empty():
+		push_warning("Cars with class ", car_class, " not found. Allowing any class.")
+		result.assign(cars)
+	return result
+
+
 func _on_player_data_container_all_players_standby():
 	var ai_personalities: AiPersonalities = load("res://core/resources/config/ai_default_personalities.tres")
 	var personalities := ai_personalities.personalities.duplicate()
 	personalities.shuffle()
+	var cars := self._opponent_pool(self._opponent_car_class())
 	for i in game_config.config.num_opponents:
-		var player_config = self._make_ai_player(personalities[i])
+		var player_config = self._make_ai_player(cars, personalities[i % personalities.size()])
 		self.race.spawn_ai_player(player_config)
 	for player in self.player_container.get_players():
 		self.race.spawn_player(player.get_player_id(), player.get_config())

@@ -20,6 +20,13 @@ const CLOUD_PARAMETERS = {
 	"y_offset": "cloud_y_offset",
 	"height": "cloud_height",
 }
+const CAR_CLASSES = {
+	"AAA": CarDatabase.CarClass.AAA,
+	"AA": CarDatabase.CarClass.AA,
+	"A": CarDatabase.CarClass.A,
+	"B": CarDatabase.CarClass.B,
+	"NONE": CarDatabase.CarClass.NONE,
+}
 
 func make_vector(data: Array) -> Vector3:
 	return Vector3(data[0], data[1], data[2])
@@ -258,9 +265,12 @@ func process_car_extras(state: GLTFState, root: Node, data: Dictionary):
 	var dimensions = data["dimensions"]
 	var color_set: Array[CarColorSet]
 	color_set.assign(data["colors"].map(self.dict_to_palette))
-	var color_list = CarColorList.from_list(color_set)
-	var color_list_path = "%s/%s_color_list.res" % [state.base_path, state.filename]
-	ResourceSaver.save(color_list, color_list_path)
+	var manifest := CarManifest.new()
+	manifest.colors = color_set
+	manifest.car_class = CAR_CLASSES[data["car_class"]]
+	manifest.police = data.get("police", false)
+	var manifest_path = "%s/%s_manifest.res" % [state.base_path, state.filename]
+	ResourceSaver.save(manifest, manifest_path)
 
 	root.set_meta("dimensions", Vector3(dimensions[0], dimensions[1], dimensions[2]))
 	root.set_meta("performance", data["performance"])

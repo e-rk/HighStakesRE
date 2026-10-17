@@ -7,12 +7,16 @@ signal database_updated
 
 var cars: Dictionary = {}
 
+enum CarClass { NONE, AAA, AA, A, B }
 
 class CarData:
 	var name: String
 	var path: String
 	var uuid: String
-	var color_list: String
+	var colors: Array[CarColorSet]
+	var car_class: CarClass
+	var police: bool
+	var manifest: CarManifest
 
 
 func get_car_by_uuid(uuid: String) -> CarData:
@@ -26,17 +30,20 @@ func _on_directory_watcher_content_changed():
 	var files = watcher.files.duplicate()
 	files.sort()
 	for file in files:
-		var path = "%s/%s/%s.glb.import" % [watcher.directory, file, file]
-		var color_list_path = "%s/%s/%s_color_list.res" % [watcher.directory, file, file]
-		if not FileAccess.file_exists(path):
+		var path = "%s/%s/%s.glb" % [watcher.directory, file, file]
+		var manifest_path = "%s/%s/%s_manifest.res" % [watcher.directory, file, file]
+		if not ResourceLoader.exists(path) or not ResourceLoader.exists(manifest_path):
 			continue
 		path = path.trim_suffix(".import")
 		var uuid = path
 		var car = CarData.new()
+		var manifest: CarManifest = load(manifest_path)
 		car.name = file
 		car.path = path
 		car.uuid = uuid
-		car.color_list = color_list_path
+		car.colors = manifest.colors
+		car.police = manifest.police
+		car.car_class = manifest.car_class
 		new_cars[uuid] = car
 	self.cars = new_cars
 	self.database_updated.emit()

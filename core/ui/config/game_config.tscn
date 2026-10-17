@@ -26,6 +26,30 @@ text = "Opponent #"
 layout_mode = 2
 max_value = 20.0
 
+[node name="OpponentClassRow" type="HBoxContainer" parent="." unique_id=1730592417]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="OpponentClassRow" unique_id=402871395]
+layout_mode = 2
+text = "Opponent class"
+
+[node name="OpponentClass" type="OptionButton" parent="OpponentClassRow" unique_id=1186402213]
+unique_name_in_owner = true
+layout_mode = 2
+selected = 0
+item_count = 5
+popup/item_0/text = "Any"
+popup/item_0/id = 0
+popup/item_1/text = "AAA"
+popup/item_1/id = 1
+popup/item_2/text = "AA"
+popup/item_2/id = 2
+popup/item_3/text = "A"
+popup/item_3/id = 3
+popup/item_4/text = "B"
+popup/item_4/id = 4
+
 [connection signal="track_selected" from="TrackPicker" to="." method="_on_track_picker_track_selected"]
 [connection signal="rules_changed" from="RuleConfigurator" to="." method="_on_rule_configurator_rules_changed"]
 [connection signal="value_changed" from="HBoxContainer/NumOpponents" to="." method="_on_num_opponents_value_changed"]
+[connection signal="item_selected" from="OpponentClassRow/OpponentClass" to="." method="_on_opponent_class_item_selected"]
