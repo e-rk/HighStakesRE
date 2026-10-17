@@ -304,6 +304,22 @@ func _make_sources(root: Node, data: Dictionary):
 		for source in data["audio_sources"]:
 			self._load_track_streams(root, source)
 
+func _make_uv_scroll(source: BaseMaterial3D, speed: float) -> ShaderMaterial:
+	const SHADER: Shader = preload("res://core/resources/shader/uv_scroll.gdshader")
+	const DOUBLE_SIDED_SHADER: Shader = preload("res://core/resources/shader/uv_scroll_double_sided.gdshader")
+	var material := ShaderMaterial.new()
+	material.resource_name = source.resource_name
+	material.shader = DOUBLE_SIDED_SHADER if source.cull_mode == BaseMaterial3D.CULL_DISABLED else SHADER
+	material.render_priority = source.render_priority
+	material.set_shader_parameter(&"texture_albedo", source.albedo_texture)
+	material.set_shader_parameter(&"albedo", source.albedo_color)
+	material.set_shader_parameter(&"roughness", source.roughness)
+	material.set_shader_parameter(&"specular", source.metallic_specular)
+	material.set_shader_parameter(&"metallic", source.metallic)
+	material.set_shader_parameter(&"vertex_color_use_as_albedo", source.vertex_color_use_as_albedo)
+	material.set_shader_parameter(&"uv_scroll", speed)
+	return material
+
 func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
 	var node = self.create_environment(state, data["environment"])
 	root.add_child(node)
@@ -339,11 +355,19 @@ func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
 			var ticks = int(material["extras"]["SPT_animation_ticks"])
 			mat.set_shader_parameter("layers", texture_array)
 			mat.set_shader_parameter("ticks", ticks)
-			for child_node in root.get_children():
-				if child_node is ImporterMeshInstance3D:
-					for surface_id in child_node.mesh.get_surface_count():
-						if child_node.mesh.get_surface_material(surface_id) == state.get_materials()[i]:
-							child_node.mesh.set_surface_material(surface_id, mat)
+			self._replace_material(root, state.get_materials()[i], mat)
+		elif material["extras"].has("SPT_uv_scroll"):
+			var source = state.get_materials()[i]
+			if source is BaseMaterial3D:
+				var speed = float(material["extras"]["SPT_uv_scroll"])
+				self._replace_material(root, source, self._make_uv_scroll(source, speed))
+
+func _replace_material(root: Node, old: Material, new: Material):
+	for child_node in root.get_children():
+		if child_node is ImporterMeshInstance3D:
+			for surface_id in child_node.mesh.get_surface_count():
+				if child_node.mesh.get_surface_material(surface_id) == old:
+					child_node.mesh.set_surface_material(surface_id, new)
 
 func process_scene_extras(state: GLTFState, root: Node):
 	var main_scene_idx = state.json["scene"]
