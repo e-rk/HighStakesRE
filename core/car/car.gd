@@ -297,7 +297,7 @@ func _collision(state: PhysicsDirectBodyState3D) -> HandlingModelRE.CollisionOut
 	return self.collision_output
 
 
-func _probe_road_under_body(point: Vector3) -> Variant:
+func _probe_road_under_body(point: Vector3) -> Plane:
 	var origin := self.handling_model_params.position
 	return self._probe_road(Vector3(point.x, maxf(point.y, origin.y), point.z))
 
@@ -330,7 +330,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	state.transform.origin = collision_result.position
 
 	var road = self._probe_road(state.transform.origin)
-	var road_normal: Vector3 = road.normal if road != null else Vector3.UP
+	var road_normal: Vector3 = road.normal if road.is_finite() else Vector3.UP
 
 	handling_model_params.position = state.transform.origin
 	handling_model_params.linear_velocity = state.linear_velocity
@@ -371,7 +371,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	handling_model.process_external_forces(handling_model_params, handling_model_output)
 	self._road_collision()
 	var road_ahead = self._probe_road_under_body(handling_model.road_lookahead_point(handling_model_params))
-	handling_model_params.road_normal_ahead = road_ahead.normal if road_ahead != null else road_normal
+	handling_model_params.road_normal_ahead = road_ahead.normal if road_ahead.is_finite() else road_normal
 	handling_model.process(handling_model_params, handling_model_output)
 
 	state.transform.origin = handling_model_output.position
