@@ -1,6 +1,8 @@
 class_name RaceTrack
 extends Node3D
 
+@export var night: bool = false
+
 @onready var waypoints: Waypoints = $Waypoints
 @onready var nav_path: NavPath = $Waypoints/NavPath
 

@@ -11,6 +11,7 @@ extends Node
 @export var driver_color: Color
 @export var position_along_track: float = 0.0
 @export var current_node_idx: float = 0.0
+@export var night: bool = false
 
 signal reposition_requested
 
@@ -26,6 +27,8 @@ func _ready():
 	self.add_child(self.car)
 	self.car.owner = self
 	self.car.color = color_set
+	if self.night:
+		self.car.lights_on = true
 	self._update_static_player_avoidance()
 
 

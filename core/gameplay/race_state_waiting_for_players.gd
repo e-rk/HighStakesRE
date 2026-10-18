@@ -17,6 +17,7 @@ func spawn_player(player_id, player_config: PlayerConfig):
 	player.player_name = player_config.player_name
 	player.initial_transform = context.race_logic.get_spawn_position(player)
 	player.name = str(player_id)
+	player.night = context.track.night
 	player.ready.connect(self._on_player_spawned.bind(player))
 	context.player_container.add_child(player)
 
@@ -32,6 +33,7 @@ func spawn_ai_player(player_config: PlayerConfig):
 	player.initial_transform = context.race_logic.get_spawn_position(player)
 	player.name = "AI"
 	player.waypoints = context.track.nav_path
+	player.night = context.track.night
 	player.ready.connect(self._on_player_spawned.bind(player))
 	context.player_container.add_child(player, true)
 

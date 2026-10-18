@@ -19,4 +19,4 @@ func set_config(game_config: GameConfig):
 
 func _make_track(config: TrackConfig):
 	var track_data = TrackDB.get_track_by_uuid(config.track_uuid)
-	return load(track_data.path).instantiate()
+	return load(track_data.get_path(config.weather, config.night)).instantiate()

@@ -321,11 +321,14 @@ func _make_uv_scroll(source: BaseMaterial3D, speed: float) -> ShaderMaterial:
 	return material
 
 func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
-	var node = self.create_environment(state, data["environment"])
+	var environment = data["environment"]
+	var node = self.create_environment(state, environment)
 	root.add_child(node)
 	node.owner = root
 	node = self.create_waypoints(data["waypoints"], root)
 	root.set_meta("type", "track")
+	root.set_meta("night", environment["weather"]["night"])
+	root.set_meta("weather", environment["weather"]["rain"])
 	var json_materials = state.json["materials"]
 	var json_images = state.json["images"]
 	var json_textures = state.json["textures"]

@@ -242,6 +242,10 @@ func add_directional_glare(light: SpotLight3D, root: Node):
 	glare.owner = root
 
 
+func set_weather(root: Node, track: RaceTrack):
+	track.night = root.get_meta("night")
+
+
 func _post_import(scene):
 	if scene.get_meta("type") == "track":
 		var new_scene = RaceTrack.new()
@@ -250,6 +254,7 @@ func _post_import(scene):
 		self.make_emitters(new_scene)
 		self.make_rigid_bodies(new_scene)
 		self.double_sided_shadows(new_scene)
+		self.set_weather(scene, new_scene)
 		for child in new_scene.get_children():
 			self.set_colliders(child)
 		var animation_player = new_scene.find_child("AnimationPlayer") as AnimationPlayer
