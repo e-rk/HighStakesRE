@@ -189,6 +189,7 @@ func _process(_delta):
 		ui.set_minimap_rotation(spectated_player.car.global_rotation.y)
 		ui.set_minimap_players(player_data)
 		ui.set_max_gear(spectated_player.car.max_gear())
+		ui.set_damage(spectated_player.car.damage)
 		self._update_ui(spectated_player)
 
 

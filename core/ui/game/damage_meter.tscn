@@ -1,0 +1,152 @@
+[gd_scene format=3 uid="uid://c4mnd6d3yfq2k"]
+
+[ext_resource type="Theme" uid="uid://df6k5ankl68ft" path="res://core/resources/ui/game_theme.tres" id="1_theme"]
+[ext_resource type="Script" uid="uid://btfb4sn8e4xh8" path="res://core/ui/game/damage_meter.gd" id="2_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qpi5t"]
+bg_color = Color(0.6117647, 0.6117647, 0.6117647, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohrxo"]
+bg_color = Color(1, 0.48235294, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oseus"]
+bg_color = Color(1, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rxey2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4js0d"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4fte8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vgphg"]
+
+[node name="DamageMeter" type="PanelContainer" unique_id=1733904152]
+offset_right = 298.0
+offset_bottom = 163.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("1_theme")
+script = ExtResource("2_script")
+light_fill = SubResource("StyleBoxFlat_qpi5t")
+warning_fill = SubResource("StyleBoxFlat_ohrxo")
+critical_fill = SubResource("StyleBoxFlat_oseus")
+
+[node name="Background" type="Panel" parent="." unique_id=902541876]
+z_index = -1
+layout_mode = 2
+
+[node name="Container" type="VBoxContainer" parent="." unique_id=1462890321]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Container" unique_id=1170357094]
+z_index = -1
+layout_mode = 2
+theme_type_variation = &"HeaderBackground"
+
+[node name="Label" type="Label" parent="Container/PanelContainer" unique_id=294158823]
+layout_mode = 2
+theme_type_variation = &"PanelHeader"
+text = "Damage"
+
+[node name="MarginContainer" type="MarginContainer" parent="Container" unique_id=1554319467]
+layout_mode = 2
+
+[node name="DamageRows" type="GridContainer" parent="Container/MarginContainer" unique_id=1823307015]
+layout_mode = 2
+columns = 3
+
+[node name="Engine" type="Label" parent="Container/MarginContainer/DamageRows" unique_id=635401400]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Engine"
+
+[node name="EngineBar" type="ProgressBar" parent="Container/MarginContainer/DamageRows" unique_id=876793993]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 12)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("StyleBoxFlat_rxey2")
+max_value = 1.0
+show_percentage = false
+
+[node name="EngineValue" type="Label" parent="Container/MarginContainer/DamageRows" unique_id=1065219292]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "0%"
+horizontal_alignment = 2
+
+[node name="Steering" type="Label" parent="Container/MarginContainer/DamageRows" unique_id=129671291]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Steering"
+
+[node name="SteeringBar" type="ProgressBar" parent="Container/MarginContainer/DamageRows" unique_id=1323129297]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 12)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("StyleBoxFlat_4js0d")
+max_value = 1.0
+show_percentage = false
+
+[node name="SteeringValue" type="Label" parent="Container/MarginContainer/DamageRows" unique_id=941772626]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "0%"
+horizontal_alignment = 2
+
+[node name="Body" type="Label" parent="Container/MarginContainer/DamageRows" unique_id=875048115]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Body"
+
+[node name="BodyBar" type="ProgressBar" parent="Container/MarginContainer/DamageRows" unique_id=1951780216]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 12)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("StyleBoxFlat_4fte8")
+max_value = 1.0
+show_percentage = false
+
+[node name="BodyValue" type="Label" parent="Container/MarginContainer/DamageRows" unique_id=1412300720]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "0%"
+horizontal_alignment = 2
+
+[node name="Suspension" type="Label" parent="Container/MarginContainer/DamageRows" unique_id=1548681798]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Suspension"
+
+[node name="SuspensionBar" type="ProgressBar" parent="Container/MarginContainer/DamageRows" unique_id=1913961908]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 12)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("StyleBoxFlat_vgphg")
+max_value = 1.0
+show_percentage = false
+
+[node name="SuspensionValue" type="Label" parent="Container/MarginContainer/DamageRows" unique_id=913012608]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "0%"
+horizontal_alignment = 2

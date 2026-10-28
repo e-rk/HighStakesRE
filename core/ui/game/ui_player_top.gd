@@ -4,6 +4,7 @@ class_name PlayerUI
 @onready var rpm_meter = %RpmMeter
 @onready var speed_meter = %SpeedMeter
 @onready var minimap_window = %MinimapWindow
+@onready var damage_meter: DamageMeter = %DamageMeter
 
 
 func set_rpm(rpm: float):
@@ -40,3 +41,7 @@ func set_minimap_waypoints(waypoints: Array):
 
 func set_laps(racer_laps: int, overall_laps: int):
 	minimap_window.set_laps(racer_laps, overall_laps)
+
+
+func set_damage(damage: Car.CarDamage):
+	damage_meter.set_damage(damage)

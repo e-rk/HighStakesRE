@@ -1,6 +1,12 @@
 class_name Car
 extends RigidBody3D
 
+class CarDamage:
+	var engine: float
+	var body: float
+	var suspension: Array[float]
+	var steering: Array[float]
+
 @export var performance: CarPerformance
 
 @export_range(-1.0, 1.0) var steering: float = 0.0:
@@ -99,6 +105,7 @@ var collision_params := HandlingModelRE.CollisionParams.new()
 var collision_output := HandlingModelRE.CollisionOutput.new()
 var steering_bone := -1
 var steering_bone_rest := Quaternion.IDENTITY
+var damage := CarDamage.new()
 
 @onready var collider: CollisionShape3D = $Collider
 @onready var interior_camera: Camera3D = get_node_or_null("Interior camera")
@@ -157,6 +164,10 @@ func _ready() -> void:
 				self.interior_meshes.append(child)
 			else:
 				self.body_meshes.append(child)
+	self.damage.suspension.resize(4)
+	self.damage.suspension.fill(0.0)
+	self.damage.steering.resize(4)
+	self.damage.steering.fill(0.0)
 
 
 func _find_steering_bone() -> void:
