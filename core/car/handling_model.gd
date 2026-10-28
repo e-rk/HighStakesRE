@@ -49,6 +49,11 @@ class HandlingState:
 	var wheel_linear_acceleration: Vector3
 	var wheel_angular_acceleration: Vector3
 	var stop_moving_sideways: bool
+	var engine_damage: float
+	var steering_damage: Vector4
+	var body_damage: float
+	var suspension_damage: Vector4
+	var automatic_gearbox: bool
 
 class HandlingOutput:
 	const F_LINEAR_VELOCITY         = 1 << 0
@@ -72,6 +77,7 @@ class HandlingOutput:
 	const F_DRIVETRAIN_OVERLOAD     = 1 << 18
 	const F_WHEEL_ACCELERATION      = 1 << 19
 	const F_STOP_MOVING_SIDEWAYS    = 1 << 20
+	const F_ENGINE_WEAR             = 1 << 21
 
 	var updated: int = 0
 
@@ -97,6 +103,7 @@ class HandlingOutput:
 	var wheel_linear_acceleration: Vector3
 	var wheel_angular_acceleration: Vector3
 	var stop_moving_sideways: bool
+	var engine_damage: float
 
 
 func extract(params: Dictionary) -> Dictionary:
@@ -160,6 +167,8 @@ func extend(f: Callable) -> Callable:
 			state.wheel_angular_acceleration = output.wheel_angular_acceleration
 		if output.updated & HandlingOutput.F_STOP_MOVING_SIDEWAYS:
 			state.stop_moving_sideways = output.stop_moving_sideways
+		if output.updated & HandlingOutput.F_ENGINE_WEAR:
+			state.engine_damage = output.engine_damage
 
 func integrate(f: Callable) -> Callable:
 	return func(state: HandlingState, output: HandlingOutput) -> void:

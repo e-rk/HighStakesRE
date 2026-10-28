@@ -22,6 +22,9 @@ class TractionState:
 	var slip_angle: float
 	var weather: int
 	var drivetrain_overload: bool
+	var engine_damage: float
+	var automatic_gearbox: bool
+	var engine_wear: float
 
 
 class TractionOutput:
@@ -33,6 +36,7 @@ class TractionOutput:
 	const F_FORCE               = 1 << 5
 	const F_LOST_GRIP           = 1 << 6
 	const F_DRIVETRAIN_OVERLOAD = 1 << 7
+	const F_ENGINE_WEAR         = 1 << 8
 
 	var updated: int = 0
 
@@ -44,6 +48,7 @@ class TractionOutput:
 	var force: float
 	var lost_grip: bool
 	var drivetrain_overload: bool
+	var engine_damage: float
 
 
 class WheelData:
@@ -113,8 +118,10 @@ func gear_effective_ratio(performance: CarPerformance, gear: CarTypes.Gear) -> f
 
 
 func traction_powertrain(state: TractionState, rpm: int) -> float:
+	const ENGINE_DAMAGE_INFLUENCE := 0.25
 	var gear := state.gear
 	var torque := torque_for_rpm(state.performance, rpm)
+	torque *= 1.0 - state.engine_damage * ENGINE_DAMAGE_INFLUENCE
 	var gear_ratio := self.gear_effective_ratio(state.performance, gear)
 	var torque_output := torque * gear_ratio
 	if gear == CarTypes.Gear.GEAR_1:
@@ -145,12 +152,15 @@ func longitudal_drag_coefficient(params: HandlingState) -> float:
 
 
 func drag(params: HandlingState) -> float:
+	const BODY_DAMAGE_DRAG := 0.5
 	const DRAG_INIT = 0.2450477
 	var basis: Basis = params.basis_to_road
 	var linear_velocity: Vector3 = params.linear_velocity
 	var performance: CarPerformance = params.performance
 	var velocity_local := basis.transposed() * linear_velocity
-	var result := DRAG_INIT * self.longitudal_drag_coefficient(params)
+	var coefficient := self.longitudal_drag_coefficient(params)
+	coefficient *= params.body_damage * BODY_DAMAGE_DRAG + 1.0
+	var result := DRAG_INIT * coefficient
 	var velocity_max_diff := absf(velocity_local.z) - performance.max_velocity()
 	result = result * velocity_local.z ** 3
 	if velocity_max_diff > 0:
@@ -187,6 +197,8 @@ func prepare_traction_model_ctx(state: HandlingState) -> TractionState:
 	ts.slip_angle = state.slip_angle
 	ts.weather = state.weather
 	ts.drivetrain_overload = false
+	ts.engine_damage = state.engine_damage
+	ts.automatic_gearbox = state.automatic_gearbox
 	return ts
 
 func traction_model_extend(f: Callable) -> Callable:
@@ -209,6 +221,8 @@ func traction_model_extend(f: Callable) -> Callable:
 			state.lost_grip = output.lost_grip
 		if output.updated & TractionOutput.F_DRIVETRAIN_OVERLOAD:
 			state.drivetrain_overload = output.drivetrain_overload
+		if output.updated & TractionOutput.F_ENGINE_WEAR:
+			state.engine_damage = output.engine_damage
 
 func make_traction_model_pipeline(func_array: Array) -> Callable:
 	return func(state: TractionState, output: TractionOutput) -> void:
@@ -250,13 +264,14 @@ func traction_model(state: HandlingState, output: HandlingOutput) -> void:
 	pipeline.call(ts, to)
 	output.updated = (HandlingOutput.F_RPM | HandlingOutput.F_FORCE | HandlingOutput.F_LOST_GRIP
 		| HandlingOutput.F_HANDBRAKE_ACCUMULATOR | HandlingOutput.F_GEAR
-		| HandlingOutput.F_DRIVETRAIN_OVERLOAD)
+		| HandlingOutput.F_DRIVETRAIN_OVERLOAD | HandlingOutput.F_ENGINE_WEAR)
 	output.rpm = ts.rpm
 	output.force = ts.force
 	output.lost_grip = ts.lost_grip
 	output.handbrake_accumulator = ts.handbrake_accumulator
 	output.gear = ts.gear
 	output.drivetrain_overload = ts.drivetrain_overload
+	output.engine_damage = ts.engine_damage
 
 func traction_model_rpm_above_redline(state: TractionState, output: TractionOutput) -> void:
 	var performance := state.performance
@@ -306,6 +321,8 @@ func rpm_from_velocity_rounded(state: TractionState) -> int:
 	return round_half_even(self.rpm_from_velocity(state))
 
 func traction_model_force(state: TractionState, output: TractionOutput) -> void:
+	const ENGINE_WEAR_SPIN := 0.03
+	const ENGINE_WEAR_OVER_REV := 0.01
 	var performance := state.performance
 	var rpm := state.rpm
 	var target_rpm := state.target_rpm
@@ -334,8 +351,11 @@ func traction_model_force(state: TractionState, output: TractionOutput) -> void:
 	var going_in_reverse_dir := CarTypes.Gear.NEUTRAL < gear and speed_xz < -0.3 and (8 / 255.0) < throttle \
 							 or CarTypes.Gear.REVERSE == gear and speed_xz > 0.3 and (8 / 255.0) < throttle
 	var drivetrain_overload := false
+	var engine_wear := 0.0
 	if rpm_diff_to_big or going_in_reverse_dir:
 		drivetrain_overload = true
+		if going_in_reverse_dir:
+			engine_wear = self.engine_wear(state, rpm, ENGINE_WEAR_SPIN)
 		var rpm_adjust := 125
 		const adjust_by_gear = [50, 50, 10, 15, 20, 22, 50, 50]
 		if target_rpm >= 2000:
@@ -360,6 +380,8 @@ func traction_model_force(state: TractionState, output: TractionOutput) -> void:
 				handbrake_accumulator = 0
 		else:
 			drivetrain_overload = true
+			if not state.automatic_gearbox:
+				engine_wear = self.engine_wear(state, rpm, ENGINE_WEAR_OVER_REV)
 			velocity_redline = engine_redline_rpm * self.gear_rpm_to_velocity(state.performance, gear)
 			force = (velocity_redline / abs(velocity_local.z)) * force
 			lost_grip = true
@@ -380,12 +402,22 @@ func traction_model_force(state: TractionState, output: TractionOutput) -> void:
 		slip_factor = min(slip_factor, 1.5)
 		force = force * throttle * slip_factor
 	output.updated = (TractionOutput.F_FORCE | TractionOutput.F_HANDBRAKE_ACCUMULATOR
-		| TractionOutput.F_RPM | TractionOutput.F_LOST_GRIP | TractionOutput.F_DRIVETRAIN_OVERLOAD)
+		| TractionOutput.F_RPM | TractionOutput.F_LOST_GRIP | TractionOutput.F_DRIVETRAIN_OVERLOAD
+		| TractionOutput.F_ENGINE_WEAR)
 	output.force = force
 	output.handbrake_accumulator = handbrake_accumulator
 	output.rpm = rpm
 	output.lost_grip = lost_grip
 	output.drivetrain_overload = drivetrain_overload
+	output.engine_damage = state.engine_damage + engine_wear
+
+func engine_wear(state: TractionState, rpm: int, rate: float) -> float:
+	const ENGINE_WEAR_RPM_PERCENT := 95
+	const ENGINE_WEAR_SCALE := 0.03125
+	var limit := state.performance.engine_redline_rpm * ENGINE_WEAR_RPM_PERCENT / 100
+	if state.gear == CarTypes.Gear.NEUTRAL or rpm <= limit:
+		return 0.0
+	return rate * (float(rpm) / limit) * ENGINE_WEAR_SCALE
 
 func traction_model_low_engine_rpm(state: TractionState, output: TractionOutput) -> void:
 	var performance := state.performance
@@ -568,6 +600,7 @@ func steering_angle(state: HandlingState, output: HandlingOutput) -> void:
 	var velocity_local := basis.transposed() * linear_velocity
 	var slip_angle_fact := self.slip_angle_factor(state)
 	var steering_accel := performance.minimum_steering_acceleration
+	steering *= self.steering_damage_factor(state)
 	steering *= slip_angle_fact
 	if 40.0 < abs(velocity_local.z):
 		var velocity_factor := 0.015 * absf(velocity_local.z)
@@ -577,6 +610,21 @@ func steering_angle(state: HandlingState, output: HandlingOutput) -> void:
 	result = clamp(result, -1.0, 1.0)
 	output.updated = HandlingOutput.F_STEERING
 	output.steering = result
+
+
+func steering_damage_factor(state: HandlingState) -> float:
+	const STEERING_DAMAGE_INFLUENCE := 0.5 * 0.25
+	var damage := state.steering_damage
+	if 0.0 < state.current_steering:
+		return 1.0 - (damage[1] + damage[3]) * STEERING_DAMAGE_INFLUENCE
+	if state.current_steering < 0.0:
+		return 1.0 - (damage[0] + damage[2]) * STEERING_DAMAGE_INFLUENCE
+	return 1.0
+
+
+func suspension_damage_factor(state: HandlingState, wheel_data: WheelData) -> float:
+	const SUSPENSION_DAMAGE_INFLUENCE := 0.25
+	return 1.0 - state.suspension_damage[wheel_data.type] * SUSPENSION_DAMAGE_INFLUENCE
 
 
 func turning_circle(
@@ -687,12 +735,13 @@ func g_transfer_damp(state: HandlingState) -> float:
 
 func wheel_downforce_factor(state: HandlingState, wheel_data: WheelData) -> float:
 	const DOWNFORCE_THRESHOLD_SPEED = 10.0
+	const BODY_DAMAGE_WHEEL_DOWNFORCE := 0.5
 	var basis := state.basis_to_road
 	var linear_velocity := state.linear_velocity
 	var velocity_local := basis.transposed() * linear_velocity
 	var performance := state.performance
 	var brake := state.brake
-	var downforce := performance.downforce_mult()
+	var downforce := (1.0 - state.body_damage * BODY_DAMAGE_WHEEL_DOWNFORCE) * performance.downforce_mult()
 	if abs(velocity_local.z) <= DOWNFORCE_THRESHOLD_SPEED:
 		return downforce + 1.0
 	downforce = velocity_local.z * downforce
@@ -818,6 +867,7 @@ func wheel_downforce_grip(state: HandlingState, wheel_data: WheelData, base_grip
 func model_wheel_grip(state: HandlingState, wheel_data: WheelData) -> float:
 	var surface_grip := self.wheel_surface_grip_factor(state, wheel_data)
 	var base_grip := self.wheel_base_road_grip(state, surface_grip)
+	base_grip *= self.suspension_damage_factor(state, wheel_data)
 	var biased_grip := self.wheel_bias_grip(state, wheel_data, base_grip)
 	var downforce_grip := self.wheel_downforce_grip(state, wheel_data, base_grip, biased_grip)
 	return downforce_grip
@@ -834,7 +884,7 @@ func wheel_traction(state: HandlingState, wheel_data: WheelData) -> float:
 		CarTypes.Wheel.REAR_RIGHT, CarTypes.Wheel.REAR_LEFT:
 			traction *= rear_drive_ratio
 	var brake := self.brake_force(state, wheel_data)
-	return traction - brake
+	return self.suspension_damage_factor(state, wheel_data) * (traction - brake)
 
 
 func calculate_wheel_data(state: HandlingState, wheel: Dictionary) -> WheelData:
@@ -1319,6 +1369,7 @@ func limit_angular_velocity_cm(state: HandlingState, output: HandlingOutput) -> 
 
 
 func downforce_cm(state: HandlingState, output: HandlingOutput) -> void:
+	const BODY_DAMAGE_DOWNFORCE := 0.2
 	var basis := state.basis
 	var linear_velocity := state.linear_velocity
 	var velocity_local := basis.transposed() * linear_velocity
@@ -1326,7 +1377,8 @@ func downforce_cm(state: HandlingState, output: HandlingOutput) -> void:
 	var upright := 0.75 < orientation_to_ground(state.basis_to_road, basis).y
 	var speed_xz := Vector2(linear_velocity.x, linear_velocity.z).length()
 	if upright and 10.0 < speed_xz and 0.0 < velocity_local.z:
-		downforce_accel = -state.performance.downforce_mult() * velocity_local.z * 32
+		var downforce := state.performance.downforce_mult() * (1.0 - state.body_damage * BODY_DAMAGE_DOWNFORCE)
+		downforce_accel = -downforce * velocity_local.z * 32
 	output.updated = HandlingOutput.F_LINEAR_ACCELERATION
 	output.linear_acceleration = basis * Vector3(0, downforce_accel, 0)
 
@@ -1518,7 +1570,10 @@ func adjust_to_road_cm(state: HandlingState, output: HandlingOutput) -> void:
 
 
 func landing_damp(state: HandlingState) -> float:
-	return clampf(state.performance.suspension_stiffness * 0.1, 0.0, 0.2) + 0.5
+	const SUSPENSION_DAMAGE_BOUNCE := 0.25 * 0.2
+	var suspension := state.suspension_damage
+	var damage := (suspension[0] + suspension[1] + suspension[2] + suspension[3]) * SUSPENSION_DAMAGE_BOUNCE
+	return clampf(state.performance.suspension_stiffness * 0.1 + damage, 0.0, 0.2) + 0.5
 
 
 func landing_cm(state: HandlingState, output: HandlingOutput) -> void:
@@ -1873,6 +1928,7 @@ func process(state: HandlingState, output: HandlingOutput) -> void:
 	output.throttle = state.throttle
 	output.brake = state.brake
 	output.has_contact_with_ground = state.has_contact_with_ground
+	output.engine_damage = state.engine_damage
 	output.updated = (HandlingOutput.F_LINEAR_VELOCITY | HandlingOutput.F_ANGULAR_VELOCITY |
 		HandlingOutput.F_GEAR | HandlingOutput.F_RPM | HandlingOutput.F_CURRENT_STEERING |
 		HandlingOutput.F_LOST_GRIP | HandlingOutput.F_HANDBRAKE_ACCUMULATOR |

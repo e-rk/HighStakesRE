@@ -9,6 +9,7 @@ extends Player
 
 func _ready():
 	super()
+	self.car.automatic_gearbox = true
 	drive_algo.waypoints = self.waypoints
 	if not self.is_multiplayer_authority():
 		self.set_physics_process(false)

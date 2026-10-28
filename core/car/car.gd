@@ -378,6 +378,11 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	handling_model_params.shifted_down = self.shifted_down
 	handling_model_params.g_transfer = self.g_transfer
 	handling_model_params.dimensions = self.dimensions()
+	handling_model_params.engine_damage = self.damage.engine
+	handling_model_params.body_damage = self.damage.body
+	handling_model_params.steering_damage = Vector4(self.damage.steering[0], self.damage.steering[1], self.damage.steering[2], self.damage.steering[3])
+	handling_model_params.suspension_damage = Vector4(self.damage.suspension[0], self.damage.suspension[1], self.damage.suspension[2], self.damage.steering[3])
+	handling_model_params.automatic_gearbox = false
 
 	handling_model.process_external_forces(handling_model_params, handling_model_output)
 	self._road_collision()
@@ -398,6 +403,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	self.current_gear = handling_model_output.gear
 	self.g_transfer = handling_model_output.g_transfer
 	self.has_contact_with_ground = handling_model_output.has_contact_with_ground
+	self.damage.engine = handling_model_output.engine_damage
 
 	self.linear_acceleration = (state.linear_velocity - prev_linear_velocity) / (state.step * 2)
 	prev_linear_velocity = state.linear_velocity
