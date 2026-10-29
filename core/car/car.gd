@@ -106,6 +106,7 @@ var collision_output := HandlingModelRE.CollisionOutput.new()
 var steering_bone := -1
 var steering_bone_rest := Quaternion.IDENTITY
 var damage := CarDamage.new()
+var automatic_gearbox := false
 
 @onready var collider: CollisionShape3D = $Collider
 @onready var interior_camera: Camera3D = get_node_or_null("Interior camera")
@@ -382,7 +383,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	handling_model_params.body_damage = self.damage.body
 	handling_model_params.steering_damage = Vector4(self.damage.steering[0], self.damage.steering[1], self.damage.steering[2], self.damage.steering[3])
 	handling_model_params.suspension_damage = Vector4(self.damage.suspension[0], self.damage.suspension[1], self.damage.suspension[2], self.damage.steering[3])
-	handling_model_params.automatic_gearbox = false
+	handling_model_params.automatic_gearbox = self.automatic_gearbox
 
 	handling_model.process_external_forces(handling_model_params, handling_model_output)
 	self._road_collision()
