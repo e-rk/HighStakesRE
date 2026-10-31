@@ -242,6 +242,24 @@ func add_directional_glare(light: SpotLight3D, root: Node):
 	glare.owner = root
 
 
+func make_license_plate(car: Node):
+	for child in car.get_children():
+		var extras: Dictionary = child.get_meta("extras", {})
+		if not extras.has("SPT_license_plate"):
+			continue
+		var data: Dictionary = extras["SPT_license_plate"]
+		var plate: LicensePlate = preload("res://core/car/license_plate/license_plate.tscn").instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		plate.name = "license_plate"
+		var position: Vector3 = child.position
+		plate.position = position
+		if position.dot(Vector3.MODEL_FRONT) < 0.0:
+			plate.basis = Basis(Vector3.UP, PI)
+		plate.layers = Constants.visual_layer_to_mask([Constants.VisualLayer.PLAYER])
+		child.replace_by(plate)
+		plate.scene_file_path = "res://core/car/license_plate/license_plate.tscn"
+		child.free()
+
+
 func set_weather(root: Node, track: RaceTrack):
 	track.night = root.get_meta("night")
 
@@ -330,4 +348,5 @@ func _post_import(scene):
 		if dashbaord is MeshInstance3D:
 			dashbaord.position += -0.001 * Vector3.MODEL_FRONT
 		add_glares(scene, scene)
+		self.make_license_plate(scene)
 	return scene

@@ -5,3 +5,5 @@ import/*
 import/textures/**
 !import/textures/**/
 !import/textures/**/*.import
+import/textures/plate/*.import
+!import/textures/plate/back.png.import

@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://bvsqgqp4f0smw"]
+
+[ext_resource type="Script" uid="uid://4t88e45s1xmr" path="res://core/car/license_plate/license_plate.gd" id="1_plate"]
+[ext_resource type="Texture2D" uid="uid://c66vi5wj337y3" path="res://import/textures/plate/back.png" id="2_13ake"]
+[ext_resource type="Shader" uid="uid://b1kaowclls28n" path="res://core/car/license_plate/license_plate.gdshader" id="2_plate"]
+[ext_resource type="FontFile" uid="uid://okst842q8fjy" path="res://core/resources/fonts/FiraSansCondensed-SemiBold.ttf" id="3_p0ta2"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_13ake"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_plate"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("2_plate")
+shader_parameter/plate_texture = ExtResource("2_13ake")
+shader_parameter/text_texture = SubResource("ViewportTexture_13ake")
+
+[sub_resource type="QuadMesh" id="QuadMesh_plate"]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_plate")
+size = Vector2(0.4, 0.16)
+
+[sub_resource type="LabelSettings" id="LabelSettings_plgsi"]
+font = ExtResource("3_p0ta2")
+font_size = 80
+font_color = Color(0, 0, 0, 1)
+
+[node name="license_plate" type="MeshInstance3D" unique_id=70170693]
+cast_shadow = 0
+instance_shader_parameters/lamp_lit = 1.0
+mesh = SubResource("QuadMesh_plate")
+script = ExtResource("1_plate")
+
+[node name="SubViewport" type="SubViewport" parent="." unique_id=1579274896]
+disable_3d = true
+transparent_bg = true
+size = Vector2i(362, 92)
+render_target_update_mode = 1
+
+[node name="Text" type="Label" parent="SubViewport" unique_id=713385251]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = SubResource("LabelSettings_plgsi")
+horizontal_alignment = 1

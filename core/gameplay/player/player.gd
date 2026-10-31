@@ -29,6 +29,8 @@ func _ready():
 	self.car.color = color_set
 	if self.night:
 		self.car.lights_on = true
+	if self.car.license_plate:
+		self.car.license_plate.text = self.player_name
 	self._update_static_player_avoidance()
 
 

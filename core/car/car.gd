@@ -48,6 +48,8 @@ class CarDamage:
 			self.interior_dashboard_lit.visible = value
 		if self.dashboard_lit:
 			self.dashboard_lit.visible = value
+		if self.license_plate:
+			self.license_plate.light = 1.0 if value else 0.0
 	get:
 		return lights_on
 
@@ -115,6 +117,7 @@ var automatic_gearbox := false
 @onready var mph_meter: MeshInstance3D = get_node_or_null("speedometer")
 @onready var interior_dashboard_lit: MeshInstance3D = get_node_or_null("interior_dashboard_lit")
 @onready var dashboard_lit: MeshInstance3D = get_node_or_null("dashboard_lit")
+@onready var license_plate: LicensePlate = get_node_or_null("license_plate")
 @onready var road_raycasts: Node3D = $RoadRaycasts
 @onready var road_raycast_down: RayCast3D = $RoadRaycasts/Down
 @onready var road_raycast_up: RayCast3D = $RoadRaycasts/Up
@@ -140,7 +143,9 @@ func _ready() -> void:
 	self._enable_lights(self.tail_lights, self.lights_on)
 	self._enable_lights(self.brake_lights, false)
 	self._enable_lights(self.reverse_lights, false)
-	self._enable_lights(self.directional_lights, false)
+	self._enable_lights(self.directional_lights, self.lights_on)
+	if self.license_plate:
+		self.license_plate.light = 1.0 if self.lights_on else 0.0
 	if self.tail_lights:
 		self.tail_light_energy = self.tail_lights[0].light_energy
 	if self.brake_lights:
