@@ -1,23 +1,35 @@
 set -e
 
+SPEEDTOOLS=$(jq -r '.speedtools' manifest.json)
+GODOT=$(jq -r '.godot' manifest.json)
+SPT_PIPELINE=$(jq -r '."spt-pipeline"' manifest.json)
+FFMPEG=$(jq -r '.ffmpeg' manifest.json)
+
+SPEEDTOOLS_URL=https://github.com/e-rk/speedtools/releases/download/v${SPEEDTOOLS}
+GODOT_URL=https://github.com/godotengine/godot/releases/download/${GODOT}-stable
+SPT_PIPELINE_URL=https://github.com/e-rk/spt-pipeline/releases/download/${SPT_PIPELINE}
+
 mkdir bundle
 
 pushd bundle
-wget https://github.com/e-rk/speedtools/releases/download/v$(jq -r '.speedtools' ../manifest.json)/speedtools-$(jq -r '.speedtools' ../manifest.json).zip
-wget https://github.com/GyanD/codexffmpeg/releases/download/$(jq -r '.ffmpeg' ../manifest.json)/ffmpeg-$(jq -r '.ffmpeg' ../manifest.json)-essentials_build.zip
-unzip ffmpeg-$(jq -r '.ffmpeg' ../manifest.json)-essentials_build.zip
-rm ffmpeg-$(jq -r '.ffmpeg' ../manifest.json)-essentials_build.zip
+wget ${SPEEDTOOLS_URL}/speedtools-${SPEEDTOOLS}.zip
+wget -O speedtool ${SPEEDTOOLS_URL}/speedtool
+wget -O speedtool.exe ${SPEEDTOOLS_URL}/speedtool.exe
+chmod +x speedtool
+wget https://github.com/GyanD/codexffmpeg/releases/download/${FFMPEG}/ffmpeg-${FFMPEG}-essentials_build.zip
+unzip ffmpeg-${FFMPEG}-essentials_build.zip
+rm ffmpeg-${FFMPEG}-essentials_build.zip
 popd
 
-wget https://github.com/godotengine/godot/releases/download/$(jq -r '.godot' manifest.json)-stable/Godot_v$(jq -r '.godot' manifest.json)-stable_win64.exe.zip
-wget https://github.com/godotengine/godot/releases/download/$(jq -r '.godot' manifest.json)-stable/Godot_v$(jq -r '.godot' manifest.json)-stable_linux.x86_64.zip
-unzip -o Godot_v$(jq -r '.godot' manifest.json)-stable_win64.exe.zip
-rm Godot_v$(jq -r '.godot' manifest.json)-stable_win64.exe.zip
-unzip -o Godot_v$(jq -r '.godot' manifest.json)-stable_linux.x86_64.zip
-rm Godot_v$(jq -r '.godot' manifest.json)-stable_linux.x86_64.zip
+wget ${GODOT_URL}/Godot_v${GODOT}-stable_win64.exe.zip
+wget ${GODOT_URL}/Godot_v${GODOT}-stable_linux.x86_64.zip
+unzip -o Godot_v${GODOT}-stable_win64.exe.zip
+rm Godot_v${GODOT}-stable_win64.exe.zip
+unzip -o Godot_v${GODOT}-stable_linux.x86_64.zip
+rm Godot_v${GODOT}-stable_linux.x86_64.zip
 
-wget https://github.com/e-rk/spt-pipeline/releases/download/$(jq -r '."spt-pipeline"' manifest.json)/installer_linux
-wget https://github.com/e-rk/spt-pipeline/releases/download/$(jq -r '."spt-pipeline"' manifest.json)/installer_windows.exe
+wget ${SPT_PIPELINE_URL}/installer_linux
+wget ${SPT_PIPELINE_URL}/installer_windows.exe
 
 chmod +x installer_linux
 
