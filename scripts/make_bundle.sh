@@ -33,4 +33,12 @@ wget ${SPT_PIPELINE_URL}/installer_windows.exe
 
 chmod +x installer_linux
 
-zip -r highstakesre-bundle.zip . -x .git -x .github
+{
+    git ls-files -- . ':!.github'
+    find bundle -type f
+    echo Godot_v${GODOT}-stable_win64.exe
+    echo Godot_v${GODOT}-stable_win64_console.exe
+    echo Godot_v${GODOT}-stable_linux.x86_64
+    echo installer_linux
+    echo installer_windows.exe
+} | zip -MM highstakesre-bundle.zip -@
