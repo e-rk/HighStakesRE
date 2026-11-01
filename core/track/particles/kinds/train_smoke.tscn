@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" uid="uid://dibam8xoak0vo" path="res://core/resources/sfx/train_smoke.tres" id="1_31xlu"]
+
+[node name="TrainSmoke" type="GPUParticles3D" unique_id=856694213]
+cast_shadow = 0
+visibility_range_end = 220.0
+amount = 22
+amount_ratio = 0.969697
+lifetime = 2.0
+preprocess = 2.0
+visibility_aabb = AABB(-70, -4, -70, 140, 14, 140)
+draw_order = 3
+process_material = ExtResource("1_31xlu")

@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://ctnuh5sags2vh"]
+
+[ext_resource type="PackedScene" path="res://core/track/particles/kinds/flame.tscn" id="1_base"]
+[ext_resource type="Material" path="res://core/resources/materials/sfx/flame_n.tres" id="2_iinr8"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_xs6u6"]
+material = ExtResource("2_iinr8")
+size = Vector2(1.414, 1.414)
+
+[node name="Flame" unique_id=615963172 instance=ExtResource("1_base")]
+draw_pass_1 = SubResource("QuadMesh_xs6u6")

@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://c42fsikggp2q"]
+
+[ext_resource type="PackedScene" path="res://core/track/particles/kinds/leaves.tscn" id="1_base"]
+[ext_resource type="Material" path="res://core/resources/materials/sfx/leaves_chb.tres" id="2_2ni3a"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_m2878"]
+material = ExtResource("2_2ni3a")
+size = Vector2(1.414, 1.414)
+
+[node name="Leaves" unique_id=1217840070 instance=ExtResource("1_base")]
+draw_pass_1 = SubResource("QuadMesh_m2878")

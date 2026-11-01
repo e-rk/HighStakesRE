@@ -1,0 +1,39 @@
+[gd_resource type="ParticleProcessMaterial" format=3 uid="uid://ctn0xtuu8g8vw"]
+
+[sub_resource type="Curve" id="Curve_sd0dp"]
+_limits = [0.0, 1.8562185, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 1.8800353, 1, 1, Vector2(0.032258064, 1.0606463), 1.8800353, 1.7660183, 1, 1, Vector2(0.06451613, 1.1176146), 1.7660183, 1.6589195, 1, 1, Vector2(0.09677419, 1.1711282), 1.6589195, 1.558306, 1, 1, Vector2(0.12903225, 1.2213961), 1.558306, 1.4638051, 1, 1, Vector2(0.16129032, 1.2686156), 1.4638051, 1.3750284, 1, 1, Vector2(0.19354838, 1.3129714), 1.3750284, 1.2916396, 1, 1, Vector2(0.22580644, 1.3546371), 1.2916396, 1.2133063, 1, 1, Vector2(0.2580645, 1.393776), 1.2133063, 1.1397218, 1, 1, Vector2(0.29032257, 1.4305413), 1.1397218, 1.070605, 1, 1, Vector2(0.32258064, 1.4650769), 1.070605, 1.0056716, 1, 1, Vector2(0.3548387, 1.497518), 1.0056716, 0.9446849, 1, 1, Vector2(0.38709676, 1.5279917), 0.9446849, 0.8873939, 1, 1, Vector2(0.41935483, 1.5566173), 0.8873939, 0.8335765, 1, 1, Vector2(0.4516129, 1.5835068), 0.8335765, 0.7830222, 1, 1, Vector2(0.48387095, 1.6087656), 0.7830222, 0.7355352, 1, 1, Vector2(0.516129, 1.6324925), 0.7355352, 0.69092625, 1, 1, Vector2(0.5483871, 1.6547805), 0.69092625, 0.6490244, 1, 1, Vector2(0.58064514, 1.6757168), 0.6490244, 0.6096626, 1, 1, Vector2(0.61290324, 1.6953833), 0.6096626, 0.57269406, 1, 1, Vector2(0.6451613, 1.7138573), 0.57269406, 0.5379554, 1, 1, Vector2(0.67741936, 1.7312107), 0.5379554, 0.5053363, 1, 1, Vector2(0.7096774, 1.7475119), 0.5053363, 0.474685, 1, 1, Vector2(0.7419355, 1.7628243), 0.474685, 0.445898, 1, 1, Vector2(0.7741935, 1.7772081), 0.445898, 0.4188573, 1, 1, Vector2(0.8064516, 1.7907196), 0.4188573, 0.3934553, 1, 1, Vector2(0.83870965, 1.8034117), 0.3934553, 0.36959282, 1, 1, Vector2(0.87096775, 1.8153341), 0.36959282, 0.34718034, 1, 1, Vector2(0.9032258, 1.8265334), 0.34718034, 0.32612285, 1, 1, Vector2(0.9354839, 1.8370535), 0.32612285, 0.30634516, 1, 1, Vector2(0.9677419, 1.8469356), 0.30634516, 0.28776738, 1, 1, Vector2(1, 1.8562185), 0.28776738, 0.0, 1, 1]
+point_count = 32
+
+[sub_resource type="CurveTexture" id="CurveTexture_p4r58"]
+curve = SubResource("Curve_sd0dp")
+
+[sub_resource type="Gradient" id="Gradient_m072n"]
+colors = PackedColorArray(1, 1, 1, 0.49803922, 0.56078434, 0.6862745, 0.7490196, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_flmhl"]
+gradient = SubResource("Gradient_m072n")
+
+[sub_resource type="Curve" id="Curve_6sqg3"]
+_limits = [0.0, 7.4, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 6.4, 1, 1, Vector2(1, 7.4), 6.4, 0.0, 1, 1]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_2vlnu"]
+curve = SubResource("Curve_6sqg3")
+
+[resource]
+particle_flag_damping_as_friction = true
+angle_min = 180.0
+angle_max = 540.0
+angle_curve = SubResource("CurveTexture_p4r58")
+spread = 0.0
+initial_velocity_min = 2.25
+initial_velocity_max = 3.75
+gravity = Vector3(0, 3.2, 0)
+damping_min = 4.1
+damping_max = 4.1
+scale_min = 0.5
+scale_max = 0.75
+scale_curve = SubResource("CurveTexture_2vlnu")
+color_ramp = SubResource("GradientTexture1D_flmhl")

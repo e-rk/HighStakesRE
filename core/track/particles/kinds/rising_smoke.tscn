@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" uid="uid://5y1i2gc0fg4m" path="res://core/resources/sfx/rising_smoke.tres" id="1_dcnaj"]
+
+[node name="RisingSmoke" type="GPUParticles3D" unique_id=367542958]
+cast_shadow = 0
+visibility_range_end = 270.0
+amount = 19
+amount_ratio = 0.96240604
+lifetime = 4.0
+preprocess = 4.0
+visibility_aabb = AABB(-8, -8, -8, 16, 34, 16)
+draw_order = 3
+process_material = ExtResource("1_dcnaj")

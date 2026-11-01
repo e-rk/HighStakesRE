@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" uid="uid://cme7wbtq0n417" path="res://core/resources/sfx/mist.tres" id="1_qhmim"]
+
+[node name="Mist" type="GPUParticles3D" unique_id=1811009234]
+cast_shadow = 0
+visibility_range_end = 320.0
+amount = 10
+amount_ratio = 0.9846154
+lifetime = 4.0
+preprocess = 4.0
+visibility_aabb = AABB(-24, -20, -24, 48, 40, 48)
+draw_order = 3
+process_material = ExtResource("1_qhmim")

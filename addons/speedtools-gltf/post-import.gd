@@ -100,6 +100,19 @@ func make_minimap_mesh(scene: Node):
 		mesh_container.add_child(mesh, true)
 		mesh.owner = scene
 
+func make_emitters(node: Node):
+	for child in node.get_children():
+		var extras: Dictionary = child.get_meta("extras", {})
+		if not extras.has("SPT_emitter"):
+			continue
+		var data: Dictionary = extras["SPT_emitter"]
+		var emitter_path = "res://core/track/particles/kinds/%s/day.tscn" % [data["type"]]
+		var emitter: GPUParticles3D = load(emitter_path).instantiate()
+		emitter.name = child.name
+		emitter.transform = child.transform
+		child.replace_by(emitter)
+		child.free()
+
 func double_sided_shadows(scene: Node):
 	for child in scene.get_children():
 		if child is MeshInstance3D:
@@ -234,6 +247,7 @@ func _post_import(scene):
 		var new_scene = RaceTrack.new()
 		new_scene.name = scene.name
 		scene.replace_by(new_scene)
+		self.make_emitters(new_scene)
 		self.make_rigid_bodies(new_scene)
 		self.double_sided_shadows(new_scene)
 		for child in new_scene.get_children():

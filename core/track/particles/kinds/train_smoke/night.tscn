@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://c3yjawlvk0q2l"]
+
+[ext_resource type="PackedScene" path="res://core/track/particles/kinds/train_smoke.tscn" id="1_base"]
+[ext_resource type="Material" path="res://core/resources/materials/sfx/train_smoke_n.tres" id="2_06ux5"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_w3jpp"]
+material = ExtResource("2_06ux5")
+size = Vector2(1.414, 1.414)
+
+[node name="TrainSmoke" unique_id=1960343294 instance=ExtResource("1_base")]
+draw_pass_1 = SubResource("QuadMesh_w3jpp")

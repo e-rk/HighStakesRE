@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dxk3d2x7tegl"]
+
+[ext_resource type="PackedScene" path="res://core/track/particles/kinds/drifting_smoke.tscn" id="1_base"]
+[ext_resource type="Material" path="res://core/resources/materials/sfx/drifting_smoke.tres" id="2_y5at7"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_auhfc"]
+material = ExtResource("2_y5at7")
+size = Vector2(1.414, 1.414)
+
+[node name="DriftingSmoke" unique_id=478993152 instance=ExtResource("1_base")]
+draw_pass_1 = SubResource("QuadMesh_auhfc")

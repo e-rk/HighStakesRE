@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" uid="uid://ctn0xtuu8g8vw" path="res://core/resources/sfx/drifting_smoke.tres" id="1_ix7ls"]
+
+[node name="DriftingSmoke" type="GPUParticles3D" unique_id=981730829]
+cast_shadow = 0
+visibility_range_end = 270.0
+amount = 14
+amount_ratio = 0.97959185
+lifetime = 3.0
+preprocess = 3.0
+visibility_aabb = AABB(-10, -5, -10, 24, 20, 20)
+draw_order = 3
+process_material = ExtResource("1_ix7ls")

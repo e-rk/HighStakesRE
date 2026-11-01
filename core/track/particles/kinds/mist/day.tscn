@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://4ljuqsau1rs2"]
+
+[ext_resource type="PackedScene" path="res://core/track/particles/kinds/mist.tscn" id="1_base"]
+[ext_resource type="Material" path="res://core/resources/materials/sfx/mist.tres" id="2_bjhn7"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_d4hfv"]
+material = ExtResource("2_bjhn7")
+size = Vector2(1.414, 1.414)
+
+[node name="Mist" unique_id=2075111624 instance=ExtResource("1_base")]
+draw_pass_1 = SubResource("QuadMesh_d4hfv")
