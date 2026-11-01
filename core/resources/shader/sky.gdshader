@@ -345,7 +345,8 @@ vec4 cloud_layer(vec2 p, float footprint, vec3 dir, vec3 strike) {
 	vec3 flash_light = BOLT_COLOR * flash * coverage * 0.5 * lightning_flash;
 
 	float rim = 1.0 - smoothstep(0.8, 1.0, rho / DOME_RADIUS);
-	float haze = cloud_fog ? horizon_haze * smoothstep(0.3, 1.0, rho / DOME_RADIUS) : 0.0;
+	float way = length(vec2(rho, cloud_y_offset - POSITION.y + cloud_height * cos(DOME_CURVE * rho)));
+	float haze = cloud_fog ? 1.0 - pow(1.0 - horizon_haze, way / max(hrz_radius, 1.0)) : 0.0;
 
 	vec3 color = texel.rgb * lit * shade + lining + flash_light;
 	if (cloud_type == 2) {
