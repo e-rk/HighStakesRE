@@ -4,6 +4,12 @@ class_name NavPath
 @export var points: PackedVector3Array
 @export var orientations: Array[Basis]
 @export var racing_line_offset: PackedFloat32Array
+## Driving lanes on each side of each waypoint (road block): the width of one lane and the number
+## of lanes. Empty on tracks converted before speedtools exported them.
+@export var left_lane_widths: PackedFloat32Array
+@export var right_lane_widths: PackedFloat32Array
+@export var left_lane_counts: PackedInt32Array
+@export var right_lane_counts: PackedInt32Array
 
 var left_walls: PackedFloat32Array = PackedFloat32Array()
 var right_walls: PackedFloat32Array = PackedFloat32Array()

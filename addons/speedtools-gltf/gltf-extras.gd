@@ -62,6 +62,11 @@ func create_waypoints(waypoints: Array, root: Node):
 	nav_path.points = vecs
 	nav_path.orientations = orientations
 	nav_path.racing_line_offset = offsets
+	for waypoint in waypoints:
+		nav_path.left_lane_widths.append(waypoint["left_lane_width"])
+		nav_path.right_lane_widths.append(waypoint["right_lane_width"])
+		nav_path.left_lane_counts.append(int(waypoint["num_left_lanes"]))
+		nav_path.right_lane_counts.append(int(waypoint["num_right_lanes"]))
 	node.waypoints = curve
 	root.add_child(node, true)
 	node.owner = root
