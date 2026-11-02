@@ -9,17 +9,35 @@ signal racer_finished(racer: Player)
 
 var players_spawned := 0
 
+const SLOT_SPACING_BLOCKS := 3
+const RACER_LANE_MARGIN := 0.5
 
-func get_spawn_position(_player: Player) -> Transform3D:
-	const SPAWN_DISTANCE := 10.0
-	const LATERAL_OFFSET := 2.0
-	var distance := -self.players_spawned * SPAWN_DISTANCE
-	var direction := 1.0 if self.players_spawned % 2 == 0 else -1.0
-	var position := self.track.nav_path.advance_by_distance_smooth(0.0, self.track.nav_path.points[0], distance)
-	var orientation := self.track.nav_path.orientations[0]
-	var shifted := position + orientation * Vector3(direction * LATERAL_OFFSET, 0, 0)
+func racer_block(slot: int) -> int:
+	var block := -slot * SLOT_SPACING_BLOCKS - 1
+	return posmod(block, self.track.nav_path.points.size())
+
+
+func racer_lateral_offset(slot: int) -> float:
+	var block := self.racer_block(slot)
+	if slot % 2 == 0:
+		return -(RACER_LANE_MARGIN + 0.5 * self.track.nav_path.left_lane_widths[block])
+	return RACER_LANE_MARGIN + 0.5 * self.track.nav_path.right_lane_widths[block]
+
+
+func _transform_on_block(block: int, lateral_offset: float) -> Transform3D:
+	var basis := self.track.nav_path.orientations[block]
+	var position := self.track.nav_path.points[block] - basis.x * lateral_offset
+	return Transform3D(basis, position)
+
+
+func racer_transform(slot: int) -> Transform3D:
+	return self._transform_on_block(self.racer_block(slot), self.racer_lateral_offset(slot))
+
+
+func get_spawn_position(player: Player) -> Transform3D:
+	var transform := self.racer_transform(self.players_spawned)
 	self.players_spawned += 1
-	return Transform3D(orientation, shifted)
+	return transform
 
 
 func player_spawned(player: Player):

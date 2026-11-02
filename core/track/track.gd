@@ -1,7 +1,13 @@
 class_name RaceTrack
 extends Node3D
 
+enum TrafficHandedness {
+	Left = 0,
+	Right = 1,
+}
+
 @export var night: bool = false
+@export var traffic_handedness: TrafficHandedness = TrafficHandedness.Right
 
 @onready var waypoints: Waypoints = $Waypoints
 @onready var nav_path: NavPath = $Waypoints/NavPath

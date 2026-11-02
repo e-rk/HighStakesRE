@@ -232,9 +232,16 @@ func _on_player_data_container_all_players_standby():
 	var personalities := ai_personalities.personalities.duplicate()
 	personalities.shuffle()
 	var cars := self._opponent_pool(self._opponent_car_class())
+	var ai_configs: Array[PlayerConfig] = []
 	for i in game_config.config.num_opponents:
 		var player_config = self._make_ai_player(cars, personalities[i % personalities.size()])
-		self.race.spawn_ai_player(player_config)
-	for player in self.player_container.get_players():
-		self.race.spawn_player(player.get_player_id(), player.get_config())
+		ai_configs.append(player_config)
+	var players: Array = self.player_container.get_players()
+	var human_configs: Array[PlayerConfig] = []
+	for player in players:
+		human_configs.append(player.get_config())
+	for ai_config in ai_configs:
+		self.race.spawn_ai_player(ai_config)
+	for i in players.size():
+		self.race.spawn_player(players[i].get_player_id(), human_configs[i])
 	self.start_race.rpc()
