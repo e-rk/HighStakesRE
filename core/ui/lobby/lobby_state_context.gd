@@ -5,7 +5,7 @@ const race_scene = preload("res://core/gameplay/race.tscn")
 @onready var disconnect_button = %Disconnect
 @onready var host_dialog = %HostDialog
 @onready var join_dialog = %JoinDialog
-@onready var game_config = %GameConfig
+@onready var game_config: UiGameConfig = %GameConfig
 @onready var start_race_button = %StartRace
 @onready var ready_button = %Ready
 @onready var lobby_window = %LobbyWindow
@@ -13,7 +13,7 @@ const race_scene = preload("res://core/gameplay/race.tscn")
 @onready var lobby_button = %ShowLobby
 @onready var lobby_status = %LobbyStatus
 @onready var player_config = %PlayerConfig
-@onready var player_data_container = $PlayerDataContainer
+@onready var player_data_container: PlayerDataContainer = $PlayerDataContainer
 @onready var lobby_ui = $Interface
 @onready var car_viewer = %CarViewer
 
@@ -231,11 +231,33 @@ func _opponent_pool(class_config: GameConfig.OpponentClass) -> Array[CarDatabase
 	return result
 
 
+func _get_game_config() -> GameConfig.OpponentClass:
+	var class_config := game_config.config.opponent_class
+	match class_config:
+		GameConfig.OpponentClass.SameAsMe:
+			var player_data := player_data_container.get_local_player_data()
+			var car := CarDB.get_car_by_uuid(player_data.car_uuid)
+			if not car:
+				return GameConfig.OpponentClass.Any
+			match car.manifest.car_class:
+				CarDatabase.CarClass.AAA:
+					return GameConfig.OpponentClass.AAA
+				CarDatabase.CarClass.AA:
+					return GameConfig.OpponentClass.AA
+				CarDatabase.CarClass.A:
+					return GameConfig.OpponentClass.A
+				CarDatabase.CarClass.B:
+					return GameConfig.OpponentClass.B
+				CarDatabase.CarClass.NONE:
+					return GameConfig.OpponentClass.None
+	return class_config
+
+
 func _on_player_data_container_all_players_standby():
 	var ai_personalities: AiPersonalities = load("res://core/resources/config/ai_default_personalities.tres")
 	var personalities := ai_personalities.personalities.duplicate()
 	personalities.shuffle()
-	var cars := self._opponent_pool(game_config.config.opponent_class)
+	var cars := self._opponent_pool(self._get_game_config())
 	var ai_configs: Array[PlayerConfig] = []
 	for i in game_config.config.num_opponents:
 		var player_config = self._make_ai_player(cars, personalities[i % personalities.size()])

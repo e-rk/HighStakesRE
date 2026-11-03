@@ -1,3 +1,4 @@
+class_name UiGameConfig
 extends Control
 
 @export var config := GameConfig.new()
