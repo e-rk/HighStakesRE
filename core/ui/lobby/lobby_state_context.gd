@@ -204,25 +204,29 @@ func _make_ai_player(cars: Array[CarDatabase.CarData], personality: AiPersonalit
 	return ai_config
 
 
-func _opponent_car_class() -> CarDatabase.CarClass:
-	match game_config.config.opponent_class:
-		GameConfig.OpponentClass.AAA:
-			return CarDatabase.CarClass.AAA
-		GameConfig.OpponentClass.AA:
-			return CarDatabase.CarClass.AA
-		GameConfig.OpponentClass.A:
-			return CarDatabase.CarClass.A
-		GameConfig.OpponentClass.B:
-			return CarDatabase.CarClass.B
-	return CarDatabase.CarClass.NONE
+func _match_car_class(class_config: GameConfig.OpponentClass, car_class: CarDatabase.CarClass) -> bool:
+	match class_config:
+		GameConfig.OpponentClass.Any, GameConfig.OpponentClass.SameAsMe:
+			return car_class != CarDatabase.CarClass.NONE
+		GameConfig.OpponentClass.AAA when car_class == CarDatabase.CarClass.AAA:
+			return true
+		GameConfig.OpponentClass.AA when car_class == CarDatabase.CarClass.AA:
+			return true
+		GameConfig.OpponentClass.A when car_class == CarDatabase.CarClass.A:
+			return true
+		GameConfig.OpponentClass.B when car_class == CarDatabase.CarClass.B:
+			return true
+		GameConfig.OpponentClass.None when car_class == CarDatabase.CarClass.NONE:
+			return true
+	return false
 
 
-func _opponent_pool(car_class: CarDatabase.CarClass) -> Array[CarDatabase.CarData]:
+func _opponent_pool(class_config: GameConfig.OpponentClass) -> Array[CarDatabase.CarData]:
 	var result: Array[CarDatabase.CarData] = []
 	var cars := CarDB.cars.values()
-	result.assign(cars.filter(func(car: CarDatabase.CarData): return car.manifest.car_class == car_class and not car.manifest.police))
+	result.assign(cars.filter(func(car: CarDatabase.CarData): return self._match_car_class(class_config, car.manifest.car_class) and not car.manifest.police))
 	if result.is_empty():
-		push_warning("Cars with class ", car_class, " not found. Allowing any class.")
+		push_warning("Cars matching class ", class_config, " not found. Allowing all cars.")
 		result.assign(cars)
 	return result
 
@@ -231,7 +235,7 @@ func _on_player_data_container_all_players_standby():
 	var ai_personalities: AiPersonalities = load("res://core/resources/config/ai_default_personalities.tres")
 	var personalities := ai_personalities.personalities.duplicate()
 	personalities.shuffle()
-	var cars := self._opponent_pool(self._opponent_car_class())
+	var cars := self._opponent_pool(game_config.config.opponent_class)
 	var ai_configs: Array[PlayerConfig] = []
 	for i in game_config.config.num_opponents:
 		var player_config = self._make_ai_player(cars, personalities[i % personalities.size()])

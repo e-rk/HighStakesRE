@@ -37,7 +37,7 @@ text = "Opponent class"
 unique_name_in_owner = true
 layout_mode = 2
 selected = 0
-item_count = 5
+item_count = 6
 popup/item_0/text = "Any"
 popup/item_0/id = 0
 popup/item_1/text = "AAA"
@@ -48,6 +48,8 @@ popup/item_3/text = "A"
 popup/item_3/id = 3
 popup/item_4/text = "B"
 popup/item_4/id = 4
+popup/item_5/text = "None"
+popup/item_5/id = 5
 
 [connection signal="track_selected" from="TrackPicker" to="." method="_on_track_picker_track_selected"]
 [connection signal="rules_changed" from="RuleConfigurator" to="." method="_on_rule_configurator_rules_changed"]
