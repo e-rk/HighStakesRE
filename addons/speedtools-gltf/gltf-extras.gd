@@ -274,6 +274,9 @@ func process_car_extras(state: GLTFState, root: Node, data: Dictionary):
 	manifest.colors = color_set
 	manifest.car_class = CAR_CLASSES[data["car_class"]]
 	manifest.police = data.get("police", false)
+	manifest.manufacturer = data["manufacturer"]
+	manifest.model = data["model"]
+	manifest.name = data["name"]
 	var manifest_path = "%s/%s_manifest.res" % [state.base_path, state.filename]
 	ResourceSaver.save(manifest, manifest_path)
 

@@ -13,9 +13,6 @@ class CarData:
 	var name: String
 	var path: String
 	var uuid: String
-	var colors: Array[CarColorSet]
-	var car_class: CarClass
-	var police: bool
 	var manifest: CarManifest
 
 
@@ -38,12 +35,10 @@ func _on_directory_watcher_content_changed():
 		var uuid = path
 		var car = CarData.new()
 		var manifest: CarManifest = load(manifest_path)
-		car.name = file
+		car.name = manifest.name if manifest.name else file
 		car.path = path
 		car.uuid = uuid
-		car.colors = manifest.colors
-		car.police = manifest.police
-		car.car_class = manifest.car_class
+		car.manifest = manifest
 		new_cars[uuid] = car
 	self.cars = new_cars
 	self.database_updated.emit()

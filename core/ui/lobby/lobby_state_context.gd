@@ -143,7 +143,7 @@ func _on_player_config_player_car_changed() -> void:
 	if car_data:
 		var car = load(car_data.path)
 		self.car_viewer.car = car
-		self.player_config.color_picker.colors = car_data.colors
+		self.player_config.color_picker.colors = car_data.manifest.colors
 
 
 func _on_player_config_player_color_changed() -> void:
@@ -192,7 +192,7 @@ func _make_ai_player(cars: Array[CarDatabase.CarData], personality: AiPersonalit
 	ai_config.car_uuid = car.uuid
 	ai_config.player_name = personality.name
 	var preferred_color := rng.randf() <= personality.preferred_color_probability
-	var color_set: CarColorSet = _rand_elem(car.colors)
+	var color_set: CarColorSet = _rand_elem(car.manifest.colors)
 	if color_set:
 		color_set = color_set.duplicate()
 		if preferred_color:
@@ -220,7 +220,7 @@ func _opponent_car_class() -> CarDatabase.CarClass:
 func _opponent_pool(car_class: CarDatabase.CarClass) -> Array[CarDatabase.CarData]:
 	var result: Array[CarDatabase.CarData] = []
 	var cars := CarDB.cars.values()
-	result.assign(cars.filter(func(car: CarDatabase.CarData): return car.car_class == car_class and not car.police))
+	result.assign(cars.filter(func(car: CarDatabase.CarData): return car.manifest.car_class == car_class and not car.manifest.police))
 	if result.is_empty():
 		push_warning("Cars with class ", car_class, " not found. Allowing any class.")
 		result.assign(cars)
