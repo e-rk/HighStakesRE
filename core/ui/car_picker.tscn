@@ -11,5 +11,7 @@ text = "Selected car"
 
 [node name="CarSelection" type="OptionButton" parent="." unique_id=718859950]
 layout_mode = 2
+allow_reselect = true
+search_bar_enabled = true
 
 [connection signal="item_selected" from="CarSelection" to="." method="_on_car_selection_item_selected"]
