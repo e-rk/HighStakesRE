@@ -106,6 +106,12 @@ func interpolate_camera(car: Car) -> Vector3:
 	return next_position
 
 
+func _reset_doppler_tracking() -> void:
+	var tracking := self.main_camera.doppler_tracking
+	self.main_camera.doppler_tracking = Camera3D.DOPPLER_TRACKING_DISABLED
+	self.main_camera.doppler_tracking = tracking
+
+
 func rotate_camera(angle: float):
 	if spectated_player:
 		var target_basis = self.initial_arm_rotation.rotated(Vector3.UP, angle)
@@ -113,6 +119,7 @@ func rotate_camera(angle: float):
 		self.main_camera.basis = target_basis
 		self.update_camera()
 		self.main_camera.reset_physics_interpolation()
+		self._reset_doppler_tracking()
 
 
 func update_camera(immediate: bool = false):
@@ -142,6 +149,7 @@ func _focus_player(player: Player) -> void:
 		apply_car_render_mode(other.car, other == player)
 	self._sync_active_camera()
 	self.update_camera()
+	self._reset_doppler_tracking()
 
 
 func _sync_active_camera() -> void:
