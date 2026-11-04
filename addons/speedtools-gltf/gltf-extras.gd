@@ -379,10 +379,11 @@ func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
 			var image_idx = material["pbrMetallicRoughness"]["baseColorTexture"]["index"]
 			var tex = json_textures[image_idx]
 			var tex_source = tex["source"]
-			var array_images = []
+			var array_images: Array[Image] = []
 			for name in material["extras"]["SPT_animation_images"]:
 				var img = self.get_image_by_name(state, name)
 				array_images.append(img.get_image())
+			self._match_first_frame(array_images)
 			var texture_array = Texture2DArray.new()
 			texture_array.create_from_images(array_images)
 			var mat = ShaderMaterial.new()
@@ -400,6 +401,23 @@ func process_track_extras(state: GLTFState, root: Node, data: Dictionary):
 			if source is BaseMaterial3D:
 				var speed = float(material["extras"]["SPT_uv_scroll"])
 				self._replace_material(root, source, self._make_uv_scroll(source, speed))
+
+
+func _match_first_frame(frames: Array[Image]) -> void:
+	var first: Image = frames[0]
+	for frame: Image in frames.slice(1):
+		if frame.is_compressed():
+			frame.decompress()
+		if frame.get_format() != first.get_format():
+			frame.convert(first.get_format())
+		if frame.get_size() != first.get_size():
+			frame.resize(first.get_width(), first.get_height(), Image.INTERPOLATE_BILINEAR)
+		if frame.has_mipmaps() != first.has_mipmaps():
+			if first.has_mipmaps():
+				frame.generate_mipmaps()
+			else:
+				frame.clear_mipmaps()
+
 
 func _replace_material(root: Node, old: Material, new: Material):
 	for child_node in root.get_children():
