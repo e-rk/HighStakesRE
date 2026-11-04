@@ -190,13 +190,26 @@ func create_environment(state: GLTFState, environment: Dictionary):
 		sky.set_shader_parameter("sun_world_radius", spt_sun["radius"])
 	return worldenv
 
+
+func vertex_colored_materials(json: Dictionary) -> Dictionary:
+	var found := {}
+	for mesh in json.get("meshes", []):
+		for primitive in mesh["primitives"]:
+			if primitive.has("material") and primitive["attributes"].has("COLOR_0"):
+				found[int(primitive["material"])] = true
+	return found
+
+
 func finalize_materials(json: Dictionary, materials: Array[Material]):
 	var json_materials = json["materials"]
+	var vertex_colored := vertex_colored_materials(json)
 	for i in len(materials):
 		var json_material = json_materials[i]
 		var material = materials[i]
 		if material is BaseMaterial3D:
 			material.vertex_color_is_srgb = true
+			if vertex_colored.has(i):
+				material.vertex_color_use_as_albedo = true
 		if json_material.has("extensions"):
 			var ext = json_material["extensions"]
 			if ext.has("KHR_materials_specular"):
