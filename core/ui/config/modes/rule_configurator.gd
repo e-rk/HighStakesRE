@@ -1,6 +1,7 @@
 extends Control
 
-const rules_extension = ".rules.tres"
+const rules_extension := ".rules.tres"
+const last_save_prefix := "user://last"
 
 @onready var mode_selector: SyncableOptionButton = %ModeSelector
 @onready var configurator: PopupPanel = %Configurator
@@ -19,12 +20,13 @@ func format_extension(mode, prefix = ""):
 
 
 func get_last_save_path(mode):
-	return self.format_extension(mode, "user://last")
+	return self.format_extension(mode, self.last_save_prefix)
 
 
 func apply_config():
 	var rules = rule_configurator.config
-	self.save_current_config(self.get_last_save_path(rules))
+	if self.is_multiplayer_authority():
+		self.save_current_config(self.get_last_save_path(rules))
 	self.rules_changed.emit(rule_configurator.config.duplicate(true))
 
 
@@ -39,8 +41,10 @@ func restore_config():
 
 
 func load_config(path: String):
-	var config = load(path)
-	if config and config is RaceRules:
+	if not ResourceLoader.exists(path):
+		return
+	var config = load(path) as RaceRules
+	if config:
 		rule_configurator.config = config.duplicate(true)
 
 
@@ -51,6 +55,11 @@ func get_current_mode() -> GDScript:
 
 func get_current_uuid() -> String:
 	return mode_selector.get_selected_uuid()
+
+
+func select_mode(mode_uuid: String):
+	if mode_selector.has_syncable_item(mode_uuid):
+		mode_selector.set_by_uuid(mode_uuid)
 
 
 func set_mode(mode_uuid: String):
@@ -81,7 +90,7 @@ func _ready():
 	configurator.popup_window = false
 	for mode in GameModeDB.get_all_modes():
 		mode_selector.add_syncable_item(mode.mode_display_name(), mode.mode_uuid())
-	self.set_mode(self.get_current_uuid())
+	mode_selector.settle_selection()
 
 
 func _on_configure_button_pressed():

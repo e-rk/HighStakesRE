@@ -15,21 +15,28 @@ const player_config_path = "user://last.player.tres"
 
 
 func _ready():
-	var previous = load(player_config_path)
+	if not ResourceLoader.exists(self.player_config_path, ""):
+		return
+	var previous = ResourceLoader.load(self.player_config_path, "", ResourceLoader.CACHE_MODE_IGNORE) as PlayerConfig
 	if previous:
-		apply_config.call_deferred(previous)
+		self.apply_config(previous)
 
 
 func apply_config(config: PlayerConfig):
-	player_name.text = config.player_name
 	self.player = config
+	player_name.text = config.player_name
+	car_picker.set_selected_car(config.car_uuid)
+	self._announce_config.call_deferred()
+
+
+func _announce_config():
 	self.player_config_changed.emit()
 	self.player_car_changed.emit()
 	self.player_color_changed.emit()
 
 
 func save_player():
-	ResourceSaver.save(self.player, player_config_path)
+	ResourceSaver.save(self.player, self.player_config_path)
 
 
 func _on_car_picker_car_selected():

@@ -26,11 +26,32 @@ func add_syncable_item(label: String, uuid: String):
 	self.set_item_metadata(-1, uuid)
 	self.uuid_to_id_map[uuid] = num_registered
 	self.num_registered += 1
-	self.selected_uuid = self.get_selected_metadata()
+	if uuid == self.selected_uuid:
+		self._set_by_uuid(uuid)
 
 
 func remove_syncable_item(uuid: String):
 	self.uuid_to_id_map.erase(uuid)
+
+
+func has_syncable_item(uuid: String) -> bool:
+	return self.uuid_to_id_map.has(uuid)
+
+
+func clear_syncable_items():
+	self.clear()
+	self.uuid_to_id_map.clear()
+	self.num_registered = 0
+
+
+func settle_selection():
+	if self.item_count == 0:
+		return
+	if self.has_syncable_item(self.selected_uuid):
+		self._set_by_uuid(self.selected_uuid)
+		self.syncable_item_selected.emit(self.selected_uuid)
+	else:
+		self.selected_uuid = self.get_item_metadata(0)
 
 
 func _set_by_uuid(uuid: String):

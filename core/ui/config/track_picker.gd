@@ -8,6 +8,7 @@ class_name TrackPicker
 @onready var configure_button: Button = %ConfigureButton
 @onready var night_button: CheckButton = %NightButton
 @onready var weather_button: CheckButton = %WeatherButton
+@onready var mirror_button: CheckButton = %MirrorButton
 
 signal track_selected
 
@@ -27,9 +28,23 @@ func enable():
 	track_selection.disabled = false
 
 
+func set_config(track: TrackConfig):
+	self.config = track.duplicate()
+	self.night_button.set_pressed_no_signal(track.night)
+	self.weather_button.set_pressed_no_signal(track.weather)
+	self.mirror_button.set_pressed_no_signal(track.mirrored)
+	var list_filled := self.track_selection.item_count > 0
+	if list_filled and not self.track_selection.has_syncable_item(track.track_uuid):
+		self.track_selection.settle_selection()
+	else:
+		self.track_selection.set_by_uuid(track.track_uuid)
+
+
 func _on_track_database_updated():
+	track_selection.clear_syncable_items()
 	for track in TrackDB.tracks.values():
 		track_selection.add_syncable_item(track.name, track.uuid)
+	track_selection.settle_selection()
 
 
 func _on_track_selection_syncable_item_selected(uuid):
